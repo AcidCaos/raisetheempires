@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Application Home Page</title>
+	<script>
+		function getUserInfo() {
+		    console.log("getUserInfo called")
+		    return {'zid':1, 'uid':0, 'first_name': 'Natalie', 'name':'Natalie', "sex":'F'};
+		}
+		function getFriendData() {
+		    console.log("getFriendData called")
+			return [{'zid':123, 'uid':123, 'first_name': 'Natalie', 'name':'Portman', "sex":'F'}];
+		}
+		function getAppFriendIds() {
+			console.log("getAppFriendIds called")
+			return []; // :-(
+		}
+
+		function onGameLoaded(seen, popp, canvas) {
+			console.log("Game is loaded " +seen +", " + popp + ", " + canvas)
+			return
+		}
+		function openInAppPurchaseAPI(gid, snid, snuid,cid,a,b,c) {
+			console.log("Purchase " +gid +", " + snid + ", " + snuid+ ", " + cid+ ", " + a+ ", " + b+ ", " + c)
+			return
+		}
+
+		function hasPermission(perm, snuid,name) {
+			console.log("Perm " +perm +", "  +snuid+ ", " + name)
+			return
+		}
+	function showPermissions(d) {
+			console.log("Show Perm " +d)
+			return
+		}
+
+
+        zynga = {
+		    "ads": {
+                "WatchToEarn": {
+                    "service": {
+                        "available": function () {
+                            console.log("W2E avail");
+              				return false;
+                        },
+						"initializeFlash": function(oid, a,b,c) {
+							console.log("initF " +oid +", " + a+ ", " + b+ ", " + c);
+							return false;
+						}
+                    }
+                }
+            }
+		}
+
+		statTracker = {
+		    "logWorldObjectCount":function () {
+                            console.log("World Count");
+              				return;
+                        }
+		}
+
+	</script>
+</head>
+<body>
+    <h2>
+        Raise The Empires pre-alpha 0.1a (No debug)
+    </h2>
+
+<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" WIDTH="1000" HEIGHT="750" id="ea" ALIGN="">
+				<param NAME=movie VALUE="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf">
+				<param name=FlashVars value="sn_app_url=&stats=1">  <!--mute=true& &zlingshot_zoom= skipFacebook=false&decouple_from_facebook=false&decoupled_facebook_id=5452 -->
+				<param NAME=quality VALUE=high>
+				<param NAME=bgcolor VALUE=#333399>
+                <param name="allowFullScreen" value="true" />
+				<embed src="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf" allowFullScreen="true" FlashVars="sn_app_url=&stats=1" quality=high bgcolor=#333399 WIDTH="1000" HEIGHT="750" NAME="ea" ALIGN="" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
+				</embed>
+			</object>
+		<div></div>
+
+<div>
+	Go to <a href="/">debug</a> version.
+</div>
+</body>
+</html>
