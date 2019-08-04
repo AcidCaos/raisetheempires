@@ -61,10 +61,87 @@
 		}
 
 	</script>
+	<!-- debug websocket connection -->
+	<script src="//code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+    });
+    socket.on( 'tutorial_step', function( msg ) {
+        console.log(msg);
+        // $('#tutorial_step').prepend('<div>' + JSON.stringify(msg) + '</div>');
+        $('#tutorial_step').prepend('<div><span class="tooltiplink">' + msg[0] + '<span class="tooltip">tooltip</span></span>' + (msg[1] || msg[2] ? ' &rarr; ': '')  + (msg[1] ? JSON.stringify(msg[1]): '') +
+			(msg[1] && msg[2] ? ', ' : '') + (msg[2] ?JSON.stringify(msg[2]): '') + '</div>');
+        $('#tutorial_step').scrollTop(0)
+    });
+
+</script>
+	<style>
+		.logbox {
+			width: 500px;
+			height: 100px;
+			vertical-align: top;
+			overflow-y: scroll;
+			z-index: 5;
+		}
+
+		.tooltiplink {
+			color: olive;
+				position: relative;
+	  display: inline-block;
+		}
+
+		.tooltiplink .tooltip {
+			visibility: hidden;
+			width: 120px;
+			background-color: black;
+			color: #fff;
+			text-align: center;
+			padding: 5px 0;
+			border-radius: 6px;
+
+			/* Position the tooltip text - see examples below! */
+			/*position: absolute;*/
+			position:fixed;
+
+			/*z-index: 1;*/
+			z-index: 2000;
+			bottom: 100%;
+			left: 50%;
+			margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+		}
+
+		.tooltiplink:hover .tooltip {
+		  visibility: visible;
+			position:relative;
+			z-index: 5;
+		}
+		.tooltiplink:hover {
+			position:relative;
+		}
+
+		.tooltiplink .tooltip::after {
+			content: " ";
+			/*position: absolute;*/
+			position:fixed;
+
+			top: 100%; /* At the bottom of the tooltip */
+			left: 50%;
+			margin-left: -5px;
+			border-width: 5px;
+			border-style: solid;
+			border-color: black transparent transparent transparent;
+		}
+
+
+
+	</style>
 </head>
 <body>
     <h2>
-        Raise The Empires pre-alpha 0.1a
+        Raise The Empires pre-alpha 0.2a
     </h2>
 
 <object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" WIDTH="1000" HEIGHT="750" id="ea" ALIGN="">
@@ -81,5 +158,11 @@
 <div>
 	Go to <a href="nodebug.html">nodebug</a> version.
 </div>
+<table>
+	<tr>
+		<td><div class="logbox" id="tutorial_step">&nbsp;</div></td>
+	</tr>
+</table>
+
 </body>
 </html>

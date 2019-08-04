@@ -16,6 +16,8 @@ import json
 import os
 import time
 from flask_compress import Compress
+from flask_socketio import SocketIO
+
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript', 'application/x-amf']
 COMPRESS_LEVEL = 6
@@ -28,6 +30,7 @@ rand_seed_z = 844
 battle_seq = 0
 
 compress = Compress()
+socketio = SocketIO()
 # game_objects = []
 with open("initial-island.json", 'r') as f:
     game_objects = json.load(f)
@@ -696,7 +699,7 @@ def tutorial_response(step):
         # [0]	String	tut_step_firstInvasionCombatSequence
         # [0]	String	tut_step_firstInvasionClientBattleEnd
         # tut_step_firstInvasionEnd
-
+    report_tutorial_step(step, meta['QuestComponent'] if 'QuestComponent' in meta else None, meta['newPVE']);
     tutorial_response = {"errorType": 0, "userId": 1, "metadata": meta,
                     "data": []}
     return tutorial_response
@@ -862,9 +865,23 @@ def add_header(r):
     # r.headers['Cache-Control'] = 'public, max-age=0'
     return r
 
+@socketio.on('message')
+def handle_message(message):
+    print('received message: ' + message)
+
+@socketio.on('my event')
+def handle_my_custom_event(json):
+    print('received json: ' + str(json))
+
+
+def report_tutorial_step(step, response, new_pve):
+    socketio.emit('tutorial_step', [step, response, new_pve])
+
 if __name__ == '__main__':
     if 'WERKZEUG_RUN_MAIN' not in os.environ:
         threading.Timer(1.25, lambda: webbrowser.open("http://127.0.0.1:5005/")).start()
 
     compress.init_app(app)
-    app.run(host='127.0.0.1', port=5005, debug=True)
+    socketio.init_app(app)
+    socketio.run(app, host='127.0.0.1', port=5005, debug=True)
+    # app.run(host='127.0.0.1', port=5005, debug=True)
