@@ -28,12 +28,13 @@
 
 		function hasPermission(perm, snuid,name) {
 			console.log("Perm " +perm +", "  +snuid+ ", " + name)
-			return
-		}
-	function showPermissions(d) {
-			console.log("Show Perm " +d)
-			return
-		}
+            return
+        }
+
+        function showPermissions(d) {
+            console.log("Show Perm " + d)
+            return
+        }
 
 
         zynga = {
@@ -63,25 +64,42 @@
 	</script>
 	<!-- debug websocket connection -->
 	<script src="//code.jquery.com/jquery-3.4.1.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-<script type="text/javascript" charset="utf-8">
-    var socket = io();
-    socket.on('connect', function() {
-        socket.emit('my event', {data: 'I\'m connected!'});
-    });
-    socket.on( 'tutorial_step', function( msg ) {
-        console.log(msg);
-        // $('#tutorial_step').prepend('<div>' + JSON.stringify(msg) + '</div>');
-        $('#tutorial_step').prepend('<div><span class="tooltiplink">' + msg[0] + '<span class="tooltip">tooltip</span></span>' + (msg[1] || msg[2] ? ' &rarr; ': '')  + (msg[1] ? JSON.stringify(msg[1]): '') +
-			(msg[1] && msg[2] ? ', ' : '') + (msg[2] ?JSON.stringify(msg[2]): '') + '</div>');
-        $('#tutorial_step').scrollTop(0)
-    });
+	<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
+			integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+	<script type="text/javascript" charset="utf-8">
+        var socket = io();
+        socket.on('connect', function () {
+            socket.emit('my event', {data: 'I\'m connected!'});
+        });
+        socket.on('tutorial_step', function (msg) {
+            console.log(msg);
+            // $('#tutorial_step').prepend('<div>' + JSON.stringify(msg) + '</div>');
+            $('#tutorial_step').prepend('<div><span class="req'+msg[6] + ' ' + (parseInt(msg[6].substring(1)) % 2 == 0 ? 'req_even' : 'req_odd' ) + '">' + msg[5] + ': </span><span class="tooltiplink">' + msg[0] + '<span class="tooltip">' + JSON.stringify(msg[3], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>'
+                + (msg[1] || msg[2] ? ' &rarr; ' : '') + (msg[1] ? '<span class="tooltiplink response">' + JSON.stringify(msg[1]) + '<span class="tooltip">' + JSON.stringify(msg[4], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>' : '') +
+                (msg[1] && msg[2] ? ', ' : '') + (msg[2] ? JSON.stringify(msg[2]) : '') + '</div>');
+            $('#tutorial_step').scrollTop(0)
+        });
 
-</script>
+        socket.on('world_log', function (msg) {
+            console.log(msg);
+            $('#world_log').prepend('<div><span class="req'+msg[4] + ' ' + (parseInt(msg[4].substring(1)) % 2 == 0 ? 'req_even' : 'req_odd' ) + '">' + msg[3] + ': </span><span class="tooltiplink">' + msg[0] + '<span class="tooltip">' + JSON.stringify(msg[2], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") +
+				'</span></span>' + (msg[1] || msg[1] == 0 ? ' &rarr; ' + msg[1] : '') + '</div>');
+            $('#world_log').scrollTop(0)
+        });
+         socket.on('other_log', function (msg) {
+            console.log(msg);
+            $('#other_log').prepend('<div><span class="req'+ msg[4] + ' ' + (parseInt(msg[4].substring(1)) % 2 == 0 ? 'req_even' : 'req_odd' ) + '">' + msg[3] + ': </span><span class="tooltiplink">' + msg[0] + '<span class="tooltip">' + JSON.stringify(msg[2], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") +
+				'</span></span>' + (msg[1] ? ' &rarr; <span class="tooltiplink response">response<span class="tooltip">' + JSON.stringify(msg[1], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>' : '')
+				+ '</div>');
+            $('#other_log').scrollTop(0)
+        });
+
+
+	</script>
 	<style>
 		.logbox {
 			width: 500px;
-			height: 100px;
+			height: 200px;
 			vertical-align: top;
 			overflow-y: scroll;
 			z-index: 5;
@@ -89,51 +107,68 @@
 
 		.tooltiplink {
 			color: olive;
-				position: relative;
-	  display: inline-block;
+			position: relative;
+			display: inline-block;
+		}
+
+		.tooltiplink.response {
+			color: cadetblue;
+		}
+
+		.req_odd {
+			color: crimson;
 		}
 
 		.tooltiplink .tooltip {
-			visibility: hidden;
-			width: 120px;
+			/* width: 120px; */
 			background-color: black;
 			color: #fff;
-			text-align: center;
-			padding: 5px 0;
-			border-radius: 6px;
+			/* text-align: center; */
+			/* padding: 5px 0; */
+			padding: 0px 0px 2px 2px;
+			/* border-radius: 6px; */
 
 			/* Position the tooltip text - see examples below! */
 			/*position: absolute;*/
-			position:fixed;
+			position: fixed;
+			display: none;
 
 			/*z-index: 1;*/
 			z-index: 2000;
-			bottom: 100%;
-			left: 50%;
-			margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+			vertical-align: top;
+			/* 			bottom: 100%;
+                      left: 50%; */
+
+			/* margin-left: -60px; */
+			/* Use half of the width (120/2 = 60), to center the tooltip */
 		}
 
 		.tooltiplink:hover .tooltip {
-		  visibility: visible;
-			position:relative;
-			z-index: 5;
+			/* z-index: 5; */
+			display: inline;
+			top: 0;
+			left: 118px;
+
 		}
+
 		.tooltiplink:hover {
-			position:relative;
+			position: relative;
 		}
 
 		.tooltiplink .tooltip::after {
 			content: " ";
 			/*position: absolute;*/
-			position:fixed;
+			position: fixed;
 
-			top: 100%; /* At the bottom of the tooltip */
+			top: 100%;
+			/* At the bottom of the tooltip */
 			left: 50%;
 			margin-left: -5px;
 			border-width: 5px;
 			border-style: solid;
 			border-color: black transparent transparent transparent;
 		}
+
 
 
 
@@ -161,6 +196,8 @@
 <table>
 	<tr>
 		<td><div class="logbox" id="tutorial_step">&nbsp;</div></td>
+		<td><div class="logbox" id="world_log">&nbsp;</div></td>
+		<td><div class="logbox" id="other_log">&nbsp;</div></td>
 	</tr>
 </table>
 

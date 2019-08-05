@@ -37,6 +37,10 @@ with open("initial-island.json", 'r') as f:
     print("Initial island",  len(game_objects), "objects loaded")
     # game_objects = [o for o in game_objects_2 if int(o["position"].split(",")[0]) > 62 and int(o["position"].split(",")[1]) > 58]
 
+with open("gamesettings-converted.json", 'r') as f:
+    game_settings = json.load(f)
+    print("gamesettings loaded: ",  len(game_settings['settings']), " setting sections loaded")
+
 
 app = Flask(__name__)
 # app = connexion.App(__name__, specification_dir="./")
@@ -113,12 +117,12 @@ def send_sol_assets(path):
 def post_gateway():
     print("Gateway:")
     print(repr(request))
-    print("Data:")
-    print(request.data)
+    # print("Data:")
+    # print(request.data)
     resp_msg = remoting.decode(request.data)
     print(resp_msg.headers)
     print(resp_msg.bodies)
-    print(resp_msg.bodies[0])
+    # print(resp_msg.bodies[0])
 
     resps = []
     for reqq in resp_msg.bodies[0][1].body[1]:
@@ -135,13 +139,14 @@ def post_gateway():
         elif reqq.functionName == 'DataServicesService.getFriendsInfo':
             resps.append(friend_info_response())
         elif reqq.functionName == 'UserService.tutorialProgress':
-            resps.append(tutorial_response(reqq.params[0]))
+            resps.append(tutorial_response(reqq.params[0], reqq.sequence, resp_msg.bodies[0][0]))
         elif reqq.functionName == 'WorldService.performAction':
             lastId = 0
             for reqq2 in resp_msg.bodies[0][1].body[1]:
                 if reqq2.functionName == 'WorldService.performAction' and reqq2.params[1] and reqq2.params[1].id:
                     lastId=reqq2.params[1].id
             resps.append(perform_world_response(lastId))
+            report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position, lastId, reqq.params, reqq.sequence, resp_msg.bodies[0][0])
         elif reqq.functionName == 'DataServicesService.getSuggestedNeighbors':
             resps.append(neighbor_suggestion_response())
         elif reqq.functionName == 'UserService.setSeenFlag':
@@ -164,6 +169,12 @@ def post_gateway():
             resps.append(update_roads_response())
         elif reqq.functionName == 'UserService.streamPublish':
             resps.append(stream_publish_response())
+        elif reqq.functionName == 'WorldService.stopMayhemEvent':
+            resps.append(stop_mayhem_response())
+
+        if reqq.functionName != 'UserService.tutorialProgress' and reqq.functionName != 'WorldService.performAction':
+            report_other_log(reqq.functionName, resps[-1] if resps else None, reqq, resp_msg.bodies[0][0])
+
 
     emsg = {
             "errorType":  0,
@@ -642,7 +653,7 @@ def friend_info_response():
                     "data": {"nonAppFriends":[{"zid":100,"first_name":"MissTery","sex":'F',"portrait":None}]}}
     return friend_info_response
 
-def tutorial_response(step):
+def tutorial_response(step, sequence, endpoint):
     meta = {"newPVE": 0}
     qz = {"name": "Q0516", "complete":True, "expired":False,"progress":[1],"completedTasks":1}
     qz_cadets_start = {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
@@ -699,10 +710,12 @@ def tutorial_response(step):
         # [0]	String	tut_step_firstInvasionCombatSequence
         # [0]	String	tut_step_firstInvasionClientBattleEnd
         # tut_step_firstInvasionEnd
-    report_tutorial_step(step, meta['QuestComponent'] if 'QuestComponent' in meta else None, meta['newPVE']);
+
+    report_tutorial_step(step, meta['QuestComponent'] if 'QuestComponent' in meta else None, meta['newPVE'], sequence, endpoint);
     tutorial_response = {"errorType": 0, "userId": 1, "metadata": meta,
                     "data": []}
     return tutorial_response
+
 
 def perform_world_response(id):
     perform_world_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
@@ -851,6 +864,11 @@ def stream_publish_response():
                     "data": []}
     return stream_publish_response
 
+def stop_mayhem_response():
+    stop_mayhem_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                    "data": []}
+    return stop_mayhem_response
+
 
 
 @app.after_request
@@ -874,8 +892,24 @@ def handle_my_custom_event(json):
     print('received json: ' + str(json))
 
 
-def report_tutorial_step(step, response, new_pve):
-    socketio.emit('tutorial_step', [step, response, new_pve])
+def report_tutorial_step(step, response, new_pve, sequence, endpoint):
+    quest_names = [r['name'] for r in response] if response else []
+    quests = [r for r in quest_settings['quests']['quest'] if r['_name'] in quest_names]
+    socketio.emit('tutorial_step', [step, response, new_pve , describe_step(step), quests, sequence, endpoint])
+
+
+def describe_step(step):
+    [descr] = [e for e in game_settings['settings']['tutorial']['step'] if e['-id'] == step]
+    return descr
+
+def report_world_log(operation, response, req, sequence, endpoint):
+    req2 = json.loads(json.dumps(req, default=lambda o: '<not serializable>'))
+    socketio.emit('world_log', [operation, response, req2, sequence, endpoint])
+
+def report_other_log(service, response, req, endpoint):
+    req2 = json.loads(json.dumps(req, default=lambda o: '<not serializable>'))
+    socketio.emit('other_log', [service, response, req2, req.sequence, endpoint])
+
 
 if __name__ == '__main__':
     if 'WERKZEUG_RUN_MAIN' not in os.environ:
