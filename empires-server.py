@@ -1,4 +1,5 @@
-from flask import Flask, render_template, send_from_directory, request, Response
+from flask import Flask, render_template, send_from_directory, request, Response, session
+from flask_session import Session
 from pyamf import remoting
 from pyamf.flex import messaging
 import pyamf
@@ -14,9 +15,12 @@ import threading, webbrowser
 import pyamf.amf0
 import json
 import os
+import sqlalchemy
+from flask_sqlalchemy import SQLAlchemy
 import time
 from flask_compress import Compress
 from flask_socketio import SocketIO
+import copy
 
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript', 'application/x-amf']
@@ -31,6 +35,9 @@ battle_seq = 0
 
 compress = Compress()
 socketio = SocketIO()
+sess = Session()
+db = SQLAlchemy()
+
 # game_objects = []
 with open("initial-island.json", 'r') as f:
     game_objects = json.load(f)
@@ -43,6 +50,12 @@ with open("gamesettings-converted.json", 'r') as f:
 
 
 app = Flask(__name__)
+
+app.config['SESSION_TYPE']  = 'sqlalchemy'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///save.db'
+app.config['SESSION_SQLALCHEMY'] = db
+
+
 # app = connexion.App(__name__, specification_dir="./")
 #application/x-amf
 # app.add_api("swagger.yaml")
@@ -141,12 +154,13 @@ def post_gateway():
         elif reqq.functionName == 'UserService.tutorialProgress':
             resps.append(tutorial_response(reqq.params[0], reqq.sequence, resp_msg.bodies[0][0]))
         elif reqq.functionName == 'WorldService.performAction':
-            lastId = 0
-            for reqq2 in resp_msg.bodies[0][1].body[1]:
-                if reqq2.functionName == 'WorldService.performAction' and reqq2.params[1] and reqq2.params[1].id:
-                    lastId=reqq2.params[1].id
-            resps.append(perform_world_response(lastId))
-            report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position, lastId, reqq.params, reqq.sequence, resp_msg.bodies[0][0])
+            # lastId = 0
+            # for reqq2 in resp_msg.bodies[0][1].body[1]:
+            #     if reqq2.functionName == 'WorldService.performAction' and reqq2.params[1] and reqq2.params[1].id:
+            #         lastId=reqq2.params[1].id
+            wr = perform_world_response(reqq.params[0], reqq.params[1].id)
+            resps.append(wr)
+            report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position, wr["data"]["id"], reqq.params, reqq.sequence, resp_msg.bodies[0][0])
         elif reqq.functionName == 'DataServicesService.getSuggestedNeighbors':
             resps.append(neighbor_suggestion_response())
         elif reqq.functionName == 'UserService.setSeenFlag':
@@ -194,86 +208,8 @@ def post_gateway():
     # return ('', 204)
 
 
-def user_response():
-    global game_objects
-
-    # game_objects = [
-    #     {
-    #     "id":100,
-    #     "itemName": "BuildingPart594",#"BuildingPart594",
-    #     "position":"55,55,0",
-    #     "referenceItem": None
-    #     # "state":1, #to check which state makes it visible
-    #     # "visible":True
-    #
-    # }
-    #     {"id": 1000, "itemName": "bricks_red", "position": "57,58,0", "referenceItem": None},
-    #     {"id": 1001, "itemName": "bricks_pink", "position": "56,58,0", "referenceItem": None},
-    #     {"id": 1002, "itemName": "bricks_red", "position": "55,58,0", "referenceItem": None},
-    #     {"id": 1003, "itemName": "bricks_pink", "position": "57,57,0", "referenceItem": None},
-    #     {"id": 1004, "itemName": "bricks_red", "position": "57,56,0", "referenceItem": None},
-    #     {"id": 1005, "itemName": "bricks_red", "position": "56,57,0", "referenceItem": None},
-    #     {"id": 1006, "itemName": "bricks_pink", "position": "56,56,0", "referenceItem": None},
-    #     {"id": 1007, "itemName": "bricks_pink", "position": "55,57,0", "referenceItem": None},
-    #     {"id": 1008, "itemName": "bricks_red", "position": "55,56,0", "referenceItem": None},
-    #     {"id": 1009, "itemName": "tree50", "position": "62,58,0", "referenceItem": None},
-    #     {"id": 1010, "itemName": "tree49", "position": "57,64,0", "referenceItem": None},
-    #     {"id": 1011, "itemName": "Small Island Hut", "position": "52,55,0", "referenceItem": None, "state": 8},
-    #     {"id": 1012, "itemName": "Small Island Hut", "position": "57,53,0", "referenceItem": None, "state": 8}, # 9 = ready to harvest
-    #     {"id": 1013, "itemName": "Small Bungalow Damaged", "position": "59,58,0", "referenceItem": None},
-    #     {"id": 1014, "itemName": "Small Bungalow Damaged", "position": "52,58,0", "referenceItem": None},
-    #     {"id": 1015, "itemName": "Small Bungalow Damaged", "position": "54,53,0", "referenceItem": None},
-    #     {"id": 1016, "itemName": "Barracks 01 Damaged", "position": "59,55,0", "referenceItem": None},
-    #     {"id": 1017, "itemName": "vehicle11", "position": "55,57,0", "referenceItem": None},
-    #     {"id": 1018, "itemName": "infantry01", "position": "57,57,0", "referenceItem": None},
-    #     {"id": 1019, "itemName": "tree31", "position": "57,52,0", "referenceItem": None},
-    #     {"id": 1020, "itemName": "tree43", "position": "51,58,0", "referenceItem": None},
-    #     {"id": 1021, "itemName": "bush 01", "position": "53,51,0", "referenceItem": None},
-
-        # {        "id":0,   "itemName": "bricks_beige",  "position":"52,55,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "bricks_beige",  "position":"52,56,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "bricks_beige",  "position":"52,57,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "bricks_beige",  "position":"52,54,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "bricks_pink",  "position":"51,55,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "bricks_pink",  "position":"51,56,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "bricks_pink",  "position":"51,57,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "bricks_pink",  "position":"51,54,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "bricks_red",  "position":"50,55,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "bricks_red",  "position":"50,56,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "bricks_red",  "position":"50,57,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "bricks_red",  "position":"50,54,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "infantry01",  "position":"57,54,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "tree01",  "position":"49,52,0",  "referenceItem": None },
-        # {        "id":0,   "itemName": "Tarmack 01",  "position":"60,60,0",  "referenceItem": None },
-     #    {
-     #    "id":101,
-     #    "itemName": "BuildingPart595",#"BuildingPart594",
-     #    "position":"52,55,0",
-     #    "referenceItem": None
-     #    # "state":1, #to check which state makes it visible
-     #    # "visible":True
-     #
-     # }
-    #     ,{
-    #     "id":102,
-    #     "itemName": "BuildingPart596",#"BuildingPart594",
-    #     "position":"52,51,0",
-    #     "referenceItem": None
-    #     # "state":1, #to check which state makes it visible
-    #     # "visible":True
-    #
-    # }
-    #     ,{
-    #     "id":103,
-    #     "itemName": "BuildingPart597",#"BuildingPart594",
-    #     "position":"50,49,0",
-    #     "referenceItem": None
-    #     # "state":1, #to check which state makes it visible
-    #     # "visible":True
-    #
-    # }
-    #     ]
-    # p=0
+def init_user():
+    # global game_objects
 
     roads_data = [
         "54,55|54,55",
@@ -311,32 +247,7 @@ def user_response():
 
     ]
 
-    # grid_lines = [ {"id":i + 200 * j,   "itemName": "bricks_red" if (i + 1) % 10 ==0 else "bricks_pink" if (i + 1) %5 ==0 else "bricks_beige",  "position": str(i + 5 *  -min(j,0))+","+str(i + 5 * max(j,0))+",0",  "referenceItem": None } for j in range(-15, 15) for i in range(112 - 5 * abs(j)) ]
-#    grid_lines = [ {"id": 10000 + i + 200 * j,   "itemName": "tree01",  "position": str(i + 5 *  -min(j,0))+","+str(i + 5 * max(j,0))+",0",  "referenceItem": None } for j in range(-15, 15) for i in range(112 - 5 * abs(j)) ]
-#     grid_lines = [ {"id": 10000 + i + 200 * j,   "itemName": "tree01",  "position": str(i + 5 *  -min(j,0))+","+str(i + 5 * max(j,0))+",0",  "referenceItem": None } for j in range(-15,0) for i in range(112 - 5 * abs(j)) ]
-
-    # itemr = [itemx for itemx in item_settings["items"]["item"]  if "tooltip" in itemx and "_type" in itemx["tooltip"] and itemx["tooltip"]["_type"]=="unit" ]
-    # buildingr = [itemx for itemx in item_settings["items"]["item"]  if "_type" in itemx and itemx["_type"]=="building" ]
-    # decor = [itemx for itemx in item_settings["items"]["item"]  if "_subtype" in itemx and itemx["_subtype"]=="decoration" ]
-    # buildabler = [itemx for itemx in item_settings["items"]["item"]  if "_type" in itemx and itemx["_type"]=="Buildable" ]
-    # print(repr(itemr))
-    # units_resp = [{"id":str(i),   "itemName": name,  "position": str(i % 100) + "," + str(int(i/100)) + ",0",  "referenceItem": None } for i, name in enumerate(units, 0)]
-    # items_resp = [{"id":str(i),   "itemName": name,  "position": str(i % 100) + "," + str(int(i/100)) + ",0",  "referenceItem": None } for i, name in enumerate(items, 0)]
-    # building_resp = [{"id":str(i),   "itemName": name["_name"],  "position": str((i % 33) * 3) + "," + str(int(i/33)*3) + ",0",  "referenceItem": None } for i, name in enumerate(buildingr, 0)]
-    # deco_resp = [{"id":str(i),   "itemName": name["_name"],  "position": str((i % 33) * 3) + "," + str(int(i/33)*3) + ",0",  "referenceItem": None } for i, name in enumerate(decor, 0)]
-    # buildable_resp = [{"id":str(i),   "itemName": name["_name"],  "position": str((i % 33) * 3) + "," + str(int(i/33)*3) + ",0",  "referenceItem": None } for i, name in enumerate(buildabler, 0)]
-    # print(repr(buildable_resp))
-    # game_objects = buildable_resp
-    # game_objects = [{
-    #     "id": 1028,
-    #     "itemName": "Small Bungalow Damaged",
-    #     "position": "66,54,0",
-    #     "referenceItem": None
-    # }]
-    # game_objects = game_objects + grid_lines
     unit = "U01,,,,"
-  #  game_objects.append({"id": 2000, "itemName": "Road", "position": "61,61,0", "referenceItem": None})
-  #  game_objects.append({"id": 2001, "itemName": "Road", "position": "61,62,0", "referenceItem": None})
 
     # resources = {"energy": 100, "coins": 100000, "oil": 7000, "wood": 5000, "aluminum": 9000,
     #                                 "copper": 4000, "gold": 3000, "iron": 2000, "uranium": 1000}
@@ -390,7 +301,7 @@ def user_response():
                 "crewNeighbors": [],
                 "dm_band": None,
                 "dm_endTS": None,
-                "tutorialProgress": 0,
+                "tutorialProgress": "",
                 "xp_multiplier": 1,
                 "cp_static": 1,
                 "lightningDeals": {},
@@ -507,7 +418,7 @@ def user_response():
             "world": {"fleets": [], "enemies": [], "globalFleetId": 0, "battleStatus": {},  #user_fleet
                       "research": {}, "research2": {"buildingTypesUpgraded": None, "treesUnlocked": None},
                       "resourceOrder": ["aluminum", "copper", "gold", "iron", "uranium"],
-                      "globalObjectId": 0,
+                      "globalObjectId": 10000, #initial id high enough not to overlap with preloaded objects
                       "sizeX": 200,
                       "sizeY": 200,
                       "ownerId": 0,
@@ -608,10 +519,22 @@ def user_response():
         "worldEvents": None,
         "FLASHFEED_EXPIRE_TIME": 0,
         "FB_REQ_PERMS": "gdpr",
-
     }
+    return user
+
 #Q0516 ? start
-    user_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0, "QuestComponent": [{"name": "Q0516", "complete":False, "expired":False,"progress":[0],"completedTasks":0}]},  # {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0},{"name": "QW120", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
+def user_response():
+    if 'user_object' in session:
+        user = session['user_object']
+        qc = session['quests']
+        print("loading user from save")
+    else:
+        user = copy.deepcopy(init_user())
+        print("initialized new")
+        session['user_object'] = user
+        qc = [{"name": "Q0516", "complete":False, "expired":False,"progress":[0],"completedTasks":0}]
+        session['quests'] = qc
+    user_response = {"errorType": 0, "userId": session.sid, "metadata": {"newPVE": 0, "QuestComponent": qc},  # {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0},{"name": "QW120", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
                     "data": user}
     return user_response
 
@@ -710,16 +633,29 @@ def tutorial_response(step, sequence, endpoint):
         # [0]	String	tut_step_firstInvasionCombatSequence
         # [0]	String	tut_step_firstInvasionClientBattleEnd
         # tut_step_firstInvasionEnd
+    merge_quest_progress(meta['QuestComponent'] if 'QuestComponent' in meta else [])
+    session['user_object']["userInfo"]["player"]["tutorialProgress"] = step # TODO: revert step when loading if needed
 
     report_tutorial_step(step, meta['QuestComponent'] if 'QuestComponent' in meta else None, meta['newPVE'], sequence, endpoint);
     tutorial_response = {"errorType": 0, "userId": 1, "metadata": meta,
                     "data": []}
     return tutorial_response
 
+def merge_quest_progress(qc):
+    print("new q before merge " + repr(qc))
+    print("q list before merge " + repr (session['quests']))
+    session['quests'] = qc + [e for e in session['quests'] if e['name'] not in [q['name'] for q in qc]]
+    print("q list after merge " + repr (session['quests']))
 
-def perform_world_response(id):
+
+def perform_world_response(step, supplied_id, position, itemName):
+    id = supplied_id
+    if step == "place":
+        session['user_object']["userInfo"]["world"]["globalObjectId"] += 1  # for place only!
+        id = session['user_object']["userInfo"]["world"]["globalObjectId"]
+
     perform_world_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": {"id":id}}
+                    "data": {"id": id}}
     return perform_world_response
 
 def neighbor_suggestion_response():
@@ -914,8 +850,15 @@ def report_other_log(service, response, req, endpoint):
 if __name__ == '__main__':
     if 'WERKZEUG_RUN_MAIN' not in os.environ:
         threading.Timer(1.25, lambda: webbrowser.open("http://127.0.0.1:5005/")).start()
+    # init_db(app, db)
+
 
     compress.init_app(app)
     socketio.init_app(app)
+    sess.init_app(app)
+    db.init_app(app)
+    # session.app.session_interface.db.create_all()
+    # app.session_interface.db.create_all()
+    # db.create_all()
     socketio.run(app, host='127.0.0.1', port=5005, debug=True)
     # app.run(host='127.0.0.1', port=5005, debug=True)
