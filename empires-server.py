@@ -16,6 +16,7 @@ import pyamf.amf0
 import json
 import os
 import sqlalchemy
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 import time
 from flask_compress import Compress
@@ -38,15 +39,17 @@ socketio = SocketIO()
 sess = Session()
 db = SQLAlchemy()
 
+start = datetime.now()
+
 # game_objects = []
 with open("initial-island.json", 'r') as f:
     game_objects = json.load(f)
-    print("Initial island",  len(game_objects), "objects loaded")
+    print("Initial island template",  len(game_objects), "objects loaded")
     # game_objects = [o for o in game_objects_2 if int(o["position"].split(",")[0]) > 62 and int(o["position"].split(",")[1]) > 58]
 
 with open("gamesettings-converted.json", 'r') as f:
     game_settings = json.load(f)
-    print("gamesettings loaded: ",  len(game_settings['settings']), " setting sections loaded")
+    print("Gamesettings loaded: ",  len(game_settings['settings']), " setting sections loaded")
 
 
 app = Flask(__name__)
@@ -69,7 +72,7 @@ def home():
 @app.route("/")
 def index():
     print("index")
-    return render_template("home.html")
+    return render_template("home.html", time=datetime.now().timestamp())
 
 
 
@@ -158,7 +161,7 @@ def post_gateway():
             # for reqq2 in resp_msg.bodies[0][1].body[1]:
             #     if reqq2.functionName == 'WorldService.performAction' and reqq2.params[1] and reqq2.params[1].id:
             #         lastId=reqq2.params[1].id
-            wr = perform_world_response(reqq.params[0], reqq.params[1].id)
+            wr = perform_world_response(reqq.params[0], reqq.params[1].id, reqq.params[1].position, reqq.params[1].itemName)
             resps.append(wr)
             report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position, wr["data"]["id"], reqq.params, reqq.sequence, resp_msg.bodies[0][0])
         elif reqq.functionName == 'DataServicesService.getSuggestedNeighbors':
@@ -189,10 +192,10 @@ def post_gateway():
         if reqq.functionName != 'UserService.tutorialProgress' and reqq.functionName != 'WorldService.performAction':
             report_other_log(reqq.functionName, resps[-1] if resps else None, reqq, resp_msg.bodies[0][0])
 
-
     emsg = {
-            "errorType":  0,
-            "data": resps
+        "serverTime": datetime.now().timestamp(),
+        "errorType": 0,
+        "data": resps
     }
 
     req = remoting.Response(emsg)
@@ -534,7 +537,9 @@ def user_response():
         session['user_object'] = user
         qc = [{"name": "Q0516", "complete":False, "expired":False,"progress":[0],"completedTasks":0}]
         session['quests'] = qc
-    user_response = {"errorType": 0, "userId": session.sid, "metadata": {"newPVE": 0, "QuestComponent": qc},  # {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0},{"name": "QW120", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
+    # for e in session['user_object']["userInfo"]["world"]["objects"]:
+    #     e['lastUpdated'] = 1308211628  #1 minute earlier to test
+    user_response = {"errorType": 0, "userId": session.sid, "metadata": {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]},  # {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0},{"name": "QW120", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
                     "data": user}
     return user_response
 
@@ -648,15 +653,149 @@ def merge_quest_progress(qc):
     print("q list after merge " + repr (session['quests']))
 
 
-def perform_world_response(step, supplied_id, position, itemName):
+def perform_world_response(step, supplied_id, position, item_name):
     id = supplied_id
     if step == "place":
         session['user_object']["userInfo"]["world"]["globalObjectId"] += 1  # for place only!
         id = session['user_object']["userInfo"]["world"]["globalObjectId"]
+        session['user_object']["userInfo"]["world"]["objects"].append({
+            "id": id,
+            "itemName": item_name,
+            "position": position,
+            "referenceItem": None,
+            "state": 0
+        })
+
+    # cur_object = lookup_object(id)
+    # print("cur_object used:", repr(cur_object))
+    #
+    #
+    # game_item = lookup_item(item_name)
+    # print("item used:", repr(game_item))
+    #
+    # state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'])
+    # print("state_machine used:", repr(state_machine))
+    # state = lookup_state(state_machine, cur_object['state'])
+    # print("cur state:", repr(state))
+    # next_click_state = lookup_state(state_machine, state['-clickNext']) # not all states have this!! end states? autostate after time?
+    # print("next_click_state:", repr(next_click_state))
+
+    if step in ["place", "setState"]:
+        click_next_state(id)  # place & setstate only
+
+    if step == "clear":
+        session['user_object']["userInfo"]["world"]["objects"].remove(lookup_object(id))
 
     perform_world_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                     "data": {"id": id}}
     return perform_world_response
+
+def click_next_state(id):
+    cur_object = lookup_object(id)
+    print("cur_object used:", repr(cur_object))
+
+    game_item = lookup_item(cur_object['itemName'])
+    print("item used:", repr(game_item))
+
+    if 'stateMachineValues' in game_item:
+        state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'], game_item['stateMachineValues']['define'])
+
+        print("state_machine used:", repr(state_machine))
+        state = lookup_state(state_machine, cur_object.get('state', 0))
+        print("cur state:", repr(state))
+
+        while '-autoNext' in state and state['-stateName'] != state['-autoNext']:   #'-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
+            duration =  parse_duration(state.get('-duration', '0'))
+            if cur_object.get('lastUpdated') / 1000 +  duration <= datetime.now().timestamp():
+                next_state_id = state['-autoNext']  # not all states have this!! end states? autostate after time?
+                state = lookup_state(state_machine, next_state_id)
+                cur_object['lastUpdated'] += duration * 1000
+                cur_object['state'] = next_state_id
+                print("pre auto_next_state:", repr(state), 'time', cur_object['lastUpdated'], "duration", duration)
+
+        if '-clickNext' in state:
+            next_state_id = state['-clickNext']  # not all states have this!! end states? autostate after time?
+            next_click_state = lookup_state(state_machine, next_state_id)
+            print("next_click_state:", repr(next_click_state))
+
+            while '-autoNext' in next_click_state and next_state_id != next_click_state['-autoNext'] and next_click_state.get('-duration', '0') in ['0', '0s']:   #'-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
+                next_state_id = next_click_state['-autoNext']  # not all states have this!! end states? autostate after time?
+                next_click_state = lookup_state(state_machine, next_state_id)
+                print("auto_next_state:", repr(next_click_state))
+
+            cur_object['state'] = next_state_id
+            cur_object['lastUpdated'] = datetime.now().timestamp() * 1000
+        else:
+            print("state has no clicknext, click does nothing")
+            cur_object['lastUpdated'] = datetime.now().timestamp() * 1000
+    else:
+        print("object has no statemachine, click does nothing")
+
+# def autoclick_next_state(state_machine, next_click_state):
+#     while '-autoNext' in next_click_state and next_click_state['-stateName'] != next_click_state[
+#         '-autoNext']:  # '-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
+#         next_state_id = next_click_state['-autoNext']  # not all states have this!! end states? autostate after time?
+#         next_click_state = lookup_state(state_machine, next_state_id)
+#         print("auto_next_state:", repr(next_click_state))
+
+def parse_duration(duration):
+    # ["ms", "m", "s", "h", "d"];
+    if duration == 'rand:1d,4d':
+        return 86400 # 1d
+    elif "ms" in duration:
+        return int(duration[:-2]) / 1000
+    elif "s" in duration:
+        return int(duration[:-1])
+    elif "m" in duration:
+        return int(duration[:-1]) * 60
+    elif "h" in duration:
+        return int(duration[:-1]) * 3600
+    elif "d" in duration:
+        return int(duration[:-1]) * 86400
+    else:
+        return int(duration)
+
+
+def lookup_state_machine(state_machine_name, custom_values):
+    state_machine = copy.deepcopy(lookup_raw_state_machine(state_machine_name))
+    replacements = {e['-name']: e['-value'] for e in custom_values}
+    print('replacements', repr(replacements))
+    repl_dict(state_machine, replacements)
+    return state_machine
+
+def repl_dict(d, replacements):
+    for k, v in d.items():
+        if isinstance(v, dict):
+            repl_dict(v, replacements)
+        elif isinstance(v, list):
+            for e in v:
+                repl_dict(e, replacements)
+        else:
+            if "$" in v:
+                # print('r1', v)
+                for s, r in replacements.items():
+                    d[k] = d[k].replace(s, r)
+                # print('r2', d[k])
+                if ":" in v:
+                    d[k] = d[k].split(':', 1)[1 if "$" in d[k] else 0]
+                    # print('r3', d[k])
+
+def lookup_raw_state_machine(state_machine_name):
+    [state_machine] = [e for e in game_settings['settings']['stateMachines']['stateMachine'] if e['-name'] == state_machine_name]
+    return state_machine
+
+def lookup_state(state_machine, i):
+    [state_machine] = [e for e in state_machine['state'] if e['-stateName'] == str(i)]
+    return state_machine
+
+def lookup_item(item_name):
+    [item] = [e for e in game_settings['settings']['items']['item'] if e['-name'] == item_name]
+    return item
+
+def lookup_object(id):
+    [game_object] = [e for e in  session['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
+    return game_object
+
 
 def neighbor_suggestion_response():
     neighbor_suggestion_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
@@ -807,17 +946,17 @@ def stop_mayhem_response():
 
 
 
-@app.after_request
-def add_header(r):
-    """
-    Add headers to both force latest IE rendering engine or Chrome Frame,
-    and also to cache the rendered page for 10 minutes.
-    """
-    # r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    # r.headers["Pragma"] = "no-cache"
-    # r.headers["Expires"] = "0"
-    # r.headers['Cache-Control'] = 'public, max-age=0'
-    return r
+# @app.after_request
+# def add_header(r):
+#     """
+#     Add headers to both force latest IE rendering engine or Chrome Frame,
+#     and also to cache the rendered page for 10 minutes.
+#     """
+#     # r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+#     # r.headers["Pragma"] = "no-cache"
+#     # r.headers["Expires"] = "0"
+#     # r.headers['Cache-Control'] = 'public, max-age=0'
+#     return r
 
 @socketio.on('message')
 def handle_message(message):
@@ -851,7 +990,6 @@ if __name__ == '__main__':
     if 'WERKZEUG_RUN_MAIN' not in os.environ:
         threading.Timer(1.25, lambda: webbrowser.open("http://127.0.0.1:5005/")).start()
     # init_db(app, db)
-
 
     compress.init_app(app)
     socketio.init_app(app)
