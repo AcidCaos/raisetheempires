@@ -163,7 +163,8 @@ def post_gateway():
             #         lastId=reqq2.params[1].id
             wr = perform_world_response(reqq.params[0], reqq.params[1].id, reqq.params[1].position, reqq.params[1].itemName)
             resps.append(wr)
-            report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position, wr["data"]["id"], reqq.params, reqq.sequence, resp_msg.bodies[0][0])
+            report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position, wr["data"]["id"], reqq.params, reqq.sequence, resp_msg.bodies[0][0],
+                             wr["metadata"].get('QuestComponent'), wr["metadata"].get('newPVE'))
         elif reqq.functionName == 'DataServicesService.getSuggestedNeighbors':
             resps.append(neighbor_suggestion_response())
         elif reqq.functionName == 'UserService.setSeenFlag':
@@ -188,6 +189,8 @@ def post_gateway():
             resps.append(stream_publish_response())
         elif reqq.functionName == 'WorldService.stopMayhemEvent':
             resps.append(stop_mayhem_response())
+        elif reqq.functionName == 'UserService.saveOptions':
+            resps.append(save_options_response(reqq.params[0]))
 
         if reqq.functionName != 'UserService.tutorialProgress' and reqq.functionName != 'WorldService.performAction':
             report_other_log(reqq.functionName, resps[-1] if resps else None, reqq, resp_msg.bodies[0][0])
@@ -535,7 +538,9 @@ def user_response():
         user = copy.deepcopy(init_user())
         print("initialized new")
         session['user_object'] = user
-        qc = [{"name": "Q0516", "complete":False, "expired":False,"progress":[0],"completedTasks":0}]
+        # qc = [{"name": "Q0516", "complete":False, "expired":False,"progress":[0],"completedTasks":0}]
+        q = lookup_quest("Q0516")
+        qc = [new_quest(q)]
         session['quests'] = qc
     # for e in session['user_object']["userInfo"]["world"]["objects"]:
     #     e['lastUpdated'] = 1308211628  #1 minute earlier to test
@@ -608,37 +613,29 @@ def tutorial_response(step, sequence, endpoint):
     parliament_Q0691_start = {"name": "Q0691", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
     parliament_Q0691_done = {"name": "Q0691", "complete":True, "expired":False,"progress":[1],"completedTasks":1}
 
-    if step == 'tut_step_placeBarracksServer':
-        meta['QuestComponent'] = [qz, qz_cadets_start]
-    # if step == 'tut_step_setupTrainCadets':
-    #     meta['QuestComponent'] = [qz_cadets_start]
+    # if step == 'tut_step_placeBarracksServer':
+    #     meta['QuestComponent'] = [qz, qz_cadets_start]
     if step == 'tut_step_cadetsComplete':
         meta['QuestComponent'] = [qz_cadets_done, qz_invasion_start]  #what starts invasion?
         meta["newPVE"] = {"status": 2, "pos": "60,63,0", "villain":"v18", "quest":"Q6016"}
-    # if step == 'tut_step_firstInvasionEnd':
-    if step == 'tut_step_postFirstInvasionResumeQuests':
+    if step == 'tut_step_firstInvasionEnd':
+    # if step == 'tut_step_postFirstInvasionResumeQuests':
         meta['QuestComponent'] = [qz_invasion_done,flag_Q1098_start,cadets_Q0611_start]
       #  meta["newPVE"] = {"status": 2, "pos": "60,66,0", "villain":"v18", "quest":"Q6016"}  #contineous battle mode experience QT01_05b_2
     if step == 'tut_step_placeFlagQuestDialog':
         meta['QuestComponent'] = [flag_Q1098_done, flag_Q6011_start]
-    if step == 'tut_step_placeFlagWaitForInventoryOpen':   # sometimes one of them is skipped?
-        meta['QuestComponent'] = [flag_Q1098_done, flag_Q6011_start]
-    if step == 'tut_step_placeFlagEnd':
-        meta['QuestComponent'] = [flag_Q6011_done, sergeant_Q0671_start, flag_Q0591_start]
-    if step == 'tut_step_buildFarm':  #after cadets placed?
-        meta['QuestComponent'] = [cadets_Q0611_done, sergeant_Q0671_start] #possibly already done by this point see if it doesn't redo quests already done
-    if step == 'tut_step_placeHouseEnd':  #after cadets placed?
-        meta['QuestComponent'] = [flag_Q0591_done, farm_Q0571_start]
-    if step == 'tut_step_placeFarmEnd':  #after cadets placed?
-        meta['QuestComponent'] = [farm_Q0571_done, corn_Q0521_start, parliament_Q0691_start, sergeant_Q0671_start]
+    # if step == 'tut_step_placeFlagWaitForInventoryOpen':   # sometimes one of them is skipped?
+    #     meta['QuestComponent'] = [flag_Q1098_done, flag_Q6011_start]
+    # if step == 'tut_step_placeFlagEnd':
+    #     meta['QuestComponent'] = [flag_Q6011_done, sergeant_Q0671_start, flag_Q0591_start]
+    # if step == 'tut_step_buildFarm':  #after cadets placed?
+    #     meta['QuestComponent'] = [cadets_Q0611_done, sergeant_Q0671_start] #possibly already done by this point see if it doesn't redo quests already done
+    # if step == 'tut_step_placeHouseEnd':  #after cadets placed?
+    #     meta['QuestComponent'] = [flag_Q0591_done, farm_Q0571_start]
+    # if step == 'tut_step_placeFarmEnd':  #after cadets placed?
+    #     meta['QuestComponent'] = [farm_Q0571_done, corn_Q0521_start, parliament_Q0691_start, sergeant_Q0671_start]
 
-
-        # if step == 'tut_step_startFirstInvasion':
-        #     meta['QuestComponent'] = [qz_invasion_start]
-        # [0]	String	tut_step_firstInvasionCombatSequence
-        # [0]	String	tut_step_firstInvasionClientBattleEnd
-        # tut_step_firstInvasionEnd
-    merge_quest_progress(meta['QuestComponent'] if 'QuestComponent' in meta else [])
+    merge_quest_progress(meta['QuestComponent'] if 'QuestComponent' in meta else [], session['quests'], "session quest")
     session['user_object']["userInfo"]["player"]["tutorialProgress"] = step # TODO: revert step when loading if needed
 
     report_tutorial_step(step, meta['QuestComponent'] if 'QuestComponent' in meta else None, meta['newPVE'], sequence, endpoint);
@@ -646,11 +643,19 @@ def tutorial_response(step, sequence, endpoint):
                     "data": []}
     return tutorial_response
 
-def merge_quest_progress(qc):
+def merge_quest_progress(qc, output_list, label):
     print("new q before merge " + repr(qc))
-    print("q list before merge " + repr (session['quests']))
-    session['quests'] = qc + [e for e in session['quests'] if e['name'] not in [q['name'] for q in qc]]
-    print("q list after merge " + repr (session['quests']))
+    print(label + " list before merge " + repr (output_list))
+    output_list[:] = qc + [e for e in output_list if e['name'] not in [q['name'] for q in qc]]
+    print(label + " list after merge " + repr (output_list))
+
+def lookup_quest(name):
+    [quest] = [r for r in quest_settings['quests']['quest'] if r['_name'] == name]
+    return quest
+
+def new_quest(quest):
+    progress = [0 for e in quest['tasks']]
+    return {"name": quest['_name'], "complete": False, "expired": False, "progress": progress, "completedTasks": 0}
 
 
 def perform_world_response(step, supplied_id, position, item_name):
@@ -679,18 +684,20 @@ def perform_world_response(step, supplied_id, position, item_name):
     # print("cur state:", repr(state))
     # next_click_state = lookup_state(state_machine, state['-clickNext']) # not all states have this!! end states? autostate after time?
     # print("next_click_state:", repr(next_click_state))
+    meta = {"newPVE": 0}
 
     if step in ["place", "setState"]:
-        click_next_state(id)  # place & setstate only
+        click_next_state(id, meta, step)  # place & setstate only
 
     if step == "clear":
         session['user_object']["userInfo"]["world"]["objects"].remove(lookup_object(id))
 
-    perform_world_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+    perform_world_response = {"errorType": 0, "userId": 1, "metadata": meta,
                     "data": {"id": id}}
+    print("perform_world_response" , repr(perform_world_response))
     return perform_world_response
 
-def click_next_state(id):
+def click_next_state(id, meta, step):
     cur_object = lookup_object(id)
     print("cur_object used:", repr(cur_object))
 
@@ -712,16 +719,19 @@ def click_next_state(id):
                 cur_object['lastUpdated'] += duration * 1000
                 cur_object['state'] = next_state_id
                 print("pre auto_next_state:", repr(state), 'time', cur_object['lastUpdated'], "duration", duration)
+                handle_world_state_change(state, game_item, meta, step)
 
         if '-clickNext' in state:
             next_state_id = state['-clickNext']  # not all states have this!! end states? autostate after time?
             next_click_state = lookup_state(state_machine, next_state_id)
             print("next_click_state:", repr(next_click_state))
+            handle_world_state_change(next_click_state, game_item, meta, step)
 
             while '-autoNext' in next_click_state and next_state_id != next_click_state['-autoNext'] and next_click_state.get('-duration', '0') in ['0', '0s']:   #'-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
                 next_state_id = next_click_state['-autoNext']  # not all states have this!! end states? autostate after time?
                 next_click_state = lookup_state(state_machine, next_state_id)
                 print("auto_next_state:", repr(next_click_state))
+                handle_world_state_change(next_click_state, game_item, meta,step)
 
             cur_object['state'] = next_state_id
             cur_object['lastUpdated'] = datetime.now().timestamp() * 1000
@@ -730,6 +740,52 @@ def click_next_state(id):
             cur_object['lastUpdated'] = datetime.now().timestamp() * 1000
     else:
         print("object has no statemachine, click does nothing")
+        cur_object['lastUpdated'] = datetime.now().timestamp() * 1000
+        handle_world_state_change({}, game_item, meta, step)
+
+# "autoComplete","battleDamage","battleKill","build","buyExpansion","challengeCreate","clear","countPlaced","expandIsland","fight","finishBuilding","fullscreen","genericString","harvest","inventoryAdded","islandWin","marketAdd","marketBuy","move","neighborsAdded","openDialog","ownObjects","ownResource","place","population","pillage","pvpCombat","resourceAdded","seenFlag","select","socialXPAdded","startImmunity","state","tending","tendingRewardDropped","unlockTutorial","useConsumable","visit","zoom"
+def handle_world_state_change(state, game_item , meta, step):
+    incomplete_quests = [e for e in session['quests'] if e["complete"] == False]
+    for session_quest in incomplete_quests:
+        new_quests = []
+        report_quest = False
+        raw_tasks = lookup_quest(session_quest['name'])['tasks']['task']
+        tasks = raw_tasks if isinstance(raw_tasks, list) else [raw_tasks]
+        for task, progress, i in zip(tasks, session_quest['progress'], range(len(session_quest['progress']))):
+            print("task", repr(task), "progress", repr(progress), "i", i)
+            if (task["_action"] == "finishBuilding" and task["_item"] == game_item['-code'] and progress < int(task["_total"]) and state['-className'] == 'Finished') \
+                    or task["_action"] == "autoComplete" \
+                    or task["_action"] in ["place", 'countPlaced'] and task["_item"] == game_item['-code'] and progress < int(task["_total"] and step == "place"):  #countPlaced tasks should be prepolulated with already placed items, however removed ones? precomplete autoComplete?
+                    report_quest = True
+                    session_quest['progress'][i] += 1
+                    print("Task progress")
+                    if session_quest['progress'][i] >= int(task["_total"]):
+                        session_quest["completedTasks"] = session_quest["completedTasks"] | 1 << i
+                        print("Task complete")
+
+        print("completedTasks", session_quest["completedTasks"], "len(tasks)", len(tasks), "calc", 2 ** len(tasks) - 1)
+        if session_quest["completedTasks"] >= 2 ** len(tasks) - 1:
+            session_quest["complete"] = True
+            print("Quest complete")
+
+            raw_sequels = lookup_quest(session_quest['name'])['sequels']
+            sequels = raw_sequels["sequel"] if isinstance(raw_sequels["sequel"], list) else [raw_sequels["sequel"]] if "sequel" in raw_sequels else []
+
+            for sequel in sequels:
+                print("activating sequel", sequel["_name"])
+                q = lookup_quest(sequel["_name"])
+                new_quests.append(new_quest(q))
+
+            # if "QuestComponent" not in meta:
+            #     meta['QuestComponent'] = []
+
+        if report_quest:
+            if "QuestComponent" not in meta:
+                meta['QuestComponent'] = []
+            merge_quest_progress([session_quest] + new_quests, meta['QuestComponent'], "output quest")
+            merge_quest_progress(new_quests, session['quests'], "session quest")
+            #meta['QuestComponent'].append(session_quest) ### merge if already in it?
+                    # progress = [0 for e in quest['tasks']]
 
 # def autoclick_next_state(state_machine, next_click_state):
 #     while '-autoNext' in next_click_state and next_click_state['-stateName'] != next_click_state[
@@ -743,17 +799,17 @@ def parse_duration(duration):
     if duration == 'rand:1d,4d':
         return 86400 # 1d
     elif "ms" in duration:
-        return int(duration[:-2]) / 1000
+        return float(duration[:-2]) / 1000
     elif "s" in duration:
-        return int(duration[:-1])
+        return float(duration[:-1])
     elif "m" in duration:
-        return int(duration[:-1]) * 60
+        return float(duration[:-1]) * 60
     elif "h" in duration:
-        return int(duration[:-1]) * 3600
+        return float(duration[:-1]) * 3600
     elif "d" in duration:
-        return int(duration[:-1]) * 86400
+        return float(duration[:-1]) * 86400
     else:
-        return int(duration)
+        return float(duration)
 
 
 def lookup_state_machine(state_machine_name, custom_values):
@@ -944,6 +1000,12 @@ def stop_mayhem_response():
                     "data": []}
     return stop_mayhem_response
 
+def save_options_response(options):
+    save_options_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                    "data": []}
+    session['user_object']["userInfo"]["player"]["options"] = options
+    return save_options_response
+
 
 
 # @app.after_request
@@ -977,9 +1039,11 @@ def describe_step(step):
     [descr] = [e for e in game_settings['settings']['tutorial']['step'] if e['-id'] == step]
     return descr
 
-def report_world_log(operation, response, req, sequence, endpoint):
+def report_world_log(operation, response, req, sequence, endpoint, response2, new_pve):
+    quest_names = [r['name'] for r in response2] if response2 else []
+    quests = [r for r in quest_settings['quests']['quest'] if r['_name'] in quest_names]
     req2 = json.loads(json.dumps(req, default=lambda o: '<not serializable>'))
-    socketio.emit('world_log', [operation, response, req2, sequence, endpoint])
+    socketio.emit('world_log', [operation, response, req2, sequence, endpoint, response2, new_pve,quests])
 
 def report_other_log(service, response, req, endpoint):
     req2 = json.loads(json.dumps(req, default=lambda o: '<not serializable>'))
