@@ -70,6 +70,19 @@
         var socket = io();
         socket.on('connect', function () {
             socket.emit('my event', {data: 'I\'m connected!'});
+
+            $('#delete_save').click(function(event) {
+				console.log('deleting save');
+				// event.preventDefault();
+
+				socket.emit('delete_save', "Deleting save game");
+
+				console.log('deleting cookie');
+				// $.cookie("session", null, { path: '/' });
+				// $.removeCookie('the_cookie', { path: '/' });
+
+			});
+
         });
         socket.on('tutorial_step', function (msg) {
             console.log(msg);
@@ -93,6 +106,8 @@
 				+ '</div>');
             $('#other_log').scrollTop(0)
         });
+
+
 
 
 	</script>
@@ -191,7 +206,7 @@
 	<div></div>
 
 <div>
-	Go to <a href="nodebug.html">nodebug</a> version.
+	Go to <a href="nodebug.html">nodebug</a> version. <a href="wipe_session" id="delete_save">Delete</a> save game.
 </div>
 <table>
 	<tr>

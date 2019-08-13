@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory, request, Response, session
+from flask import Flask, render_template, send_from_directory, request, Response, session, make_response, redirect
 from flask_session import Session
 from pyamf import remoting
 from pyamf.flex import messaging
@@ -11,6 +11,7 @@ from units import units
 from items import items
 from itemsettings import item_settings
 from questsettings import quest_settings
+from game_settings import game_settings
 import threading, webbrowser
 import pyamf.amf0
 import json
@@ -21,6 +22,8 @@ from flask_sqlalchemy import SQLAlchemy
 import time
 from flask_compress import Compress
 from flask_socketio import SocketIO
+from quest_engine import *
+from state_machine import *
 import copy
 
 
@@ -46,10 +49,6 @@ with open("initial-island.json", 'r') as f:
     game_objects = json.load(f)
     print("Initial island template",  len(game_objects), "objects loaded")
     # game_objects = [o for o in game_objects_2 if int(o["position"].split(",")[0]) > 62 and int(o["position"].split(",")[1]) > 58]
-
-with open("gamesettings-converted.json", 'r') as f:
-    game_settings = json.load(f)
-    print("Gamesettings loaded: ",  len(game_settings['settings']), " setting sections loaded")
 
 
 app = Flask(__name__)
@@ -79,9 +78,15 @@ def index():
 @app.route("/nodebug.html")
 def no_debug():
     print("index")
-    return render_template("nodebug.html")
+    return render_template("nodebug.html", time=datetime.now().timestamp())
 
 
+@app.route("/wipe_session", methods=['GET', 'POST'])
+def wipe_session():
+    session.clear()
+    response = make_response(redirect('/'))
+    # response.set_cookie('session', '', expires=0)
+    return response
 
 @app.route("/127.0.0.1record_stats.php", methods=['GET', 'POST'])
 def record_stats():
@@ -539,8 +544,10 @@ def user_response():
         print("initialized new")
         session['user_object'] = user
         # qc = [{"name": "Q0516", "complete":False, "expired":False,"progress":[0],"completedTasks":0}]
-        q = lookup_quest("Q0516")
-        qc = [new_quest(q)]
+        session['quests'] = []
+        qc = []
+
+        new_quest_with_sequels("Q0516", qc)
         session['quests'] = qc
     # for e in session['user_object']["userInfo"]["world"]["objects"]:
     #     e['lastUpdated'] = 1308211628  #1 minute earlier to test
@@ -616,14 +623,17 @@ def tutorial_response(step, sequence, endpoint):
     # if step == 'tut_step_placeBarracksServer':
     #     meta['QuestComponent'] = [qz, qz_cadets_start]
     if step == 'tut_step_cadetsComplete':
-        meta['QuestComponent'] = [qz_cadets_done, qz_invasion_start]  #what starts invasion?
+        handle_quest_progress(meta, progress_action("build"))
+        # meta['QuestComponent'] = [qz_cadets_done, qz_invasion_start]  #what starts invasion?
         meta["newPVE"] = {"status": 2, "pos": "60,63,0", "villain":"v18", "quest":"Q6016"}
     if step == 'tut_step_firstInvasionEnd':
     # if step == 'tut_step_postFirstInvasionResumeQuests':
-        meta['QuestComponent'] = [qz_invasion_done,flag_Q1098_start,cadets_Q0611_start]
+        handle_quest_progress(meta, progress_action("fight"))
+        # meta['QuestComponent'] = [qz_invasion_done,flag_Q1098_start,cadets_Q0611_start]
       #  meta["newPVE"] = {"status": 2, "pos": "60,66,0", "villain":"v18", "quest":"Q6016"}  #contineous battle mode experience QT01_05b_2
-    if step == 'tut_step_placeFlagQuestDialog':
-        meta['QuestComponent'] = [flag_Q1098_done, flag_Q6011_start]
+    # if step == 'tut_step_placeFlagQuestDialog':
+    #     meta['QuestComponent'] = [flag_Q1098_done, flag_Q6011_start]
+
     # if step == 'tut_step_placeFlagWaitForInventoryOpen':   # sometimes one of them is skipped?
     #     meta['QuestComponent'] = [flag_Q1098_done, flag_Q6011_start]
     # if step == 'tut_step_placeFlagEnd':
@@ -642,20 +652,6 @@ def tutorial_response(step, sequence, endpoint):
     tutorial_response = {"errorType": 0, "userId": 1, "metadata": meta,
                     "data": []}
     return tutorial_response
-
-def merge_quest_progress(qc, output_list, label):
-    print("new q before merge " + repr(qc))
-    print(label + " list before merge " + repr (output_list))
-    output_list[:] = qc + [e for e in output_list if e['name'] not in [q['name'] for q in qc]]
-    print(label + " list after merge " + repr (output_list))
-
-def lookup_quest(name):
-    [quest] = [r for r in quest_settings['quests']['quest'] if r['_name'] == name]
-    return quest
-
-def new_quest(quest):
-    progress = [0 for e in quest['tasks']]
-    return {"name": quest['_name'], "complete": False, "expired": False, "progress": progress, "completedTasks": 0}
 
 
 def perform_world_response(step, supplied_id, position, item_name):
@@ -696,161 +692,6 @@ def perform_world_response(step, supplied_id, position, item_name):
                     "data": {"id": id}}
     print("perform_world_response" , repr(perform_world_response))
     return perform_world_response
-
-def click_next_state(id, meta, step):
-    cur_object = lookup_object(id)
-    print("cur_object used:", repr(cur_object))
-
-    game_item = lookup_item(cur_object['itemName'])
-    print("item used:", repr(game_item))
-
-    if 'stateMachineValues' in game_item:
-        state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'], game_item['stateMachineValues']['define'])
-
-        print("state_machine used:", repr(state_machine))
-        state = lookup_state(state_machine, cur_object.get('state', 0))
-        print("cur state:", repr(state))
-
-        while '-autoNext' in state and state['-stateName'] != state['-autoNext']:   #'-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
-            duration =  parse_duration(state.get('-duration', '0'))
-            if cur_object.get('lastUpdated') / 1000 +  duration <= datetime.now().timestamp():
-                next_state_id = state['-autoNext']  # not all states have this!! end states? autostate after time?
-                state = lookup_state(state_machine, next_state_id)
-                cur_object['lastUpdated'] += duration * 1000
-                cur_object['state'] = next_state_id
-                print("pre auto_next_state:", repr(state), 'time', cur_object['lastUpdated'], "duration", duration)
-                handle_world_state_change(state, game_item, meta, step)
-
-        if '-clickNext' in state:
-            next_state_id = state['-clickNext']  # not all states have this!! end states? autostate after time?
-            next_click_state = lookup_state(state_machine, next_state_id)
-            print("next_click_state:", repr(next_click_state))
-            handle_world_state_change(next_click_state, game_item, meta, step)
-
-            while '-autoNext' in next_click_state and next_state_id != next_click_state['-autoNext'] and next_click_state.get('-duration', '0') in ['0', '0s']:   #'-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
-                next_state_id = next_click_state['-autoNext']  # not all states have this!! end states? autostate after time?
-                next_click_state = lookup_state(state_machine, next_state_id)
-                print("auto_next_state:", repr(next_click_state))
-                handle_world_state_change(next_click_state, game_item, meta,step)
-
-            cur_object['state'] = next_state_id
-            cur_object['lastUpdated'] = datetime.now().timestamp() * 1000
-        else:
-            print("state has no clicknext, click does nothing")
-            cur_object['lastUpdated'] = datetime.now().timestamp() * 1000
-    else:
-        print("object has no statemachine, click does nothing")
-        cur_object['lastUpdated'] = datetime.now().timestamp() * 1000
-        handle_world_state_change({}, game_item, meta, step)
-
-# "autoComplete","battleDamage","battleKill","build","buyExpansion","challengeCreate","clear","countPlaced","expandIsland","fight","finishBuilding","fullscreen","genericString","harvest","inventoryAdded","islandWin","marketAdd","marketBuy","move","neighborsAdded","openDialog","ownObjects","ownResource","place","population","pillage","pvpCombat","resourceAdded","seenFlag","select","socialXPAdded","startImmunity","state","tending","tendingRewardDropped","unlockTutorial","useConsumable","visit","zoom"
-def handle_world_state_change(state, game_item , meta, step):
-    incomplete_quests = [e for e in session['quests'] if e["complete"] == False]
-    for session_quest in incomplete_quests:
-        new_quests = []
-        report_quest = False
-        raw_tasks = lookup_quest(session_quest['name'])['tasks']['task']
-        tasks = raw_tasks if isinstance(raw_tasks, list) else [raw_tasks]
-        for task, progress, i in zip(tasks, session_quest['progress'], range(len(session_quest['progress']))):
-            print("task", repr(task), "progress", repr(progress), "i", i)
-            if (task["_action"] == "finishBuilding" and task["_item"] == game_item['-code'] and progress < int(task["_total"]) and state['-className'] == 'Finished') \
-                    or task["_action"] == "autoComplete" \
-                    or task["_action"] in ["place", 'countPlaced'] and task["_item"] == game_item['-code'] and progress < int(task["_total"] and step == "place"):  #countPlaced tasks should be prepolulated with already placed items, however removed ones? precomplete autoComplete?
-                    report_quest = True
-                    session_quest['progress'][i] += 1
-                    print("Task progress")
-                    if session_quest['progress'][i] >= int(task["_total"]):
-                        session_quest["completedTasks"] = session_quest["completedTasks"] | 1 << i
-                        print("Task complete")
-
-        print("completedTasks", session_quest["completedTasks"], "len(tasks)", len(tasks), "calc", 2 ** len(tasks) - 1)
-        if session_quest["completedTasks"] >= 2 ** len(tasks) - 1:
-            session_quest["complete"] = True
-            print("Quest complete")
-
-            raw_sequels = lookup_quest(session_quest['name'])['sequels']
-            sequels = raw_sequels["sequel"] if isinstance(raw_sequels["sequel"], list) else [raw_sequels["sequel"]] if "sequel" in raw_sequels else []
-
-            for sequel in sequels:
-                print("activating sequel", sequel["_name"])
-                q = lookup_quest(sequel["_name"])
-                new_quests.append(new_quest(q))
-
-            # if "QuestComponent" not in meta:
-            #     meta['QuestComponent'] = []
-
-        if report_quest:
-            if "QuestComponent" not in meta:
-                meta['QuestComponent'] = []
-            merge_quest_progress([session_quest] + new_quests, meta['QuestComponent'], "output quest")
-            merge_quest_progress(new_quests, session['quests'], "session quest")
-            #meta['QuestComponent'].append(session_quest) ### merge if already in it?
-                    # progress = [0 for e in quest['tasks']]
-
-# def autoclick_next_state(state_machine, next_click_state):
-#     while '-autoNext' in next_click_state and next_click_state['-stateName'] != next_click_state[
-#         '-autoNext']:  # '-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
-#         next_state_id = next_click_state['-autoNext']  # not all states have this!! end states? autostate after time?
-#         next_click_state = lookup_state(state_machine, next_state_id)
-#         print("auto_next_state:", repr(next_click_state))
-
-def parse_duration(duration):
-    # ["ms", "m", "s", "h", "d"];
-    if duration == 'rand:1d,4d':
-        return 86400 # 1d
-    elif "ms" in duration:
-        return float(duration[:-2]) / 1000
-    elif "s" in duration:
-        return float(duration[:-1])
-    elif "m" in duration:
-        return float(duration[:-1]) * 60
-    elif "h" in duration:
-        return float(duration[:-1]) * 3600
-    elif "d" in duration:
-        return float(duration[:-1]) * 86400
-    else:
-        return float(duration)
-
-
-def lookup_state_machine(state_machine_name, custom_values):
-    state_machine = copy.deepcopy(lookup_raw_state_machine(state_machine_name))
-    replacements = {e['-name']: e['-value'] for e in custom_values}
-    print('replacements', repr(replacements))
-    repl_dict(state_machine, replacements)
-    return state_machine
-
-def repl_dict(d, replacements):
-    for k, v in d.items():
-        if isinstance(v, dict):
-            repl_dict(v, replacements)
-        elif isinstance(v, list):
-            for e in v:
-                repl_dict(e, replacements)
-        else:
-            if "$" in v:
-                # print('r1', v)
-                for s, r in replacements.items():
-                    d[k] = d[k].replace(s, r)
-                # print('r2', d[k])
-                if ":" in v:
-                    d[k] = d[k].split(':', 1)[1 if "$" in d[k] else 0]
-                    # print('r3', d[k])
-
-def lookup_raw_state_machine(state_machine_name):
-    [state_machine] = [e for e in game_settings['settings']['stateMachines']['stateMachine'] if e['-name'] == state_machine_name]
-    return state_machine
-
-def lookup_state(state_machine, i):
-    [state_machine] = [e for e in state_machine['state'] if e['-stateName'] == str(i)]
-    return state_machine
-
-def lookup_item(item_name):
-    [item] = [e for e in game_settings['settings']['items']['item'] if e['-name'] == item_name]
-    return item
-
-def lookup_object(id):
-    [game_object] = [e for e in  session['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
-    return game_object
 
 
 def neighbor_suggestion_response():
@@ -1028,6 +869,13 @@ def handle_message(message):
 def handle_my_custom_event(json):
     print('received json: ' + str(json))
 
+@socketio.on('delete_save')
+def delete_save(message):
+    # session.permanent = False
+    # session.clear() #unsolved flask-session bug
+
+    # print('deleted save: ' + message)
+    print("Save will be deleted after redirect " + message)
 
 def report_tutorial_step(step, response, new_pve, sequence, endpoint):
     quest_names = [r['name'] for r in response] if response else []
