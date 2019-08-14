@@ -30,7 +30,7 @@ def prepopulate_task(task):
         else:
             state_machine = None
         objects = lookup_objects_by_item_name(item['-name'])
-        number_built = len([e for e in objects if e.get('state', 0) >= (int(state_machine['-builtState']) if state_machine else 0)])
+        number_built = len([e for e in objects if int(e.get('state', 0)) >= (int(state_machine['-builtState']) if state_machine else 0)])
         return min(number_built, int(task["_total"])), number_built >= int(task["_total"])
     elif task["_action"] == 'autoComplete':
         return 1, True
@@ -51,28 +51,56 @@ def world_state_change(*state_args):
     return lambda *args: \
         any([progress_finish_building_count_placed(*state_args)(*args),
              progress_auto_complete()(*args),
-             progress_place(*state_args)(*args)])
+             progress_place(*state_args)(*args),
+             progress_build(*state_args)(*args),
+             progress_harvest(*state_args)(*args)
+             ])
 
 
-def progress_finish_building_count_placed(state, state_machine, game_item, step):
+def progress_finish_building_count_placed(state, state_machine, game_item, step, previous_state, *state_args):
     return lambda task, progress, i, *args: \
         task["_action"] in ["finishBuilding", "countPlaced"] and task["_item"] == game_item[
-            '-code'] and progress < int(task["_total"]) and state['-stateName'] == state_machine['-builtState']
+            '-code'] and progress < int(task["_total"]) and state['-stateName'] == state_machine['-builtState'] and \
+        int(previous_state['-stateName']) < int(state['-stateName'])
+
+
+#cancels?
+def progress_build(state, state_machine, game_item, step, previous_state, reference_item, previous_reference_item, *state_args):
+    return lambda task, progress, i, *args: \
+        task["_action"] == "build" and reference_item in task["_item"].split(',') and previous_reference_item == None
+
+
+def progress_harvest(state, state_machine, game_item, step, previous_state, reference_item, previous_reference_item, *state_args):
+    return lambda task, progress, i, *args: \
+        task["_action"] == "harvest" and previous_reference_item in task["_item"].split(',') and reference_item == None
 
 
 def progress_auto_complete():
     return lambda task, *args: task["_action"] == "autoComplete"
 
 
-def progress_place(state, state_machine, game_item, step):
+def progress_place(state, state_machine, game_item, step, *state_args):
     return lambda task, progress, i, *args: \
         task["_action"] in ["place"] and task["_item"] == game_item['-code'] and progress < int(task["_total"] and step == "place")
+
+
+# def all_lambda(lambdas, *initializer):
+#     return lambda *args: all([l(*initializer)(*args) for l in lambdas])
+
+
+def all_lambda(*lambdas):
+    return lambda *args: all([l(*args) for l in lambdas])
 
 
 def progress_action(action):
     return lambda task, *args: task["_action"] == action
 
 
+def progress_parameter_equals(key, value):
+    return lambda task, *args: task.get(key) == value
+
+
+# deprogress functions?
 def handle_quest_progress(meta, progress_function):
     incomplete_quests = [e for e in session['quests'] if e["complete"] == False]
     for session_quest in incomplete_quests:
@@ -93,6 +121,7 @@ def handle_quest_progress(meta, progress_function):
         if session_quest["completedTasks"] >= 2 ** len(tasks) - 1:
             session_quest["complete"] = True
             print("Quest complete", session_quest['name'])
+            do_quest_rewards(lookup_quest(session_quest['name']))
             activate_sequels(session_quest, new_quests)
         if report_quest:
             if "QuestComponent" not in meta:
@@ -128,6 +157,8 @@ def new_quest_with_sequels(name, new_quests):
         new_sequel_quest = new_quest(q)
         new_quests.append(new_sequel_quest)
         if new_sequel_quest["complete"]:
+            print("Sequel quest precompleted", name)
+            do_quest_rewards(q)
             activate_sequels(new_sequel_quest, new_quests)
 
 
@@ -138,3 +169,75 @@ def new_quest_with_sequels(name, new_quests):
 #         next_state_id = next_click_state['-autoNext']  # not all states have this!! end states? autostate after time?
 #         next_click_state = lookup_state(state_machine, next_state_id)
 #         print("auto_next_state:", repr(next_click_state))
+
+
+def do_quest_rewards(quest):
+    # TODO: rewardModifier
+    raw_rewards = quest['reward']
+    rewards = raw_rewards if isinstance(raw_rewards, list) else [raw_rewards]
+    inc = {r["_type"]: int(r.get('_count', 1)) for r in rewards if r["_type"] != "item"}
+    items = {r["_item"]: int(r.get('_count', 1)) for r in rewards if r["_type"] == "item"}
+
+
+    player = session['user_object']["userInfo"]["player"]
+    player['energy'] += int(inc.get('energy', 0))
+    player['xp'] += int(inc.get('xp', 0))
+
+
+    player['cash'] += int(inc.get('cash', 0))
+    player['socialXpGood'] += int(inc.get('socialXpGood', 0))
+    player['socialXpBad'] += int(inc.get('socialXpBad', 0))
+
+    world = session['user_object']["userInfo"]["world"]
+    resources = world['resources']
+    resources['coins'] += int(inc.get('coins', 0))
+    resources['energy'] += int(inc.get('energy', 0)) #correct one?  #repleenish!!
+    resources['oil'] += int(inc.get('oil', 0))
+    resources['wood'] += int(inc.get('wood', 0))
+
+    resourceOrder = world['resourceOrder']
+    resources[resourceOrder[0]] += int(inc.get('rare', 0))
+    resources[resourceOrder[0]] += int(inc.get('nrare0', 0))
+    resources[resourceOrder[1]] += int(inc.get('nrare1', 0))
+    resources[resourceOrder[2]] += int(inc.get('nrare2', 0))
+    resources[resourceOrder[3]] += int(inc.get('nrare3', 0))
+    resources[resourceOrder[4]] += int(inc.get('nrare4', 0))
+
+    level_cash = 0
+    levels_count = 0
+    levels = [level for level in game_settings['settings']['levels']['level'] if int(level["-num"]) > player['level'] and int(level["-requiredXP"]) <= player['xp']    ]
+    for level in levels:
+        print("Level increased to", level["-num"])
+        player['level'] = int(level["-num"])
+        levels_count += 1
+        if "reward" in level and level["reward"]["-type"] == "cash":
+            player['cash'] += level["reward"]["-count"]
+            level_cash += level["reward"]["-count"]
+
+    if inc:
+        print("Quest rewards:", ", ".join(
+            [label + " " + ("+" if int(increment) > 0 else "") + str(increment) + " (" + str(total) + ")" for
+             (label, increment, total)
+             in
+             [("xp:", inc.get('xp', 0), player['xp']),
+              ("energy:", inc.get('energy', 0), resources['energy']),
+              ("coins:", inc.get('coins', 0), resources['coins']),
+              ("oil:", inc.get('oil', 0), resources['oil']),
+              ("wood:", inc.get('wood', 0), resources['wood']),
+              ("cash:", inc.get('cash', 0), player['cash']),
+              ("cash (level):", level_cash, player['cash']),
+              ("levels:", levels_count, player['level']),
+              ("socialXpGood:", inc.get('socialXpGood', 0), player['socialXpGood']),
+              ("socialXpBad:", inc.get('socialXpBad', 0), player['socialXpBad']),
+              (resourceOrder[0] + ":", inc.get('rare', 0), resources[resourceOrder[0]]),
+              (resourceOrder[0] + ":", inc.get('nrare0', 0), resources[resourceOrder[0]]),
+              (resourceOrder[1] + ":", inc.get('nrare1', 0), resources[resourceOrder[1]]),
+              (resourceOrder[2] + ":", inc.get('nrare2', 0), resources[resourceOrder[2]]),
+              (resourceOrder[3] + ":", inc.get('nrare3', 0), resources[resourceOrder[3]]),
+              (resourceOrder[4] + ":", inc.get('nrare4', 0), resources[resourceOrder[4]])
+              ] if int(increment) != 0]))
+
+    if items:
+        print("Quest item rewards:", ", ".join([ k + ": " + str(v) for k,v in items]))
+
+        # TODO store them & consumption
