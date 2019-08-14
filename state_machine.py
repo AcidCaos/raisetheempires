@@ -119,12 +119,15 @@ def do_rewards(state):
     levels = [level for level in game_settings['settings']['levels']['level'] if
               int(level["-num"]) > player['level'] and int(level["-requiredXP"]) <= player['xp']]
     for level in levels:
-        print("Level increased to", level["-num"])
+        [energy_cap] = [e['-cap'] for e in game_settings['settings']['energycaps']['energycap'] if e['-level'] == level["-num"]]
+        print("Level increased to", level["-num"], "New energy:", energy_cap)
         player['level'] = int(level["-num"])
+        player['energy'] = int(energy_cap)
+        player['energyMax'] = int(energy_cap)
         levels_count += 1
         if "reward" in level and level["reward"]["-type"] == "cash":
-            player['cash'] += level["reward"]["-count"]
-            level_cash += level["reward"]["-count"]
+            player['cash'] += int(level["reward"]["-count"])
+            level_cash += int(level["reward"]["-count"])
 
     log_rewards = ", ".join([label + " " + ("+" if int(increment) > 0 else "") + str(increment) + " (" + str(total) + ")" for
                      (label, increment, total)
