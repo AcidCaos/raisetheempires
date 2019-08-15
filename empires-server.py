@@ -88,6 +88,16 @@ def wipe_session():
     # response.set_cookie('session', '', expires=0)
     return response
 
+@app.route("/gazillionaire", methods=['GET', 'POST'])
+def more_money():
+    if 'user_object' in session:
+        player = session['user_object']["userInfo"]["player"]
+        player['cash'] += 10000
+        response = make_response(redirect('/'))
+        return response
+    else:
+        return ('Nope', 403)
+
 @app.route("/127.0.0.1record_stats.php", methods=['GET', 'POST'])
 def record_stats():
     return ('', 204)
@@ -177,7 +187,7 @@ def post_gateway():
         elif reqq.functionName == 'PVPService.createRandomFleetChallenge':
             resps.append(random_fleet_challenge_response())
         elif reqq.functionName == 'WorldService.spawnFleet':
-            resps.append(spawn_fleet())
+            resps.append(spawn_fleet(reqq.params[0]))
         elif reqq.functionName == 'PVPService.loadChallenge':
             resps.append(load_challenge_response())
         elif reqq.functionName == 'WorldService.resolveBattle':
@@ -1126,12 +1136,22 @@ def random_fleet_challenge_response():
                     }}
     return random_fleet_challenge_response
 
-def spawn_fleet():
+def spawn_fleet(params):
     global battle_seq
     battle_seq = 0 #STATE! no multiple battles at the same time!!
     meta = {}
+
+    # params['code']
+    # params['fleet']
+
+    quest = lookup_quest(params['code'])
+    tasks = get_tasks(quest)
+
+    [task] = [t for t in tasks if t["_action"] == "fight"]
+
    # meta["newPVE"] = {"status": 2, "pos": "58,60,0", "villain": "v18"}
-    meta["newPVE"] = {"status": 2, "pos": "60,63,0", "villain": "v18", "quest": "Q6016"}
+   #  meta["newPVE"] = {"status": 2, "pos": "60,63,0", "villain": "v18", "quest": "Q6016"}
+    meta["newPVE"] = {"status": 2, "pos": task["_spawnLocation"], "villain": task["_pveVillain"], "quest": params['code']}
     spawn_fleet = {"errorType": 0, "userId": 1, "metadata": meta,
                           "data": []}
     return spawn_fleet
@@ -1163,7 +1183,7 @@ def battle_complete_response(params):
 
 
     battle_complete_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},  #CHALLENGE_STATE_IN_PROGRESS
-                    "data": first_battle[battle_seq]}
+                    "data": first_battle[battle_seq] if battle_seq < len(first_battle) else first_battle[0]}
     battle_seq += 1
     return battle_complete_response
 

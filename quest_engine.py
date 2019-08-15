@@ -140,8 +140,8 @@ def get_tasks(quest):
 
 def activate_sequels(session_quest, new_quests):
     raw_sequels = lookup_quest(session_quest['name'])['sequels']
-    sequels = raw_sequels["sequel"] if isinstance(raw_sequels["sequel"], list) else [
-        raw_sequels["sequel"]] if "sequel" in raw_sequels else []
+    sequels = (raw_sequels["sequel"] if isinstance(raw_sequels["sequel"], list) else [
+        raw_sequels["sequel"]]) if raw_sequels != "" and "sequel" in raw_sequels else []
     for sequel in sequels:
         new_quest_with_sequels(sequel["_name"], new_quests)
 
