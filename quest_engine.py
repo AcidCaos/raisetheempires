@@ -2,6 +2,7 @@ from questsettings import quest_settings
 from game_settings import game_settings, lookup_item_by_code, lookup_state_machine
 from flask import session
 from functools import reduce
+import math
 
 def merge_quest_progress(qc, output_list, label):
     print("new q before merge " + repr(qc))
@@ -137,6 +138,8 @@ def get_tasks(quest):
     tasks = raw_tasks if isinstance(raw_tasks, list) else [raw_tasks]
     return tasks
 
+def simple_list(raw_list):
+    return (raw_list if isinstance(raw_list, list) else [raw_list]) if raw_list != '' else []
 
 def activate_sequels(session_quest, new_quests):
     raw_sequels = lookup_quest(session_quest['name'])['sequels']
@@ -218,7 +221,6 @@ def do_quest_rewards(quest):
             player['cash'] += int(level["reward"]["-count"])
             level_cash += int(level["reward"]["-count"])
 
-
     if inc:
         print("Quest rewards:", ", ".join(
             [label + " " + ("+" if int(increment) > 0 else "") + str(increment) + " (" + str(total) + ")" for
@@ -246,3 +248,28 @@ def do_quest_rewards(quest):
         print("Quest item rewards:", ", ".join([ k + ": " + str(v) for k,v in items]))
 
         # TODO store them & consumption
+
+
+def roll_random():
+    world = session['user_object']["userInfo"]["world"]
+    world["randSeedZ"] = 36969 * (world["randSeedZ"] & 65535)  + (world["randSeedZ"] >> 16 & 65535) & 4294967295;
+    world["randSeedW"] = 18000 * (world["randSeedW"] & 65535)  + (world["randSeedW"] >> 16 & 65535) & 4294967295;
+    return world["randSeedZ"] & 65535 +  world["randSeedW"] & 4294967295
+
+
+def roll_random_float():
+    number = roll_random() / (2 ** 32 - 1)
+    return math.floor(number * 10 ** 3) / 10 ** 3
+
+
+def roll_random_between(a, b):
+    return roll_random_float() * (b - a) + a
+
+
+def get_seed_w():
+    return session['user_object']["userInfo"]["world"]["randSeedW"]
+
+
+def get_seed_z():
+    return session['user_object']["userInfo"]["world"]["randSeedZ"]
+
