@@ -1,5 +1,6 @@
 import copy
 import json
+from flask import session
 
 
 with open("gamesettings-converted.json", 'r') as f:
@@ -16,6 +17,24 @@ def lookup_item_by_code(code):
     [item] = [e for e in game_settings['settings']['items']['item'] if e['-code'] == code]
     return item
 
+
+def lookup_items_with_workers_yield():
+    items = [e for e in game_settings['settings']['items']['item'] if 'yield' in e and '-workers' in e['yield']]
+    return items
+
+
+def lookup_yield():  #TODO buildstate
+    yields = {e['-name']: int(e['yield']['-workers']) for e in lookup_items_with_workers_yield()}
+    return sum([yields[e['itemName']] for e in session['user_object']["userInfo"]["world"]["objects"] if e['itemName'] in yields.keys()])
+
+
+# def lookup_built_yield(placed_objects):
+#     built_objects = [e for e in objects if
+#                      int(e.get('state', 0)) >= (int(state_machine['-builtState']) if state_machine else 0)]
+#
+#     yields = {e['-name']: int(e['yield']['-workers']) for e in lookup_items_with_workers_yield()}
+#     return sum([yields[e['itemName']] for e in session['user_object']["userInfo"]["world"]["objects"] if
+#                 e['itemName'] in yields.keys()])
 
 def lookup_state_machine(state_machine_name, custom_values):
     state_machine = copy.deepcopy(lookup_raw_state_machine(state_machine_name))

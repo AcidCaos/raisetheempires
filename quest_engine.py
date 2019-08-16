@@ -31,8 +31,12 @@ def prepopulate_task(task):
         else:
             state_machine = None
         objects = lookup_objects_by_item_name(item['-name'])
-        number_built = len([e for e in objects if int(e.get('state', 0)) >= (int(state_machine['-builtState']) if state_machine else 0)])
+        built_objects = [e for e in objects if
+                 int(e.get('state', 0)) >= (int(state_machine['-builtState']) if state_machine else 0)]
+        number_built = len(built_objects)
         return min(number_built, int(task["_total"])), number_built >= int(task["_total"])
+    elif task["_action"] == 'population':
+        return min(session['population'], int(task["_total"])), session['population'] >= int(task["_total"])
     elif task["_action"] == 'autoComplete':
         return 1, True
     else:
@@ -54,7 +58,8 @@ def world_state_change(*state_args):
              progress_auto_complete()(*args),
              progress_place(*state_args)(*args),
              progress_build(*state_args)(*args),
-             progress_harvest(*state_args)(*args)
+             progress_harvest(*state_args)(*args),
+             progress_state(*state_args)(*args)
              ])
 
 
@@ -77,12 +82,18 @@ def progress_harvest(state, state_machine, game_item, step, previous_state, refe
 
 
 def progress_auto_complete():
-    return lambda task, *args: task["_action"] == "autoComplete"
+    return lambda task, *args: task["_action"] in ["autoComplete", "population"]
 
 
 def progress_place(state, state_machine, game_item, step, *state_args):
     return lambda task, progress, i, *args: \
-        task["_action"] in ["place"] and task["_item"] == game_item['-code'] and progress < int(task["_total"] and step == "place")
+        task["_action"] in ["place"] and task["_item"] == game_item['-code'] and progress < int(task["_total"]) and step == "place"
+
+
+def progress_state(state, state_machine, game_item, step, *state_args):
+    return lambda task, progress, i, *args: \
+        task["_action"] in ["state"] and task["_state"] == state['-stateName'] and ("_item" not in task or task["_item"] == game_item['-code'])\
+        and ("_subtype" not in task or task["_subtype"] == game_item['-subtype']) and progress < int(task["_total"])
 
 
 # def all_lambda(lambdas, *initializer):
@@ -112,7 +123,10 @@ def handle_quest_progress(meta, progress_function):
             print("task", repr(task), "progress", repr(progress), "i", i)
             if progress_function(task, progress, i):  #countPlaced tasks should be prepolulated with already placed items, however removed ones? precomplete autoComplete?
                     report_quest = True
-                    session_quest['progress'][i] += 1
+                    if task['_action'] == 'population':
+                        session_quest['progress'][i] = min(session['population'], int(task["_total"]))
+                    else:
+                        session_quest['progress'][i] += 1
                     print("Task progress", task["_action"])
                     if session_quest['progress'][i] >= int(task["_total"]):
                         session_quest["completedTasks"] = session_quest["completedTasks"] | 1 << i
@@ -248,7 +262,6 @@ def do_quest_rewards(quest):
         print("Quest item rewards:", ", ".join([ k + ": " + str(v) for k,v in items]))
 
         # TODO store them & consumption
-
 
 def roll_random():
     world = session['user_object']["userInfo"]["world"]

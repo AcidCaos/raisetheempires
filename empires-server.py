@@ -11,7 +11,7 @@ from units import units
 from items import items
 from itemsettings import item_settings
 from questsettings import quest_settings
-from game_settings import game_settings
+from game_settings import game_settings, lookup_yield
 import threading, webbrowser
 import pyamf.amf0
 import json
@@ -25,6 +25,7 @@ from flask_socketio import SocketIO
 from quest_engine import *
 from state_machine import *
 import copy
+import libscrc
 
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript', 'application/x-amf']
@@ -70,14 +71,14 @@ def home():
 @app.route("/")
 def index():
     print("index")
-    return render_template("home.html", time=datetime.now().timestamp())
+    return render_template("home.html", time=datetime.now().timestamp(), zid=str(get_zid()))
 
 
 
 @app.route("/nodebug.html")
 def no_debug():
     print("index")
-    return render_template("nodebug.html", time=datetime.now().timestamp())
+    return render_template("nodebug.html", time=datetime.now().timestamp(),zid=str(get_zid()))
 
 
 @app.route("/wipe_session", methods=['GET', 'POST'])
@@ -209,6 +210,12 @@ def post_gateway():
             resps.append(full_screen_response())
         elif reqq.functionName == 'WorldService.viewZoom':
             resps.append(view_zoom_response(reqq.params[0].get('zoom')))
+        elif reqq.functionName == 'WorldService.loadWorld':
+            resps.append(load_world_response(reqq.params))
+        elif reqq.functionName == 'VisitorService.help':
+            resps.append(tend_ally_response())
+        elif reqq.functionName == 'WorldService.addFleet':
+            resps.append(dummy_response())
         elif reqq.functionName == 'UserService.publishUserAction':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.sendUserNotification':
@@ -270,8 +277,6 @@ def post_gateway():
         elif reqq.functionName == 'UserService.reactivateFightMeter':
             resps.append(dummy_response())
         elif reqq.functionName == 'DominationModeService.addDominationChat':
-            resps.append(dummy_response())
-        elif reqq.functionName == 'WorldService.addFleet':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.addFriendPublish':
             resps.append(dummy_response())
@@ -545,13 +550,9 @@ def post_gateway():
             resps.append(dummy_response())
         elif reqq.functionName == 'VisitorService.decline':
             resps.append(dummy_response())
-        elif reqq.functionName == 'VisitorService.help':
-            resps.append(dummy_response())
         elif reqq.functionName == 'VisitorService.helpedInvalid':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.grantWatchToEarnReward':
-            resps.append(dummy_response())
-        elif reqq.functionName == 'WorldService.loadWorld':
             resps.append(dummy_response())
         elif reqq.functionName == 'ZlingshotService.zoom':
             resps.append(dummy_response())
@@ -667,7 +668,7 @@ def init_user():
     user = {
         "userInfo": {
             "player": {
-                "uid": 0,
+                "uid": get_zid(),
                 "lastTrackingTimestamp": 0,
                 "viralSurfacing": {"seen": [], "counts": {}},
                 "crewNeighbors": [],
@@ -811,8 +812,11 @@ def init_user():
                       }
 
         },
-        "neighbors": [{"uid":123, "resource": 3, "coins": 100, "xp":10, "level": 1, "socialXpGood": 0, "socialLevelGood":1,
-                       "socialXpBad":0, "socialLevelBad":1, "profilePic": None,"dominanceRank":1, "tending":{"actions":3} }],
+        "neighbors": [
+            {"uid": 123, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
+             "socialXpBad": 0, "socialLevelBad": 1, "profilePic": None, "dominanceRank": 1, "tending": {"actions": 3}},
+            {"uid": -1, "resource": 3, "coins": 100, "xp": 10, "level": 6, "socialXpGood": 0, "socialLevelGood": 20,
+             "socialXpBad": 0, "socialLevelBad": 1, "profilePic": "assets/game/GeneralAssetGroup_UI.swf/NeighborOneCP.png", "dominanceRank": 1, "tending": {"actions": 3}}],
         "unlockedResource": {"aluminum": 3, "copper": 4, "gold": 5, "iron": 6},
         "showBookmark": True,
         "firstDay": True,
@@ -898,8 +902,19 @@ def init_user():
 def user_response():
     if 'user_object' in session:
         user = session['user_object']
+        user["userInfo"]["player"]["uid"] = get_zid()
         qc = session['quests']
         print("loading user from save")
+
+        user["neighbors"] = [
+            {"uid": 123, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
+             "socialXpBad": 0, "socialLevelBad": 1, "profilePic": None, "dominanceRank": 1, "tending": {"actions": 3}},
+            # {"uid": -2, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
+            #  "socialXpBad": 0, "socialLevelBad": 1, "profilePic": None, "dominanceRank": 1, "tending": {"actions": 3}},
+            {"uid": -1, "resource": 3, "coins": 100, "xp": 10, "level": 6, "socialXpGood": 0, "socialLevelGood": 20,
+             "socialXpBad": 0, "socialLevelBad": 1, "profilePic": "assets/game/GeneralAssetGroup_UI.swf/NeighborOneCP.png", "dominanceRank": 1, "tending": {"actions": 3}}]
+
+
     else:
         user = copy.deepcopy(init_user())
         print("initialized new")
@@ -911,12 +926,22 @@ def user_response():
         new_quest_with_sequels("Q0516", qc)
         session['quests'] = qc
 
+    # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_inviteFriendsViral'
+
     session["battle"] = None
+    session['population'] = lookup_yield()
+
+
     # for e in session['user_object']["userInfo"]["world"]["objects"]:
     #     e['lastUpdated'] = 1308211628  #1 minute earlier to test
-    user_response = {"errorType": 0, "userId": session.sid, "metadata": {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]},  # {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0},{"name": "QW120", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
+    user_response = {"errorType": 0, "userId": get_zid(), "metadata": {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]},  # {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0},{"name": "QW120", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
                     "data": user}
     return user_response
+
+
+def get_zid():
+    return libscrc.iso(session.sid.encode()) // 1000
+
 
 def friend_response():
     friend = {
@@ -1232,11 +1257,13 @@ def battle_complete_response(params):
         baddie_strengths[enemy_unit_id] -= damage
         if baddie_strengths[enemy_unit_id] < 0:
             baddie_strengths[enemy_unit_id] = 0 #dead
+            session["battle"] = None
         print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_id])
     else:
         friendly_strengths[player_unit_id] -= damage
         if friendly_strengths[player_unit_id] < 0:
             friendly_strengths[player_unit_id] = 0  # dead
+            session["battle"] = None
         print("Taken", damage, "damage, player hp:", friendly_strengths[player_unit_id])
 
     if not player_turn:
@@ -1331,6 +1358,42 @@ def view_zoom_response(zoom):
     view_zoom_response = {"errorType": 0, "userId": 1, "metadata": meta,
                     "data": []}
     return view_zoom_response
+
+def load_world_response(params):
+    meta = {"newPVE": 0}
+    handle_quest_progress(meta, progress_action("visit"))
+
+    print("world resp", int(params[0]) , session['user_object']["userInfo"]["player"]["uid"])
+    if int(params[0]) == session['user_object']["userInfo"]["player"]["uid"]:
+        ally = session['user_object']["userInfo"]
+        # qc = session['quests']
+        print("reloading user from save")
+    else:
+        ally = copy.deepcopy(init_user()["userInfo"])
+        ally["player"]["uid"] = int(params[0])
+        # ally["gf"] = False
+        # ally["yimf"] = ""
+        # ally["novisit"] = False
+        # ally["globalPVP"] = {}
+        # ally["nonFriendInfo"] = {}
+        # ally["untendableObjIDs"] = []
+
+        # ally["world"]["yimf"] = ""
+    ally["pvpMode"] = params[2]
+    ally["visitorEnergy"] = 5
+
+    load_world_response = {"errorType": 0, "userId": 1, "metadata": meta,
+                    "data": ally}
+    return load_world_response
+
+
+def tend_ally_response():
+    meta = {"newPVE": 0}
+    handle_quest_progress(meta, progress_action("tending"))
+    tend_ally_response = {"errorType": 0, "userId": 1, "metadata": meta,
+                    "data": []}
+    return tend_ally_response
+
 
 def dummy_response():
     dummy_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
