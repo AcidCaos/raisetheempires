@@ -102,7 +102,7 @@ def do_rewards(state):
     world = session['user_object']["userInfo"]["world"]
     resources = world['resources']
     resources['coins'] += int(state.get('-coins', 0))
-    resources['energy'] += int(state.get('-energy', 0)) #correct one?  #repleenish!!
+    resources['energy'] += int(state.get('-energy', 0)) #which one?
     resources['oil'] += int(state.get('-oil', '0').split('|')[0])
     resources['wood'] += int(state.get('-wood', '0').split('|')[0])
 
@@ -133,7 +133,7 @@ def do_rewards(state):
                      (label, increment, total)
                      in
                      [("xp:", state.get('-xp', '0'), player['xp']),
-                      ("energy:", state.get('-energy', '0'), resources['energy']),
+                      ("energy:", state.get('-energy', '0'), player['energy']),
                       ("coins:", state.get('-coins', '0'), resources['coins']),
                       ("oil:", state.get('-oil', '0'), resources['oil']),
                       ("wood:", state.get('-wood', '0'), resources['wood']),

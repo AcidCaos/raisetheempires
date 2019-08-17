@@ -1,5 +1,5 @@
 from questsettings import quest_settings
-from game_settings import game_settings, lookup_item_by_code, lookup_state_machine
+from game_settings import game_settings, lookup_item_by_code, lookup_state_machine, replenish_energy, lookup_yield
 from flask import session
 from functools import reduce
 import math
@@ -12,8 +12,8 @@ def merge_quest_progress(qc, output_list, label):
 
 
 def lookup_quest(name):
-    [quest] = [r for r in quest_settings['quests']['quest'] if r['_name'] == name]
-    return quest
+    quests = [r for r in quest_settings['quests']['quest'] if r['_name'] == name]
+    return quests[0] if len(quests) == 1 else None
 
 
 def new_quest(quest):
@@ -114,6 +114,7 @@ def progress_parameter_equals(key, value):
 
 # deprogress functions?
 def handle_quest_progress(meta, progress_function):
+    replenish_energy()
     incomplete_quests = [e for e in session['quests'] if e["complete"] == False]
     for session_quest in incomplete_quests:
         new_quests = []
@@ -124,7 +125,7 @@ def handle_quest_progress(meta, progress_function):
             if progress_function(task, progress, i):  #countPlaced tasks should be prepolulated with already placed items, however removed ones? precomplete autoComplete?
                     report_quest = True
                     if task['_action'] == 'population':
-                        session_quest['progress'][i] = min(session['population'], int(task["_total"]))
+                        session_quest['progress'][i] = min(lookup_yield(), int(task["_total"]))  # session['population']
                     else:
                         session_quest['progress'][i] += 1
                     print("Task progress", task["_action"])
@@ -208,7 +209,7 @@ def do_quest_rewards(quest):
     world = session['user_object']["userInfo"]["world"]
     resources = world['resources']
     resources['coins'] += int(inc.get('coins', 0))
-    resources['energy'] += int(inc.get('energy', 0)) #correct one?  #repleenish!!
+    resources['energy'] += int(inc.get('energy', 0)) #which one?  #repleenish!!
     resources['oil'] += int(inc.get('oil', 0))
     resources['wood'] += int(inc.get('wood', 0))
 
@@ -241,7 +242,7 @@ def do_quest_rewards(quest):
              (label, increment, total)
              in
              [("xp:", inc.get('xp', 0), player['xp']),
-              ("energy:", inc.get('energy', 0), resources['energy']),
+              ("energy:", inc.get('energy', 0), player['energy']),
               ("coins:", inc.get('coins', 0), resources['coins']),
               ("oil:", inc.get('oil', 0), resources['oil']),
               ("wood:", inc.get('wood', 0), resources['wood']),

@@ -214,6 +214,8 @@ def post_gateway():
             resps.append(load_world_response(reqq.params))
         elif reqq.functionName == 'VisitorService.help':
             resps.append(tend_ally_response())
+        elif reqq.functionName == 'WorldService.beginNextCampaign':
+            resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.addFleet':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.publishUserAction':
@@ -285,8 +287,6 @@ def post_gateway():
         elif reqq.functionName == 'RequestService.partRequest':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.assignConsumable':
-            resps.append(dummy_response())
-        elif reqq.functionName == 'WorldService.beginNextCampaign':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.beginQuestBattle':
             resps.append(dummy_response())
@@ -739,6 +739,9 @@ def init_user():
                 "energizerMax": 1000,
                 "energy": energy,
                 "energyMax": energy_max,
+                "unlimitedEnergyTS": 0,
+                "unlimitedEnergyIndex": 0,
+                "lastEnergyCheck": datetime.now().timestamp(),
                 "ammo": 1234,
                 "ammoMax": 2000,
                 "options": {"musicDisabled": False, "sfxDisabled": False},
@@ -926,7 +929,11 @@ def user_response():
         new_quest_with_sequels("Q0516", qc)
         session['quests'] = qc
 
+
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_inviteFriendsViral'
+    # session['user_object']["userInfo"]["player"]["lastEnergyCheck"] = datetime.now().timestamp()
+
+    replenish_energy()
 
     session["battle"] = None
     session['population'] = lookup_yield()
@@ -1189,9 +1196,12 @@ def load_challenge_response():
     return load_challenge_response
 
 def battle_complete_response(params):
-    quest = lookup_quest(params['target'])
-    tasks = get_tasks(quest)
-    [task] = [t for t in tasks if t["_action"] == "fight"]
+    if params['target'].startswith('fleet'):
+        pass
+    else:
+        quest = lookup_quest(params['target'])
+        tasks = get_tasks(quest)
+        [task] = [t for t in tasks if t["_action"] == "fight"]
 
     enemy_fleet = lookup_item_by_code(task["_item"])
     baddies = [lookup_item_by_code(baddie_slot["-item"]) for baddie_slot in simple_list(enemy_fleet["baddie"])]
@@ -1393,6 +1403,13 @@ def tend_ally_response():
     tend_ally_response = {"errorType": 0, "userId": 1, "metadata": meta,
                     "data": []}
     return tend_ally_response
+
+
+def next_campaign_response(map):
+    meta = {"newPVE": 0}
+    next_campaign_response = {"errorType": 0, "userId": 1, "metadata": meta,
+                    "data": []}
+    return next_campaign_response
 
 
 def dummy_response():

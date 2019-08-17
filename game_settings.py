@@ -1,7 +1,7 @@
 import copy
 import json
 from flask import session
-
+from datetime import datetime
 
 with open("gamesettings-converted.json", 'r') as f:
     game_settings = json.load(f)
@@ -65,3 +65,14 @@ def repl_dict(d, replacements):
                 if ":" in v:
                     d[k] = d[k].split(':', 1)[1 if "$" in d[k] else 0]
                     # print('r3', d[k])
+
+def replenish_energy():
+    player = session['user_object']["userInfo"]["player"]
+    current_energy_max = max(player["energy"], player["energyMax"])  # overfill possible
+    now = datetime.now().timestamp()
+    energy_replenished = (now - player["lastEnergyCheck"]) // 300
+    player["energy"] = min(player["energy"] + energy_replenished, current_energy_max)
+    # print("Energy now:", now, "lastEnergyCheck", player["lastEnergyCheck"], "inc", (now - player["lastEnergyCheck"]), "till300", (now - player["lastEnergyCheck"]) % 300, "newec",  now - (now - player["lastEnergyCheck"]) % 300  )
+    player["lastEnergyCheck"] = now - (now - player["lastEnergyCheck"] + 1) % 300
+    if energy_replenished != 0:
+        print("Energy replenished:", energy_replenished)
