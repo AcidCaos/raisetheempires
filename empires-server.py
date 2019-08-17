@@ -215,9 +215,9 @@ def post_gateway():
         elif reqq.functionName == 'VisitorService.help':
             resps.append(tend_ally_response())
         elif reqq.functionName == 'WorldService.beginNextCampaign':
-            resps.append(dummy_response())
+            resps.append(next_campaign_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.addFleet':
-            resps.append(dummy_response())
+            resps.append(add_fleet_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.publishUserAction':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.sendUserNotification':
@@ -930,14 +930,18 @@ def user_response():
         session['quests'] = qc
 
 
-    # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_inviteFriendsViral'
+    session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_inviteFriendsViral'
     # session['user_object']["userInfo"]["player"]["lastEnergyCheck"] = datetime.now().timestamp()
 
     replenish_energy()
 
     session["battle"] = None
+    session["fleets"] = {}
     session['population'] = lookup_yield()
 
+    session['campaign'] = {}
+    session['campaign']['C000'] = {}
+    user["completedQuests"] = [e["name"] for e in qc if e["complete"] == True]
 
     # for e in session['user_object']["userInfo"]["world"]["objects"]:
     #     e['lastUpdated'] = 1308211628  #1 minute earlier to test
@@ -1197,15 +1201,15 @@ def load_challenge_response():
 
 def battle_complete_response(params):
     if params['target'].startswith('fleet'):
-        pass
+        baddies = [lookup_item_by_code(friendly[1:]) for friendly, count in session['fleets'][params['target']].items() for i in range(int(count))]
+        friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in session['fleets'][params['fleet']]]
     else:
         quest = lookup_quest(params['target'])
         tasks = get_tasks(quest)
         [task] = [t for t in tasks if t["_action"] == "fight"]
-
-    enemy_fleet = lookup_item_by_code(task["_item"])
-    baddies = [lookup_item_by_code(baddie_slot["-item"]) for baddie_slot in simple_list(enemy_fleet["baddie"])]
-    friendlies = [lookup_item_by_code(friendly[1:]) for friendly, count in task["fleet"].items() for i in range(int(count))]
+        enemy_fleet = lookup_item_by_code(task["_item"])
+        baddies = [lookup_item_by_code(baddie_slot["-item"]) for baddie_slot in simple_list(enemy_fleet["baddie"])]
+        friendlies = [lookup_item_by_code(friendly[1:]) for friendly, count in task["fleet"].items() for i in range(int(count))]
 
     player_unit_id = 0
     enemy_unit_id = 0
@@ -1216,6 +1220,7 @@ def battle_complete_response(params):
     else:
         player_turn = False
 
+    print("repr baddies", baddies)
     baddie_unit = baddies[enemy_unit_id]["unit"]
     baddie_max_strength = int(baddie_unit.get("-strength","0"))
     baddie_weak = int(baddie_unit.get("-weak","0"))
@@ -1235,6 +1240,15 @@ def battle_complete_response(params):
 
     friendly_strength = friendly_strengths[player_unit_id]
     baddie_strength = baddie_strengths[enemy_unit_id]
+
+
+    if not player_turn:
+        unknown_rolls = ["init seed", get_seed_w(),get_seed_z(),
+                         roll_random_between(0, 1),"seed",get_seed_w(),get_seed_z(),
+                        roll_random_between(0, 1),"seed",get_seed_w(),get_seed_z(),
+                        roll_random_between(0, 1),"seed",get_seed_w(),get_seed_z()]
+    else:
+        unknown_rolls = ["init seed", get_seed_w(),get_seed_z()]
 
     roll = unit_roll(friendly_weak if player_turn else baddie_weak, baddie_weak if player_turn else friendly_weak)
 
@@ -1267,19 +1281,27 @@ def battle_complete_response(params):
         baddie_strengths[enemy_unit_id] -= damage
         if baddie_strengths[enemy_unit_id] < 0:
             baddie_strengths[enemy_unit_id] = 0 #dead
-            session["battle"] = None
-        print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_id])
+            # session["battle"] = None
+        print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_id], roll,"after seed", get_seed_w(),get_seed_z(), repr(unknown_rolls))
     else:
         friendly_strengths[player_unit_id] -= damage
         if friendly_strengths[player_unit_id] < 0:
             friendly_strengths[player_unit_id] = 0  # dead
-            session["battle"] = None
-        print("Taken", damage, "damage, player hp:", friendly_strengths[player_unit_id])
+            # session["battle"] = None
+        print("Taken", damage, "damage, player hp:", friendly_strengths[player_unit_id], "after seed", get_seed_w(),get_seed_z(), repr(unknown_rolls))
 
     if not player_turn:
-        roll_random()
-        roll_random()
-        roll_random()
+        pass
+
+    if sum(baddie_strengths) == 0:
+        print("Enemy defeated")
+        session["battle"] = None
+
+
+    if sum(friendly_strengths) == 0:
+        print("Player defeated")
+        session["battle"] = None
+
 
     result = {"attackerStunned": None, "psh": 0, "esh": 0, "ps": friendly_strengths[player_unit_id], "es": baddie_strengths[enemy_unit_id], "hv": None, "ur": roll,
      "playerUnit": player_unit_id, "enemyUnit": enemy_unit_id, "seeds": {"w": get_seed_w(), "z": get_seed_z()},
@@ -1407,9 +1429,45 @@ def tend_ally_response():
 
 def next_campaign_response(map):
     meta = {"newPVE": 0}
+
+    map_item = lookup_item_by_code(map["map"])
+
+    if map["map"] not in session['campaign'] or not session['campaign'][map["map"]]:
+        session['campaign'][map["map"]] = {"island": -1}
+
+    session['campaign'][map["map"]]["island"] += 1
+
+    island = session['campaign'][map["map"]]["island"]
+
     next_campaign_response = {"errorType": 0, "userId": 1, "metadata": meta,
-                    "data": []}
+                              "data": {"map": map["map"], "island": island}}
+
+    if 'fleets' not in session:
+        session["fleets"] = {}
+
+    enemy_fleet = map_item["island"][island]['fleet']
+
+    i=1
+    fleet_name = "fleet1_" + str(get_zid())
+    while fleet_name in session["fleets"]:
+        i += 2
+        fleet_name = "fleet" + str(i) + "_" + str(get_zid())
+
+    session["fleets"][fleet_name] = enemy_fleet
+    print("Enemy fleet:", enemy_fleet)
+
     return next_campaign_response
+
+
+def add_fleet_response(param):
+    meta = {"newPVE": 0}
+
+    add_fleet_response = {"errorType": 0, "userId": 1, "metadata": meta,
+                    "data": []}
+
+    session["fleets"][param['name']] = param['units']
+    print("Player fleet:", param['units'])
+    return add_fleet_response
 
 
 def dummy_response():

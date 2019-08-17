@@ -268,7 +268,7 @@ def roll_random():
     world = session['user_object']["userInfo"]["world"]
     world["randSeedZ"] = 36969 * (world["randSeedZ"] & 65535)  + (world["randSeedZ"] >> 16 & 65535) & 4294967295;
     world["randSeedW"] = 18000 * (world["randSeedW"] & 65535)  + (world["randSeedW"] >> 16 & 65535) & 4294967295;
-    return world["randSeedZ"] & 65535 +  world["randSeedW"] & 4294967295
+    return (world["randSeedZ"] << 16) +  world["randSeedW"] & 4294967295
 
 
 def roll_random_float():
