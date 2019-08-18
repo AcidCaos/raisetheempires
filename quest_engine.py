@@ -75,7 +75,9 @@ def progress_finish_building_count_placed(state, state_machine, game_item, step,
 #cancels?
 def progress_build(state, state_machine, game_item, step, previous_state, reference_item, previous_reference_item, *state_args):
     return lambda task, progress, i, *args: \
-        task["_action"] == "build" and reference_item in task["_item"].split(',') and previous_reference_item == None
+        task["_action"] == "build" and (reference_item in task.get("_item", "").split(',') or
+                                        (reference_item is not None and progress_parameter_equals("_resourceType", lookup_item_by_code(reference_item).get("_resourceType","")))) \
+        and previous_reference_item == None
 
 
 def progress_harvest(state, state_machine, game_item, step, previous_state, reference_item, previous_reference_item, *state_args):

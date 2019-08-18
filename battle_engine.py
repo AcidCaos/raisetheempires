@@ -4,7 +4,7 @@ from flask import session
 
 from game_settings import lookup_item_by_code, game_settings, get_zid
 from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_seed_z, roll_random_between, \
-    handle_quest_progress, progress_action, roll_random_float
+    handle_quest_progress, progress_action, roll_random_float, all_lambda, progress_parameter_equals
 
 
 def battle_complete_response(params):
@@ -71,13 +71,14 @@ def battle_complete_response(params):
             # session["battle"] = None
         print("Taken", damage, "damage, player hp:", friendly_strengths[player_unit_id], "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
 
-    if not player_turn:
-        pass
-
     if sum(baddie_strengths) == 0:
         print("Enemy defeated")
         session["battle"] = None
         handle_quest_progress(meta, progress_action("fight"))
+        current_island = get_current_island(params)
+        if current_island != None:
+            handle_quest_progress(meta, all_lambda(progress_action("islandWin"),
+                                                   progress_parameter_equals("_island", str(current_island))))
 
     if sum(friendly_strengths) == 0:
         print("Player defeated")
@@ -86,7 +87,6 @@ def battle_complete_response(params):
     result = {"attackerStunned": None, "psh": 0, "esh": 0, "ps": friendly_strengths[player_unit_id], "es": baddie_strengths[enemy_unit_id], "hv": None, "ur": roll,
      "playerUnit": player_unit_id, "enemyUnit": enemy_unit_id, "seeds": {"w": get_seed_w(), "z": get_seed_z()},
      "energy": None}
-
 
     battle_complete_response = {"errorType": 0, "userId": 1, "metadata": meta, "data": result}
     return battle_complete_response
@@ -306,6 +306,12 @@ def get_unit_max_strength(unit, params=None):
 
     return strength
 
+def get_current_island(params):
+    if params and 'map' in params and params['map'] and params['map'][0] == 'C':
+        if 'campaign' in session and params['map'] in session['campaign']:
+            map_item = lookup_item_by_code(params["map"])
+            return session['campaign'][params['map']]["island"]
+    return None
 
 
 def apply_map_mod_strength(unit, strength, strengths):

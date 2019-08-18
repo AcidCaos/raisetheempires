@@ -175,7 +175,7 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.resolveBattle':
             resps.append(battle_complete_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.genericString':
-            resps.append(generic_string_response())
+            resps.append(generic_string_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.streakBonus':
             resps.append(streak_bonus_response())
         elif reqq.functionName == 'UserService.setWorldName':
@@ -1158,8 +1158,11 @@ def load_challenge_response():
     return load_challenge_response
 
 
-def generic_string_response():
-    generic_string_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+def generic_string_response(param):
+    meta = {"newPVE": 0}
+    handle_quest_progress(meta, all_lambda(progress_action("genericString"), progress_parameter_equals("_string", str(param))))
+
+    generic_string_response = {"errorType": 0, "userId": 1, "metadata": meta,
                     "data": []}
     return generic_string_response
 
