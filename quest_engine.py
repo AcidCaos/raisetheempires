@@ -4,11 +4,13 @@ from flask import session
 from functools import reduce
 import math
 
+
 def merge_quest_progress(qc, output_list, label):
-    print("new q before merge " + repr(qc))
-    print(label + " list before merge " + repr (output_list))
-    output_list[:] = qc + [e for e in output_list if e['name'] not in [q['name'] for q in qc]]
-    print(label + " list after merge " + repr (output_list))
+    if qc:
+        print("new q before merge " + repr(qc))
+        print(label + " list before merge " + repr (output_list))
+        output_list[:] = qc + [e for e in output_list if e['name'] not in [q['name'] for q in qc]]
+        print(label + " list after merge " + repr (output_list))
 
 
 def lookup_quest(name):

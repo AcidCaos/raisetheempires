@@ -1,5 +1,7 @@
 import copy
 import json
+
+import libscrc
 from flask import session
 from datetime import datetime
 
@@ -76,3 +78,7 @@ def replenish_energy():
     player["lastEnergyCheck"] = now - (now - player["lastEnergyCheck"] + 1) % 300
     if energy_replenished != 0:
         print("Energy replenished:", energy_replenished)
+
+
+def get_zid():
+    return libscrc.iso(session.sid.encode()) // 1000

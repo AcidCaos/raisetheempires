@@ -3,9 +3,8 @@ from flask_session import Session
 from pyamf import remoting
 import pyamf
 
-# import connexion
-# import amfast
-from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response
+from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response
+from game_settings import get_zid
 from questsettings import quest_settings
 import threading, webbrowser
 import pyamf.amf0
@@ -17,13 +16,11 @@ from flask_socketio import SocketIO
 from quest_engine import *
 from state_machine import *
 import copy
-import libscrc
-
+# import logging.config
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript', 'application/x-amf']
 COMPRESS_LEVEL = 6
 COMPRESS_MIN_SIZE = 500
-# import plot
 
 #STATE todo statemachine class
 rand_seed_w = 5445 # very random
@@ -36,7 +33,6 @@ db = SQLAlchemy()
 
 start = datetime.now()
 
-# game_objects = []
 with open("initial-island.json", 'r') as f:
     game_objects = json.load(f)
     print("Initial island template",  len(game_objects), "objects loaded")
@@ -48,12 +44,6 @@ app = Flask(__name__)
 app.config['SESSION_TYPE']  = 'sqlalchemy'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///save.db'
 app.config['SESSION_SQLALCHEMY'] = db
-
-
-# app = connexion.App(__name__, specification_dir="./")
-#application/x-amf
-# app.add_api("swagger.yaml")
-
 
 @app.route("/old")
 def home():
@@ -143,7 +133,7 @@ def post_gateway():
     # print("Data:")
     # print(request.data)
     resp_msg = remoting.decode(request.data)
-    print(resp_msg.headers)
+    # print(resp_msg.headers)
     print(resp_msg.bodies)
     # print(resp_msg.bodies[0])
 
@@ -210,6 +200,8 @@ def post_gateway():
             resps.append(next_campaign_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.addFleet':
             resps.append(add_fleet_response(reqq.params[0]))
+        elif reqq.functionName == 'WorldService.assignConsumable':
+            resps.append(assign_consumable_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.publishUserAction':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.sendUserNotification':
@@ -277,8 +269,6 @@ def post_gateway():
         elif reqq.functionName == 'ClansService.completeQuest':
             resps.append(dummy_response())
         elif reqq.functionName == 'RequestService.partRequest':
-            resps.append(dummy_response())
-        elif reqq.functionName == 'WorldService.assignConsumable':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.beginQuestBattle':
             resps.append(dummy_response())
@@ -941,11 +931,6 @@ def user_response():
                     "data": user}
     return user_response
 
-
-def get_zid():
-    return libscrc.iso(session.sid.encode()) // 1000
-
-
 def friend_response():
     friend = {
         "recommendedFriends":{"data":[]},
@@ -1345,3 +1330,6 @@ if __name__ == '__main__':
     # db.create_all()
     socketio.run(app, host='127.0.0.1', port=5005, debug=True)
     # app.run(host='127.0.0.1', port=5005, debug=True)
+    # logging.getLogger('socketio').setLevel(logging.ERROR)
+    # logging.getLogger('engineio').setLevel(logging.ERROR)
+    # logging.getLogger('geventwebsocket.handler').setLevel(logging.ERROR)
