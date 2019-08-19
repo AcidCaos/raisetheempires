@@ -18,7 +18,7 @@ def battle_complete_response(params):
         player_turn = False
         enemy_unit_id, _, player_unit_id = ai_best_attack(friendlies, friendly_strengths, baddies, baddie_strengths)
 
-    print("repr baddies", baddies)
+    # print("repr baddies", baddies)
     baddie_max_strength = get_unit_max_strength(baddies[enemy_unit_id], params)
     baddie_weak = get_unit_weak(baddies[enemy_unit_id])
     baddie_unit_type = get_unit_type(baddies[enemy_unit_id])
@@ -60,16 +60,22 @@ def battle_complete_response(params):
 
     if player_turn:
         baddie_strengths[enemy_unit_id] -= damage
-        if baddie_strengths[enemy_unit_id] < 0:
+        if baddie_strengths[enemy_unit_id] == 1:
+            damage +=1
+            baddie_strengths[enemy_unit_id] -= 1
+            print("Enemy inced to prevent 1 strength")
+        if baddie_strengths[enemy_unit_id] <= 0: #incing
             baddie_strengths[enemy_unit_id] = 0 #dead
+            print("Enemy unit", enemy_unit_id, "down")
             # session["battle"] = None
-        print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_id], roll,"after seed", get_seed_w(),get_seed_z(), repr(init_seed))
+        print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
     else:
         friendly_strengths[player_unit_id] -= damage
-        if friendly_strengths[player_unit_id] < 0:
+        if friendly_strengths[player_unit_id] <= 0:
             friendly_strengths[player_unit_id] = 0  # dead
+            print("Player unit", player_unit_id, "down")
             # session["battle"] = None
-        print("Taken", damage, "damage, player hp:", friendly_strengths[player_unit_id], "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
+        print("Taken", damage, "damage, player hp:", friendly_strengths[player_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
 
     if sum(baddie_strengths) == 0:
         print("Enemy defeated")
@@ -219,7 +225,7 @@ def assign_consumable_response(params):
 
     selected_random_consumable = int(roll_random_between(0, 0)) # required roll fixed allyconsumable in tutorialstep
 
-    targeted_baddie = int(round(roll_random_between(0, round(len(baddies) - 1)))) if len(baddies) > 1 else 0
+    targeted_baddie = round(roll_random_between(0, round(len(baddies) - 1))) if len(baddies) > 1 else 0
 
     baddie_strengths[targeted_baddie] = 0 # assume death baddie
     print("Consumable used to baddie:", targeted_baddie)
@@ -251,7 +257,7 @@ def ai_best_attack(player_units, player_units_strengths, baddies, baddies_streng
     best_units = [ai_best_unit(baddies, baddies_strengths,  player_unit, first_random) + (i,) for player_unit, strength, i in players_tuple if strength > 0]
     max_grade = max([grade for baddie_index, grade, player_index in best_units])
     best_pairings = [(baddie_index, grade, player_index) for baddie_index, grade, player_index in best_units if grade == max_grade]
-    best_pairing = best_pairings[int(round(roll_random_between(0, len(best_pairings) - 1))) if len(best_pairings) > 1 else 0]  #optional roll
+    best_pairing = best_pairings[round(roll_random_between(0, len(best_pairings) - 1)) if len(best_pairings) > 1 else 0]  #optional roll
     print("best AI pairing method 1 (baddie, grade, friendly)", repr(best_pairing))
 
     baddies_tuple = zip(baddies, baddies_strengths, range(len(baddies)))
@@ -281,7 +287,7 @@ def ai_best_unit(first_units, first_units_strengths, second_unit, random):
     best_grade = max([get_hit_chance(first_unit, second_unit) for first_unit, strength, i in first_units_tuple if strength > 0])
     best_units = [i for first_unit, strength, i in first_units_tuple if strength > 0 and get_hit_chance(first_unit, second_unit) == best_grade]
     # print("AI best unit" ,repr((first_units, first_units_strengths, second_unit, random)),best_grade, repr(best_units))
-    random_roll = int(random * (len(best_units) - 1))
+    random_roll = round(random * (len(best_units) - 1))
     return best_units[random_roll], best_grade
 
 def get_unit_type(unit):

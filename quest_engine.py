@@ -37,6 +37,11 @@ def prepopulate_task(task):
                  int(e.get('state', 0)) >= (int(state_machine['-builtState']) if state_machine else 0)]
         number_built = len(built_objects)
         return min(number_built, int(task["_total"])), number_built >= int(task["_total"])
+    if task["_action"] == 'countPlacements':
+        item = lookup_item_by_code(task.get("_item", task.get('_code')))
+        objects = lookup_objects_by_item_name(item['-name'])
+        number_placed = len(objects)
+        return min(number_placed, int(task["_total"])), number_placed >= int(task["_total"])
     elif task["_action"] == 'population':
         return min(session['population'], int(task["_total"])), session['population'] >= int(task["_total"])
     elif task["_action"] == 'autoComplete':
@@ -76,13 +81,15 @@ def progress_finish_building_count_placed(state, state_machine, game_item, step,
 def progress_build(state, state_machine, game_item, step, previous_state, reference_item, previous_reference_item, *state_args):
     return lambda task, progress, i, *args: \
         task["_action"] == "build" and (reference_item in task.get("_item", "").split(',') or
-                                        (reference_item is not None and progress_parameter_equals("_resourceType", lookup_item_by_code(reference_item).get("_resourceType","")))) \
+                                        (reference_item is not None and progress_parameter_equals("_resourceType", lookup_item_by_code(reference_item).get("-resourceType","")))) \
         and previous_reference_item == None
 
 
 def progress_harvest(state, state_machine, game_item, step, previous_state, reference_item, previous_reference_item, *state_args):
     return lambda task, progress, i, *args: \
-        task["_action"] == "harvest" and previous_reference_item in task["_item"].split(',') and reference_item == None
+        task["_action"] == "harvest" and (previous_reference_item in  task.get("_item", "").split(',') or
+                                          (previous_reference_item is not None and progress_parameter_equals("_subtype", lookup_item_by_code(previous_reference_item).get("-subtype","")))) \
+        and reference_item == None
 
 
 def progress_auto_complete():
@@ -91,12 +98,12 @@ def progress_auto_complete():
 
 def progress_place(state, state_machine, game_item, step, *state_args):
     return lambda task, progress, i, *args: \
-        task["_action"] in ["place"] and task["_item"] == game_item['-code'] and progress < int(task["_total"]) and step == "place"
+        task["_action"] in ["place", "countPlacements"] and task.get("_item", task.get('_code')) == game_item['-code'] and progress < int(task["_total"]) and step == "place"
 
 
 def progress_state(state, state_machine, game_item, step, *state_args):
     return lambda task, progress, i, *args: \
-        task["_action"] in ["state"] and task["_state"] == state['-stateName'] and ("_item" not in task or task["_item"] == game_item['-code'])\
+        task["_action"] in ["state"] and '-stateName' in state and task["_state"] == state['-stateName'] and ("_item" not in task or task["_item"] == game_item['-code'])\
         and ("_subtype" not in task or task["_subtype"] == game_item['-subtype']) and progress < int(task["_total"])
 
 
@@ -264,7 +271,7 @@ def do_quest_rewards(quest):
               ] if int(increment) != 0]))
 
     if items:
-        print("Quest item rewards:", ", ".join([ k + ": " + str(v) for k,v in items]))
+        print("Quest item rewards:", ", ".join([ k + ": " + str(v) for k,v in items.items()]))
 
         # TODO store them & consumption
 
