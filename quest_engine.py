@@ -203,10 +203,12 @@ def new_quest_with_sequels(name, new_quests):
 def do_quest_rewards(quest):
     # TODO: rewardModifier
     raw_rewards = quest['reward']
-    rewards = raw_rewards if isinstance(raw_rewards, list) else [raw_rewards]
-    inc = {r["_type"]: int(r.get('_count', 1)) for r in rewards if r["_type"] != "item"}
-    items = {r["_item"]: int(r.get('_count', 1)) for r in rewards if r["_type"] == "item"}
+    do_rewards("Quest", raw_rewards)
 
+def do_rewards(label, raw_rewards):
+    rewards = simple_list(raw_rewards)
+    inc = {r.get("_type", r.get("-type")): int(r.get('_count', r.get('-count', 1))) for r in rewards if r.get("_type") != "item" and r.get("-type") != "item"}
+    items = {r.get("_item", r.get("-item")): int(r.get('_count', r.get('-count', 1))) for r in rewards if r.get("_type") == "item" or r.get("-type") == "item"}
 
     player = session['user_object']["userInfo"]["player"]
     player['energy'] += int(inc.get('energy', 0))
@@ -248,7 +250,7 @@ def do_quest_rewards(quest):
             level_cash += int(level["reward"]["-count"])
 
     if inc:
-        print("Quest rewards:", ", ".join(
+        print(label, "rewards:", ", ".join(
             [label + " " + ("+" if int(increment) > 0 else "") + str(increment) + " (" + str(total) + ")" for
              (label, increment, total)
              in
@@ -271,7 +273,7 @@ def do_quest_rewards(quest):
               ] if int(increment) != 0]))
 
     if items:
-        print("Quest item rewards:", ", ".join([ k + ": " + str(v) for k,v in items.items()]))
+        print(label, "item rewards:", ", ".join([ k + ": " + str(v) for k,v in items.items()]))
 
         # TODO store them & consumption
 

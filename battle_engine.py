@@ -4,7 +4,7 @@ from flask import session
 
 from game_settings import lookup_item_by_code, game_settings, get_zid
 from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_seed_z, roll_random_between, \
-    handle_quest_progress, progress_action, roll_random_float, all_lambda, progress_parameter_equals
+    handle_quest_progress, progress_action, roll_random_float, all_lambda, progress_parameter_equals, do_rewards
 
 
 def battle_complete_response(params):
@@ -81,10 +81,19 @@ def battle_complete_response(params):
         print("Enemy defeated")
         session["battle"] = None
         handle_quest_progress(meta, progress_action("fight"))
-        current_island = get_current_island(params)
+        map_name, current_island, map_item = get_current_island(params)
         if current_island != None:
             handle_quest_progress(meta, all_lambda(progress_action("islandWin"),
                                                    progress_parameter_equals("_island", str(current_island))))
+            do_rewards("Campaign", map_item['island'][current_island].get("reward"))
+            next_island_id = map_item['island'][current_island].get('-unlocks')
+            if next_island_id is not None:
+                print("Activating next island", map_name, next_island_id)
+                set_active_island_by_map(map_name, int(next_island_id))
+            else:
+                print("Current island group finished", map_name)
+                set_active_island_by_map(map_name, len(map_item['island']))
+
 
     if sum(friendly_strengths) == 0:
         print("Player defeated")
@@ -188,26 +197,32 @@ def spawn_fleet(params):
     return spawn_fleet
 
 
-def next_campaign_response(map):
+def next_campaign_response(params):
     meta = {"newPVE": 0}
 
-    map_item = lookup_item_by_code(map["map"])
+    # map_item = lookup_item_by_code(map["map"])
+    #
+    # if map["map"] not in session['campaign'] or not session['campaign'][map["map"]]:
+    #     session['campaign'][map["map"]] = {"island": -1}
+    #
+    # session['campaign'][map["map"]]["island"] += 1
+    #
+    # island = session['campaign'][map["map"]]["island"]
+    #
 
-    if map["map"] not in session['campaign'] or not session['campaign'][map["map"]]:
-        session['campaign'][map["map"]] = {"island": -1}
+    map_name, island, map_item = get_current_island(params)
 
-    session['campaign'][map["map"]]["island"] += 1
-
-    island = session['campaign'][map["map"]]["island"]
+    if island is None:
+        island = 0
 
     next_campaign_response = {"errorType": 0, "userId": 1, "metadata": meta,
-                              "data": {"map": map["map"], "island": island}}
+                              "data": {"map": params["map"], "island": island}}
 
     if 'fleets' not in session:
         session["fleets"] = {}
 
     enemy_fleet = map_item["island"][island]['fleet']
-
+    #TODO what if defeated?
     i=1
     fleet_name = "fleet1_" + str(get_zid())
     while fleet_name in session["fleets"]:
@@ -300,24 +315,52 @@ def get_unit_terrain(unit):
 
 def get_unit_max_strength(unit, params=None):
     strength = int(unit["unit"].get("-strength", "0"))
-
-    if params and 'map' in params and  params['map'] and params['map'][0] == 'C':
-        if 'campaign' in session and params['map'] in session['campaign']:
-            map_item = lookup_item_by_code(params["map"])
-            island = session['campaign'][params['map']]["island"]
-            if "strength" in map_item["island"][island]:
-                strengths = simple_list(map_item["island"][island]["strength"])
-                strength = apply_map_mod_strength(unit, strength, strengths)
-                # print("Mod strenghts",repr(strengths))
-
+    _, island, map_item = get_current_island(params)
+    if island != None:
+        strengths = simple_list(map_item["island"][island]["strength"])
+        strength = apply_map_mod_strength(unit, strength, strengths)
+        # print("Mod strenghts",repr(strengths))
     return strength
+
+
+# def get_current_island(params):
+#     if params and 'map' in params and params['map'] and params['map'][0] == 'C':
+#         if 'campaign' in session and params['map'] in session['campaign']:
+#             map_item = lookup_item_by_code(params["map"])
+#             return session['campaign'][params['map']]["island"], map_item
+#     return None, None
 
 def get_current_island(params):
     if params and 'map' in params and params['map'] and params['map'][0] == 'C':
-        if 'campaign' in session and params['map'] in session['campaign']:
-            map_item = lookup_item_by_code(params["map"])
-            return session['campaign'][params['map']]["island"]
-    return None
+        map_item = lookup_item_by_code(params["map"])
+        return get_active_island_by_map(params['map']) + (map_item,)
+    return None, None, None
+
+def get_active_island_by_map(map_name):
+    campaign = session['user_object']['userInfo']['world']['campaign']
+    if map_name not in campaign['active'].keys():
+        campaign['active'][map_name] = {"status": 0, "fleets": []}
+
+    status = campaign['active'][map_name]["status"]
+    island_id = (status & 4293918720) >> 20
+    return map_name, island_id
+
+def set_active_island_by_map(map_name, island_id):
+    campaign = session['user_object']['userInfo']['world']['campaign']
+    if map_name not in campaign['active'].keys():
+        campaign['active'][map_name] = {"status": island_id << 20, "fleets": []}
+    else:
+        status = campaign['active'][map_name]["status"]
+        status = (status & 1048575) | (island_id << 20)
+        campaign['active'][map_name]["status"] = status
+
+
+#
+# def get_current_island_from_session():
+#     campaign = session['user_object']['userInfo']['world']['campaign']
+#     if 'current' in campaign:
+#         return get_active_island_by_map()
+#     return None, None
 
 
 def apply_map_mod_strength(unit, strength, strengths):

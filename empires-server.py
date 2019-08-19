@@ -1,3 +1,5 @@
+from builtins import print
+
 from flask import Flask, render_template, send_from_directory, request, Response, make_response, redirect
 from flask_session import Session
 from pyamf import remoting
@@ -793,7 +795,7 @@ def init_user():
                       "scrapRandSeedW": 5646,
                       "scrapRandSeedZ": 3567,
                       "resources": resources,
-                      "campaign": {}
+                      "campaign": {"current": "camp001", "active":{}, "mastery": {}}
                       }
 
         },
@@ -913,6 +915,8 @@ def user_response():
 
 
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_inviteFriendsViral'
+    # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_remindCombatUIWaitForPreBattleUI'
+    # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_remindCombatUIClearCircles'
     # session['user_object']["userInfo"]["player"]["lastEnergyCheck"] = datetime.now().timestamp()
 
     replenish_energy()
@@ -921,8 +925,22 @@ def user_response():
     session["fleets"] = {}
     session['population'] = lookup_yield()
 
-    session['campaign'] = {}
-    session['campaign']['C000'] = {}
+
+
+    # battle_status = 0
+    # island = 2
+    # replay_island = 0
+    #
+    # status_campaign = battle_status | replay_island << 8 | island << 20
+    # status_campaign_2 = battle_status | replay_island << 8 | 5 << 20
+    # #
+    # user['userInfo']['world']['campaign'] = {"current": "camp001", "active":{'C000': {"status": status_campaign, "fleets":[]},
+    #                                                                       'C003': {"status": status_campaign_2, "fleets":[]}}, "mastery": {}}
+
+    # session['campaign'] = {}
+    # session['campaign']['C003'] = {'island':4} #will receive a next "island": 1
+
+
     user["completedQuests"] = [e["name"] for e in qc if e["complete"] == True]
 
     # for e in session['user_object']["userInfo"]["world"]["objects"]:
@@ -1068,6 +1086,12 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
 
     if step == "clear":
         session['user_object']["userInfo"]["world"]["objects"].remove(lookup_object(id))
+        print("Object", id, "removed")
+
+    if step == "move":
+        lookup_object(id)["position"] = position
+        print("Object", id, "moved to", position)
+
 
     perform_world_response = {"errorType": 0, "userId": 1, "metadata": meta,
                     "data": {"id": id}}

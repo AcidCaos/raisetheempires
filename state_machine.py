@@ -24,7 +24,7 @@ def click_next_state(id, meta, step, reference_item):
                 next_state_id = state['-autoNext']  # not all states have this!! end states? autostate after time?
                 previous_state = state
                 state = lookup_state(state_machine, next_state_id)
-                do_rewards(state)
+                do_state_rewards(state)
                 if 'lastUpdated' not in cur_object:
                     cur_object['lastUpdated'] = 0  #init?
                 cur_object['lastUpdated'] += duration * 1000
@@ -39,7 +39,7 @@ def click_next_state(id, meta, step, reference_item):
             next_state_id = state['-clickNext']  # not all states have this!! end states? autostate after time?
             next_click_state = lookup_state(state_machine, next_state_id)
             print("next_click_state:", repr(next_click_state))
-            do_rewards(next_click_state)
+            do_state_rewards(next_click_state)
             handle_world_state_change(meta, next_click_state, state_machine, game_item, step, state, reference_item,  cur_object.get('referenceItem'))
 
             while '-autoNext' in next_click_state and next_state_id != next_click_state['-autoNext'] and next_click_state.get('-duration', '0') in ['0', '0s']:   #'-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
@@ -47,7 +47,7 @@ def click_next_state(id, meta, step, reference_item):
                 previous_state = next_click_state
                 next_click_state = lookup_state(state_machine, next_state_id)
                 print("auto_next_state:", repr(next_click_state))
-                do_rewards(next_click_state)
+                do_state_rewards(next_click_state)
                 handle_world_state_change(meta, next_click_state, state_machine, game_item, step, previous_state, reference_item, reference_item)
 
             cur_object['state'] = next_state_id
@@ -91,7 +91,7 @@ def parse_duration(duration):
     else:
         return float(duration)
 
-def do_rewards(state):
+def do_state_rewards(state):
     player = session['user_object']["userInfo"]["player"]
     player['xp'] += int(state.get('-xp', 0))
     player['energy'] += int(state.get('-energy', 0))
