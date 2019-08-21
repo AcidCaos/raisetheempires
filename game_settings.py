@@ -20,6 +20,10 @@ def lookup_item_by_code(code):
     return item
 
 
+def lookup_reference_item(cur_object):
+    return lookup_item_by_code(cur_object['referenceItem']) if cur_object and 'referenceItem' in cur_object and cur_object['referenceItem'] else None
+
+
 def lookup_items_with_workers_yield():
     items = [e for e in game_settings['settings']['items']['item'] if 'yield' in e and '-workers' in e['yield']]
     return items
@@ -38,10 +42,18 @@ def lookup_yield():  #TODO buildstate
 #     return sum([yields[e['itemName']] for e in session['user_object']["userInfo"]["world"]["objects"] if
 #                 e['itemName'] in yields.keys()])
 
-def lookup_state_machine(state_machine_name, custom_values):
+def lookup_state_machine(state_machine_name, custom_values, custom_reference_values=None):
+    if custom_reference_values is None:
+        custom_reference_values = []
     state_machine = copy.deepcopy(lookup_raw_state_machine(state_machine_name))
     replacements = {e['-name']: e['-value'] for e in custom_values}
+    reference_replacements = {e['-name']: e['-value'] for e in custom_reference_values}
     print('replacements', repr(replacements))
+    if reference_replacements:
+        print('reference item replacements', repr(replacements))
+        replacements = {**replacements, **reference_replacements}
+        print('combined reference item replacements', repr(replacements))
+
     repl_dict(state_machine, replacements)
     return state_machine
 

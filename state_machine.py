@@ -1,9 +1,13 @@
-from quest_engine import  handle_world_state_change
+from quest_engine import handle_world_state_change, roll_reward_random_float
 from datetime import datetime
 from flask import session
-from game_settings import game_settings, lookup_item_by_name, lookup_state_machine
+from game_settings import game_settings, lookup_item_by_name, lookup_state_machine, lookup_reference_item, \
+    lookup_item_by_code
 
 
+# TODO add new reference item from clicknext step, use old one for first autostep, new one for 2nd autonext,
+#  not needed: is handled by checkstates if new one is null then use old reference item in clicknext(harvesting step?)
+# TODO checkState?
 def click_next_state(id, meta, step, reference_item):
     cur_object = lookup_object(id)
     print("cur_object used:", repr(cur_object))
@@ -12,10 +16,12 @@ def click_next_state(id, meta, step, reference_item):
     print("item used:", repr(game_item))
 
     if 'stateMachineValues' in game_item:
-        state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'], game_item['stateMachineValues']['define'])
+        state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'],
+                                             game_item['stateMachineValues']['define'],
+                                             (lookup_reference_item(cur_object) or {}).get('referenceValues',{}).get('define'))
 
         print("state_machine used:", repr(state_machine))
-        state = lookup_state(state_machine, cur_object.get('state', 0))
+        state = lookup_state(state_machine, cur_object.get('state', 0), cur_object)
         print("cur state:", repr(state))
 
         while '-autoNext' in state and state['-stateName'] != state['-autoNext']:   # '-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
@@ -23,7 +29,8 @@ def click_next_state(id, meta, step, reference_item):
             if cur_object.get('lastUpdated', 0) / 1000 +  duration <= datetime.now().timestamp():
                 next_state_id = state['-autoNext']  # not all states have this!! end states? autostate after time?
                 previous_state = state
-                state = lookup_state(state_machine, next_state_id)
+                state = lookup_state(state_machine, next_state_id, cur_object)
+                check_state(state_machine, state, cur_object)
                 do_state_rewards(state)
                 if 'lastUpdated' not in cur_object:
                     cur_object['lastUpdated'] = 0  #init?
@@ -37,7 +44,13 @@ def click_next_state(id, meta, step, reference_item):
 
         if '-clickNext' in state:
             next_state_id = state['-clickNext']  # not all states have this!! end states? autostate after time?
-            next_click_state = lookup_state(state_machine, next_state_id)
+            if reference_item != cur_object.get('referenceItem'):
+                state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'],
+                                                     game_item['stateMachineValues']['define'],
+                                                     (lookup_item_by_code(reference_item) if reference_item else {})
+                                                     .get('referenceValues', {}).get('define'))
+            next_click_state = lookup_state(state_machine, next_state_id, cur_object)
+            check_state(state_machine, next_click_state, cur_object)
             print("next_click_state:", repr(next_click_state))
             do_state_rewards(next_click_state)
             handle_world_state_change(meta, next_click_state, state_machine, game_item, step, state, reference_item,  cur_object.get('referenceItem'))
@@ -45,7 +58,8 @@ def click_next_state(id, meta, step, reference_item):
             while '-autoNext' in next_click_state and next_state_id != next_click_state['-autoNext'] and next_click_state.get('-duration', '0') in ['0', '0s']:   #'-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
                 next_state_id = next_click_state['-autoNext']  # not all states have this!! end states? autostate after time?
                 previous_state = next_click_state
-                next_click_state = lookup_state(state_machine, next_state_id)
+                next_click_state = lookup_state(state_machine, next_state_id, cur_object)
+                check_state(state_machine, next_click_state, cur_object)
                 print("auto_next_state:", repr(next_click_state))
                 do_state_rewards(next_click_state)
                 handle_world_state_change(meta, next_click_state, state_machine, game_item, step, previous_state, reference_item, reference_item)
@@ -61,17 +75,37 @@ def click_next_state(id, meta, step, reference_item):
         handle_world_state_change(meta, {}, None, game_item, step, {}, reference_item, reference_item)
 
 
-def lookup_state(state_machine, i):
-    [state_machine] = [e for e in state_machine['state'] if e['-stateName'] == str(i)]
-    return state_machine
+def lookup_state(state_machine, i, cur_object):
+    [state] = [e for e in state_machine['state'] if e['-stateName'] == str(i)]
+    if 'check_state' in cur_object and str(i) in cur_object['check_state']:
+        state = cur_object['check_state'][str(i)]
+        print("Overridden state used", str(i))
+    return state
+
 
 def lookup_object(id):
     [game_object] = [e for e in  session['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
     return game_object
 
+
 def lookup_object(id):
     [game_object] = [e for e in  session['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
     return game_object
+
+
+#use state from current statemachine as replacement state for that state (with values and 2 random numbers
+def check_state(state_machine, state, cur_object):
+    if '-checkState' in state:
+        check_state = lookup_state(state_machine, state["-checkState"], cur_object) # possibly overriding using already overridden state
+        if 'check_state' not in cur_object:
+            cur_object['check_state'] = {}
+        cur_object['check_state'][state["-checkState"]] = check_state
+        print("Future check state overridden", state["-checkState"])
+        if "-xp" in check_state:
+            roll_reward_random_float() # prison xp
+        if "-dooberType" in check_state:
+            roll_reward_random_float() # for the platinum pipes
+
 
 
 def parse_duration(duration):

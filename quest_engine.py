@@ -300,3 +300,22 @@ def get_seed_w():
 def get_seed_z():
     return session['user_object']["userInfo"]["world"]["randSeedZ"]
 
+
+
+def roll_reward_random():
+    world = session['user_object']["userInfo"]["world"]
+    world["rewardRandSeedZ"] = 36969 * (world["rewardRandSeedZ"] & 65535)  + (world["rewardRandSeedZ"] >> 16 & 65535) & 4294967295;
+    world["rewardRandSeedW"] = 18000 * (world["rewardRandSeedW"] & 65535)  + (world["rewardRandSeedW"] >> 16 & 65535) & 4294967295;
+    return (world["rewardRandSeedZ"] << 16) +  world["rewardRandSeedW"] & 4294967295
+
+
+def roll_reward_random_float():
+    number = roll_reward_random() / (2 ** 32 - 1)
+    return math.floor(number * 10 ** 3) / 10 ** 3
+
+
+def roll_reward_random_between(a, b):
+    return roll_reward_random_float() * (b - a) + a
+
+
+
