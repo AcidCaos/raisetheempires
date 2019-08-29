@@ -140,13 +140,13 @@ def do_state_rewards(state):
     resources['oil'] += int(state.get('-oil', '0').split('|')[0])
     resources['wood'] += int(state.get('-wood', '0').split('|')[0])
 
-    resourceOrder = world['resourceOrder']
-    resources[resourceOrder[0]] += int(state.get('-rare', '0').split('|')[0])
-    resources[resourceOrder[0]] += int(state.get('-nrare0', '0').split('|')[0])
-    resources[resourceOrder[1]] += int(state.get('-nrare1', '0').split('|')[0])
-    resources[resourceOrder[2]] += int(state.get('-nrare2', '0').split('|')[0])
-    resources[resourceOrder[3]] += int(state.get('-nrare3', '0').split('|')[0])
-    resources[resourceOrder[4]] += int(state.get('-nrare4', '0').split('|')[0])
+    resource_order = world['resourceOrder']
+    resources[resource_order[0]] += int(state.get('-rare', '0').split('|')[0])
+    resources[resource_order[0]] += int(state.get('-nrare0', '0').split('|')[0])
+    resources[resource_order[1]] += int(state.get('-nrare1', '0').split('|')[0])
+    resources[resource_order[2]] += int(state.get('-nrare2', '0').split('|')[0])
+    resources[resource_order[3]] += int(state.get('-nrare3', '0').split('|')[0])
+    resources[resource_order[4]] += int(state.get('-nrare4', '0').split('|')[0])
 
     level_cash = 0
     levels_count = 0
@@ -176,12 +176,12 @@ def do_state_rewards(state):
                       ("levels:", str(levels_count), player['level']),
                       ("socialXpGood:", state.get('-socialXpGood', '0'), player['socialXpGood']),
                       ("socialXpBad:", state.get('-socialXpBad', '0'), player['socialXpBad']),
-                      (resourceOrder[0] + ":", state.get('-rare', '0'), resources[resourceOrder[0]]),
-                      (resourceOrder[0] + ":", state.get('-nrare0', '0'), resources[resourceOrder[0]]),
-                      (resourceOrder[1] + ":", state.get('-nrare1', '0'), resources[resourceOrder[1]]),
-                      (resourceOrder[2] + ":", state.get('-nrare2', '0'), resources[resourceOrder[2]]),
-                      (resourceOrder[3] + ":", state.get('-nrare3', '0'), resources[resourceOrder[3]]),
-                      (resourceOrder[4] + ":", state.get('-nrare4', '0'), resources[resourceOrder[4]])
+                      (resource_order[0] + ":", state.get('-rare', '0'), resources[resource_order[0]]),
+                      (resource_order[0] + ":", state.get('-nrare0', '0'), resources[resource_order[0]]),
+                      (resource_order[1] + ":", state.get('-nrare1', '0'), resources[resource_order[1]]),
+                      (resource_order[2] + ":", state.get('-nrare2', '0'), resources[resource_order[2]]),
+                      (resource_order[3] + ":", state.get('-nrare3', '0'), resources[resource_order[3]]),
+                      (resource_order[4] + ":", state.get('-nrare4', '0'), resources[resource_order[4]])
                       ] if int(increment.split('|')[0]) != 0])
     if log_rewards:
         print("State rewards:", log_rewards)

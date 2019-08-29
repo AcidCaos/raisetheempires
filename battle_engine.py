@@ -4,7 +4,8 @@ from flask import session
 
 from game_settings import lookup_item_by_code, game_settings, get_zid
 from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_seed_z, roll_random_between, \
-    handle_quest_progress, progress_action, roll_random_float, all_lambda, progress_parameter_equals, do_rewards
+    handle_quest_progress, progress_action, roll_random_float, all_lambda, progress_parameter_equals, do_rewards, \
+    roll_reward_random_float
 
 
 def battle_complete_response(params):
@@ -51,10 +52,14 @@ def battle_complete_response(params):
     glance = 0.10
     critter = 1.5
 
+    hit_type = "directhit"
+
     if not hit:
         damage *= glance
+        hit_type = "glancinghit"
     elif roll != 2 and roll >= crit:
         damage *= critter
+        hit_type = "criticalhit"
 
     damage = math.ceil(damage)
 
@@ -67,8 +72,10 @@ def battle_complete_response(params):
         if baddie_strengths[enemy_unit_id] <= 0: #incing
             baddie_strengths[enemy_unit_id] = 0 #dead
             print("Enemy unit", enemy_unit_id, "down")
+            hit_type = "kill" if hit_type != "criticalhit" else "criticalkill"
             # session["battle"] = None
         print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
+        doBattleRewards(hit_type, baddie_max_strength, damage, friendly_max_strength)
     else:
         friendly_strengths[player_unit_id] -= damage
         if friendly_strengths[player_unit_id] <= 0:
@@ -242,8 +249,12 @@ def assign_consumable_response(params):
 
     targeted_baddie = round(roll_random_between(0, round(len(baddies) - 1))) if len(baddies) > 1 else 0
 
+    baddie_current_strength = baddie_strengths[targeted_baddie]
+
     baddie_strengths[targeted_baddie] = 0 # assume death baddie
     print("Consumable used to baddie:", targeted_baddie)
+
+    doBattleRewards("kill", baddie_current_strength, baddie_current_strength, 0)
 
     meta = {"newPVE": 0}
     assign_consumable_response = {"errorType": 0, "userId": 1, "metadata": meta,
@@ -316,7 +327,7 @@ def get_unit_terrain(unit):
 def get_unit_max_strength(unit, params=None):
     strength = int(unit["unit"].get("-strength", "0"))
     _, island, map_item = get_current_island(params)
-    if island != None:
+    if island != None and "strength" in map_item["island"][island]:
         strengths = simple_list(map_item["island"][island]["strength"])
         strength = apply_map_mod_strength(unit, strength, strengths)
         # print("Mod strenghts",repr(strengths))
@@ -373,4 +384,53 @@ def apply_map_mod_strength(unit, strength, strengths):
 
 def get_unit_weak(unit):
     return int(unit["unit"].get("-weak", "0"))
+
+
+
+def doBattleRewards(hit_type, max_strength, damage, friendly_max_strength):
+    #mod strength?
+    coin_amount = math.ceil(max_strength * damage * 0.01)  # * unit mult * ammo experiment
+    rare_amount = math.ceil(max_strength * damage * 0.0001)  # * unit mult * ammo experiment
+    rare_count = 0
+    xp = 1
+    energy = 0
+    # TODO: energyRewardModVariant
+    # TODO combat losses
+
+    rare_type = friendly_max_strength % 5;
+
+    if hit_type == "glancinghit":
+        coin_amount = 0
+    elif hit_type == "criticalkill":
+        coin_amount *= 3
+        rare_count = 3
+        xp = 3
+        energy = 1 if roll_reward_random_float() <= 0.8 else 0
+        energy += 1 if roll_reward_random_float() <= 0.2 else 0
+
+    elif hit_type == "criticalhit":
+        rare_count = 1
+        energy = 1 if roll_reward_random_float() <= 0.25 else 0
+
+    rare_amount *= rare_count
+
+    world = session['user_object']["userInfo"]["world"]
+    resources = world['resources']
+    resources['coins'] += coin_amount
+
+    player = session['user_object']["userInfo"]["player"]
+    player['xp'] += xp
+
+    print("Combat rewards", hit_type ,  "coins:", coin_amount, "(" + str(resources['coins']) + ")")
+    if rare_amount:
+        resource_order = world['resourceOrder']
+        resources[resource_order[rare_type]] += rare_amount
+        print("Combat rewards", hit_type ,  "rare" + str(rare_type) + ":", rare_amount, "(" + str(resources[resource_order[rare_type]]) + ")")
+
+    print("Combat rewards", hit_type ,  "xp:", xp, "(" + str(player['xp']) + ")")
+
+    if energy:
+        player['energy'] += energy
+        resources['energy'] += energy # needed?
+        print("Combat rewards", hit_type ,  "energy:", energy, "(" + str(player['energy']) + ")")
 

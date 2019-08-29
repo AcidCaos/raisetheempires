@@ -226,13 +226,13 @@ def do_rewards(label, raw_rewards):
     resources['oil'] += int(inc.get('oil', 0))
     resources['wood'] += int(inc.get('wood', 0))
 
-    resourceOrder = world['resourceOrder']
-    resources[resourceOrder[0]] += int(inc.get('rare', 0))
-    resources[resourceOrder[0]] += int(inc.get('nrare0', 0))
-    resources[resourceOrder[1]] += int(inc.get('nrare1', 0))
-    resources[resourceOrder[2]] += int(inc.get('nrare2', 0))
-    resources[resourceOrder[3]] += int(inc.get('nrare3', 0))
-    resources[resourceOrder[4]] += int(inc.get('nrare4', 0))
+    resource_order = world['resourceOrder']
+    resources[resource_order[0]] += int(inc.get('rare', 0))
+    resources[resource_order[0]] += int(inc.get('nrare0', 0))
+    resources[resource_order[1]] += int(inc.get('nrare1', 0))
+    resources[resource_order[2]] += int(inc.get('nrare2', 0))
+    resources[resource_order[3]] += int(inc.get('nrare3', 0))
+    resources[resource_order[4]] += int(inc.get('nrare4', 0))
 
     level_cash = 0
     levels_count = 0
@@ -264,12 +264,12 @@ def do_rewards(label, raw_rewards):
               ("levels:", levels_count, player['level']),
               ("socialXpGood:", inc.get('socialXpGood', 0), player['socialXpGood']),
               ("socialXpBad:", inc.get('socialXpBad', 0), player['socialXpBad']),
-              (resourceOrder[0] + ":", inc.get('rare', 0), resources[resourceOrder[0]]),
-              (resourceOrder[0] + ":", inc.get('nrare0', 0), resources[resourceOrder[0]]),
-              (resourceOrder[1] + ":", inc.get('nrare1', 0), resources[resourceOrder[1]]),
-              (resourceOrder[2] + ":", inc.get('nrare2', 0), resources[resourceOrder[2]]),
-              (resourceOrder[3] + ":", inc.get('nrare3', 0), resources[resourceOrder[3]]),
-              (resourceOrder[4] + ":", inc.get('nrare4', 0), resources[resourceOrder[4]])
+              (resource_order[0] + ":", inc.get('rare', 0), resources[resource_order[0]]),
+              (resource_order[0] + ":", inc.get('nrare0', 0), resources[resource_order[0]]),
+              (resource_order[1] + ":", inc.get('nrare1', 0), resources[resource_order[1]]),
+              (resource_order[2] + ":", inc.get('nrare2', 0), resources[resource_order[2]]),
+              (resource_order[3] + ":", inc.get('nrare3', 0), resources[resource_order[3]]),
+              (resource_order[4] + ":", inc.get('nrare4', 0), resources[resource_order[4]])
               ] if int(increment) != 0]))
 
     if items:
