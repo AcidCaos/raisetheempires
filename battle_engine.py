@@ -385,8 +385,24 @@ def apply_map_mod_strength(unit, strength, strengths):
 def get_unit_weak(unit):
     return int(unit["unit"].get("-weak", "0"))
 
+# unused?
+# def getAbsolute(baddie_strength):
+#     base_damage = 25  # TODO tier difference & increments
+#
+#     # if player_turn:
+#     damage = base_damage * (3 * friendly_max_strength + baddie_strength) / (
+#                 3 * baddie_strength + friendly_max_strength)
+#     damage = damage / 100 * baddie_max_strength
+#     # else:
+#     #     damage = base_damage * (3 * baddie_max_strength + friendly_strength) / (
+#     #                 3 * friendly_strength + baddie_max_strength)
+#     #     damage = damage / 100 * friendly_max_strength
+#
+#     damage = math.floor(damage * 10 ** 3) / 10 ** 3
 
 
+
+#TODO: fix kill has more coins?
 def doBattleRewards(hit_type, max_strength, damage, friendly_max_strength):
     #mod strength?
     coin_amount = math.ceil(max_strength * damage * 0.01)  # * unit mult * ammo experiment

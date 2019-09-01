@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Save Editor</title>
+    <style>
+        textarea, body, html {
+            width:100%;
+            height:100%;
+        }
+
+        form {
+            width:90%;
+            height:80%;
+        }
+    </style>
+ </head>
+<body>
+
+    <h2>
+        Raise The Empires Save Editor uid:{{uid}}
+    </h2>
+    <form action="/save-editor" method="post">
+        <textarea name="savegame" >
+{{ savegame | default("ERROR: No savegame present!")}}
+        </textarea>
+<p>
+    <input type="submit"> <span style="color: crimson">Warning: This can corrupt your save game!</span>
+</p>
+    </form>
+
+</body>
+</html>

@@ -31,7 +31,7 @@ def click_next_state(id, meta, step, reference_item):
                 previous_state = state
                 state = lookup_state(state_machine, next_state_id, cur_object)
                 check_state(state_machine, state, cur_object)
-                do_state_rewards(state)
+                do_state_rewards(state, cur_object.get('referenceItem'))
                 if 'lastUpdated' not in cur_object:
                     cur_object['lastUpdated'] = 0  #init?
                 cur_object['lastUpdated'] += duration * 1000
@@ -43,7 +43,7 @@ def click_next_state(id, meta, step, reference_item):
                 break
 
         if '-clickNext' in state:
-            next_state_id = state['-clickNext']  # not all states have this!! end states? autostate after time?
+            next_state_id = state['-clickNext']
             if reference_item != cur_object.get('referenceItem'):
                 state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'],
                                                      game_item['stateMachineValues']['define'],
@@ -52,16 +52,16 @@ def click_next_state(id, meta, step, reference_item):
             next_click_state = lookup_state(state_machine, next_state_id, cur_object)
             check_state(state_machine, next_click_state, cur_object)
             print("next_click_state:", repr(next_click_state))
-            do_state_rewards(next_click_state)
+            do_state_rewards(next_click_state, cur_object.get('referenceItem'))
             handle_world_state_change(meta, next_click_state, state_machine, game_item, step, state, reference_item,  cur_object.get('referenceItem'))
 
             while '-autoNext' in next_click_state and next_state_id != next_click_state['-autoNext'] and next_click_state.get('-duration', '0') in ['0', '0s']:   #'-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
-                next_state_id = next_click_state['-autoNext']  # not all states have this!! end states? autostate after time?
+                next_state_id = next_click_state['-autoNext']
                 previous_state = next_click_state
                 next_click_state = lookup_state(state_machine, next_state_id, cur_object)
                 check_state(state_machine, next_click_state, cur_object)
                 print("auto_next_state:", repr(next_click_state))
-                do_state_rewards(next_click_state)
+                do_state_rewards(next_click_state, reference_item)
                 handle_world_state_change(meta, next_click_state, state_machine, game_item, step, previous_state, reference_item, reference_item)
 
             cur_object['state'] = next_state_id
@@ -107,7 +107,6 @@ def check_state(state_machine, state, cur_object):
             roll_reward_random_float() # for the platinum pipes
 
 
-
 def parse_duration(duration):
     # ["ms", "m", "s", "h", "d"];
     if duration == 'rand:1d,4d':
@@ -125,7 +124,8 @@ def parse_duration(duration):
     else:
         return float(duration)
 
-def do_state_rewards(state):
+
+def do_state_rewards(state, reference_item):
     player = session['user_object']["userInfo"]["player"]
     player['xp'] += int(state.get('-xp', 0))
     player['energy'] += int(state.get('-energy', 0))
@@ -147,6 +147,14 @@ def do_state_rewards(state):
     resources[resource_order[2]] += int(state.get('-nrare2', '0').split('|')[0])
     resources[resource_order[3]] += int(state.get('-nrare3', '0').split('|')[0])
     resources[resource_order[4]] += int(state.get('-nrare4', '0').split('|')[0])
+
+    item_inventory = player["inventory"]["items"]
+    if int(state.get('-buildable', '0')):
+        if reference_item:
+            item_inventory[reference_item] = item_inventory.get(reference_item, 0) + 1
+            print("Adding", reference_item, "to inventory")
+        else:
+            print("ERROR: Buildable present but no reference item")
 
     level_cash = 0
     levels_count = 0
@@ -176,6 +184,7 @@ def do_state_rewards(state):
                       ("levels:", str(levels_count), player['level']),
                       ("socialXpGood:", state.get('-socialXpGood', '0'), player['socialXpGood']),
                       ("socialXpBad:", state.get('-socialXpBad', '0'), player['socialXpBad']),
+                      ("buildable:", state.get('-buildable', '0'), sum(item_inventory.values())),
                       (resource_order[0] + ":", state.get('-rare', '0'), resources[resource_order[0]]),
                       (resource_order[0] + ":", state.get('-nrare0', '0'), resources[resource_order[0]]),
                       (resource_order[1] + ":", state.get('-nrare1', '0'), resources[resource_order[1]]),
@@ -185,3 +194,48 @@ def do_state_rewards(state):
                       ] if int(increment.split('|')[0]) != 0])
     if log_rewards:
         print("State rewards:", log_rewards)
+        
+        
+def do_costs(costs):
+    player = session['user_object']["userInfo"]["player"]
+    player['xp'] -= int(costs.get('-xp', 0))
+    player['energy'] -= int(costs.get('-energy', 0))
+    player['cash'] -= int(costs.get('-cash', 0))
+    player['socialXpGood'] -= int(costs.get('-socialXpGood', 0))
+    player['socialXpBad'] -= int(costs.get('-socialXpBad', 0))
+
+    world = session['user_object']["userInfo"]["world"]
+    resources = world['resources']
+    resources['coins'] -= int(costs.get('-coins', 0))
+    resources['energy'] -= int(costs.get('-energy', 0)) #which one?
+    resources['oil'] -= int(costs.get('-oil', '0').split('|')[0])
+    resources['wood'] -= int(costs.get('-wood', '0').split('|')[0])
+
+    resource_order = world['resourceOrder']
+    resources[resource_order[0]] -= int(costs.get('-rare', '0').split('|')[0])
+    resources[resource_order[0]] -= int(costs.get('-nrare0', '0').split('|')[0])
+    resources[resource_order[1]] -= int(costs.get('-nrare1', '0').split('|')[0])
+    resources[resource_order[2]] -= int(costs.get('-nrare2', '0').split('|')[0])
+    resources[resource_order[3]] -= int(costs.get('-nrare3', '0').split('|')[0])
+    resources[resource_order[4]] -= int(costs.get('-nrare4', '0').split('|')[0])
+
+    log_costs = ", ".join([label + " " + ("+" if int(decrement) < 0 else "") + str(-int(decrement)) + " (" + str(total) + ")" for
+                     (label, decrement, total)
+                     in
+                     [("xp:", costs.get('-xp', '0'), player['xp']),
+                      ("energy:", costs.get('-energy', '0'), player['energy']),
+                      ("coins:", costs.get('-coins', '0'), resources['coins']),
+                      ("oil:", costs.get('-oil', '0'), resources['oil']),
+                      ("wood:", costs.get('-wood', '0'), resources['wood']),
+                      ("cash:", costs.get('-cash', '0'), player['cash']),
+                      ("socialXpGood:", costs.get('-socialXpGood', '0'), player['socialXpGood']),
+                      ("socialXpBad:", costs.get('-socialXpBad', '0'), player['socialXpBad']),
+                      (resource_order[0] + ":", costs.get('-rare', '0'), resources[resource_order[0]]),
+                      (resource_order[0] + ":", costs.get('-nrare0', '0'), resources[resource_order[0]]),
+                      (resource_order[1] + ":", costs.get('-nrare1', '0'), resources[resource_order[1]]),
+                      (resource_order[2] + ":", costs.get('-nrare2', '0'), resources[resource_order[2]]),
+                      (resource_order[3] + ":", costs.get('-nrare3', '0'), resources[resource_order[3]]),
+                      (resource_order[4] + ":", costs.get('-nrare4', '0'), resources[resource_order[4]])
+                      ] if int(decrement.split('|')[0]) != 0])
+    if log_costs:
+        print("Costs:", log_costs)

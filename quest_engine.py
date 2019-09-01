@@ -132,8 +132,9 @@ def handle_quest_progress(meta, progress_function):
         report_quest = False
         tasks = get_tasks(lookup_quest(session_quest['name']))
         for task, progress, i in zip(tasks, session_quest['progress'], range(len(session_quest['progress']))):
-            print("task", repr(task), "progress", repr(progress), "i", i)
-            if progress_function(task, progress, i):  #countPlaced tasks should be prepolulated with already placed items, however removed ones? precomplete autoComplete?
+            extra = {"yield": 1}
+            if progress_function(task, progress, i, extra):  #countPlaced tasks should be prepopulated with already placed items, however removed ones? precomplete autoComplete?
+                    print("Task", repr(task), "progress", repr(progress), "i", i)
                     report_quest = True
                     if task['_action'] == 'population':
                         session_quest['progress'][i] = min(lookup_yield(), int(task["_total"]))  # session['population']
@@ -144,7 +145,8 @@ def handle_quest_progress(meta, progress_function):
                         session_quest["completedTasks"] = session_quest["completedTasks"] | 1 << i
                         print("Task complete", task["_action"])
 
-        print("completedTasks", session_quest["completedTasks"], "len(tasks)", len(tasks), "calc", 2 ** len(tasks) - 1)
+        if report_quest:
+            print("completedTasks", session_quest["completedTasks"], "len(tasks)", len(tasks), "calc", 2 ** len(tasks) - 1)
         if session_quest["completedTasks"] >= 2 ** len(tasks) - 1:
             session_quest["complete"] = True
             print("Quest complete", session_quest['name'])

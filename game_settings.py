@@ -11,13 +11,21 @@ with open("gamesettings-converted.json", 'r') as f:
 
 
 def lookup_item_by_name(item_name):
-    [item] = [e for e in game_settings['settings']['items']['item'] if e['-name'] == item_name]
-    return item
+    try:
+        [item] = [e for e in game_settings['settings']['items']['item'] if e['-name'] == item_name]
+        return item
+    except ValueError as e:
+        print("ERROR: Could not look up item by name", item_name)
+        raise e
 
 
 def lookup_item_by_code(code):
-    [item] = [e for e in game_settings['settings']['items']['item'] if e['-code'] == code]
-    return item
+    try:
+        [item] = [e for e in game_settings['settings']['items']['item'] if e['-code'] == code]
+        return item
+    except ValueError as e:
+        print("ERROR: Could not look up item by code", code)
+        raise e
 
 
 def lookup_reference_item(cur_object):
@@ -59,8 +67,12 @@ def lookup_state_machine(state_machine_name, custom_values, custom_reference_val
 
 
 def lookup_raw_state_machine(state_machine_name):
-    [state_machine] = [e for e in game_settings['settings']['stateMachines']['stateMachine'] if e['-name'] == state_machine_name]
-    return state_machine
+    try:
+        [state_machine] = [e for e in game_settings['settings']['stateMachines']['stateMachine'] if e['-name'] == state_machine_name]
+        return state_machine
+    except ValueError as e:
+        print("ERROR: Could not look up state machine by name", state_machine_name)
+        raise e
 
 
 def repl_dict(d, replacements):

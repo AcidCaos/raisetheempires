@@ -20,6 +20,8 @@ from state_machine import *
 import copy
 # import logging.config
 
+version = "0.2"
+
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript', 'application/x-amf']
 COMPRESS_LEVEL = 6
 COMPRESS_MIN_SIZE = 500
@@ -81,6 +83,36 @@ def more_money():
         return response
     else:
         return ('Nope', 403)
+
+
+@app.route("/save-editor", methods=['GET'])
+def save_editor():
+    return render_template("save-editor.html", savegame = json.dumps(
+        {
+            'user_object': session['user_object'] if 'user_object' in session else None,
+            'quests': session['quests'] if 'quests' in session else None,
+            'battle': session['battle'] if 'battle' in session else None,
+            'fleets': session['fleets'] if 'fleets' in session else None,
+            'population': session['population'] if 'population' in session else None
+         }
+        , default=lambda o: '<not serializable>', sort_keys = False, indent = 2), uid = get_zid())
+
+@app.route("/save-editor", methods=['POST'])
+def save_savegame():
+    print("Going to save:")
+    save_game = json.loads(request.form['savegame'])
+    print(repr(save_game))
+    session['user_object'] = save_game['user_object']
+    session['quests'] = save_game['quests']
+    session['battle'] = save_game['battle']
+    session['fleets'] = save_game['fleets']
+    session['population'] = save_game['population']
+
+
+    response = make_response(redirect('/'))
+    return response
+
+    # return ('', 400)
 
 @app.route("/127.0.0.1record_stats.php", methods=['GET', 'POST'])
 def record_stats():
@@ -160,7 +192,7 @@ def post_gateway():
             # for reqq2 in resp_msg.bodies[0][1].body[1]:
             #     if reqq2.functionName == 'WorldService.performAction' and reqq2.params[1] and reqq2.params[1].id:
             #         lastId=reqq2.params[1].id
-            wr = perform_world_response(reqq.params[0], reqq.params[1].id, reqq.params[1].position, reqq.params[1].itemName, reqq.params[2][0].get('referenceItem') if len(reqq.params[2]) > 0 else None)
+            wr = perform_world_response(reqq.params[0], reqq.params[1].id, reqq.params[1].position, reqq.params[1].itemName, reqq.params[2][0].get('referenceItem') if len(reqq.params[2]) > 0 else None, reqq.params[2][0].get('isGift') if len(reqq.params[2]) > 0 else None)
             resps.append(wr)
             report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position, wr["data"]["id"], reqq.params, reqq.sequence, resp_msg.bodies[0][0],
                              wr["metadata"].get('QuestComponent'), wr["metadata"].get('newPVE'))
@@ -739,7 +771,7 @@ def init_user():
                 "enableOnetimePopup": False,
                 "alliesUsed": None,
                 "storageData": {},
-                "inventory": {"items": {}},
+                "inventory": {"items": {"B01": 20}},
                 "neighborVisits": {},
                 "unlockedUnits": [],
                 "unlockedItems": [],
@@ -891,7 +923,9 @@ def user_response():
         user = session['user_object']
         user["userInfo"]["player"]["uid"] = get_zid()
         qc = session['quests']
-        print("loading user from save")
+        print("Loading user from save")
+        if session.get('save_version') != version:
+            print("WARNING: Save game was saved with version", session.get('save_version'), "while game is version", version)
 
         user["neighbors"] = [
             {"uid": 123, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
@@ -912,12 +946,15 @@ def user_response():
 
         new_quest_with_sequels("Q0516", qc)
         session['quests'] = qc
+        session['save_version'] = version
 
-
-    # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_inviteFriendsViral'
+    # session['user_object']["userInfo"]["player"]["tutorialProgress"] = "tut_step_krunsch1Battle2Speeech" #'tut_step_inviteFriendsViral'
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_remindCombatUIWaitForPreBattleUI'
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_remindCombatUIClearCircles'
     # session['user_object']["userInfo"]["player"]["lastEnergyCheck"] = datetime.now().timestamp()
+    #save migration only
+    # if "lastEnergyCheck" not in session['user_object']["userInfo"]["player"]:
+    #     session['user_object']["userInfo"]["player"]["lastEnergyCheck"] = datetime.now().timestamp()
 
     replenish_energy()
 
@@ -926,22 +963,31 @@ def user_response():
     session['population'] = lookup_yield()
 
 
-
+    # #temp migration
     # battle_status = 0
     # island = 2
     # replay_island = 0
     #
     # status_campaign = battle_status | replay_island << 8 | island << 20
     # status_campaign_2 = battle_status | replay_island << 8 | 5 << 20
-    # #
+    # # #
     # user['userInfo']['world']['campaign'] = {"current": "camp001", "active":{'C000': {"status": status_campaign, "fleets":[]},
-    #                                                                       'C003': {"status": status_campaign_2, "fleets":[]}}, "mastery": {}}
+    #                                                                        'C003': {"status": status_campaign_2, "fleets":[]}}, "mastery": {}}
+
+    # user['userInfo']['world']['campaign'] =  {"current": "camp001", "active": {}, "mastery": {}}
+    # user['userInfo']['world']['campaign'] =  {"current": "camp001", "active": {'C000': {"status": 1 << 20, "fleets":[]}}, "mastery": {}}
 
     # session['campaign'] = {}
     # session['campaign']['C003'] = {'island':4} #will receive a next "island": 1
 
+    # if ""B01": 20"
 
     user["completedQuests"] = [e["name"] for e in qc if e["complete"] == True]
+
+    item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
+    if item_inventory.get("B01",0) < 20:
+        item_inventory["B01"] = 20
+        print("Refilling upgrade blueprints to 20") #until friend gift mechanisms are working
 
     # for e in session['user_object']["userInfo"]["world"]["objects"]:
     #     e['lastUpdated'] = 1308211628  #1 minute earlier to test
@@ -1050,7 +1096,7 @@ def tutorial_response(step, sequence, endpoint):
     return tutorial_response
 
 
-def perform_world_response(step, supplied_id, position, item_name, reference_item):
+def perform_world_response(step, supplied_id, position, item_name, reference_item, from_inventory):
     id = supplied_id
     if step == "place":
         session['user_object']["userInfo"]["world"]["globalObjectId"] += 1  # for place only!
@@ -1091,6 +1137,23 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
     if step == "move":
         lookup_object(id)["position"] = position
         print("Object", id, "moved to", position)
+
+    if step == "place":
+        if not from_inventory:
+            costs = lookup_item_by_name(item_name).get("cost")
+            if costs:
+                do_costs(costs)
+        else:
+            item = lookup_item_by_name(item_name)
+            item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
+
+            if item['-code'] in item_inventory:
+                item_inventory[item['-code']] -= 1
+                if item_inventory[item['-code']] <= 0:
+                    del item_inventory[item['-code']]
+                print("Placing", item_name + "(" + item['-code'] + ")", "from inventory")
+            else:
+                print("ERROR: Placing", item_name + "(" + item['-code'] + ")", "from inventory but not in inventory. Ignoring for now.")
 
 
     perform_world_response = {"errorType": 0, "userId": 1, "metadata": meta,
