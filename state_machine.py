@@ -47,7 +47,7 @@ def click_next_state(id, meta, step, reference_item):
             if reference_item != cur_object.get('referenceItem'):
                 state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'],
                                                      game_item['stateMachineValues']['define'],
-                                                     (lookup_item_by_code(reference_item) if reference_item else {})
+                                                     (lookup_item_by_code(reference_item.split(":")[0]) if reference_item else {})
                                                      .get('referenceValues', {}).get('define'))
             next_click_state = lookup_state(state_machine, next_state_id, cur_object)
             check_state(state_machine, next_click_state, cur_object)

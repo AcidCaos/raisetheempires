@@ -192,7 +192,11 @@ def post_gateway():
             # for reqq2 in resp_msg.bodies[0][1].body[1]:
             #     if reqq2.functionName == 'WorldService.performAction' and reqq2.params[1] and reqq2.params[1].id:
             #         lastId=reqq2.params[1].id
-            wr = perform_world_response(reqq.params[0], reqq.params[1].id, reqq.params[1].position, reqq.params[1].itemName, reqq.params[2][0].get('referenceItem') if len(reqq.params[2]) > 0 else None, reqq.params[2][0].get('isGift') if len(reqq.params[2]) > 0 else None)
+            wr = perform_world_response(reqq.params[0], reqq.params[1].id, reqq.params[1].position,
+                                        reqq.params[1].itemName,
+                                        reqq.params[2][0].get('referenceItem') if len(reqq.params[2]) > 0 else None,
+                                        reqq.params[2][0].get('isGift') if len(reqq.params[2]) > 0 else None,
+                                        reqq.params[2][0].get('elapsed') if len(reqq.params[2]) > 0 else None)
             resps.append(wr)
             report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position, wr["data"]["id"], reqq.params, reqq.sequence, resp_msg.bodies[0][0],
                              wr["metadata"].get('QuestComponent'), wr["metadata"].get('newPVE'))
@@ -989,9 +993,13 @@ def user_response():
         item_inventory["B01"] = 20
         print("Refilling upgrade blueprints to 20") #until friend gift mechanisms are working
 
+    meta = {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]}
+    handle_quest_progress(meta, progress_inventory_count())
+
+
     # for e in session['user_object']["userInfo"]["world"]["objects"]:
     #     e['lastUpdated'] = 1308211628  #1 minute earlier to test
-    user_response = {"errorType": 0, "userId": get_zid(), "metadata": {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]},  # {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0},{"name": "QW120", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
+    user_response = {"errorType": 0, "userId": get_zid(), "metadata": meta,  # {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0},{"name": "QW120", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
                     "data": user}
     return user_response
 
@@ -1096,7 +1104,7 @@ def tutorial_response(step, sequence, endpoint):
     return tutorial_response
 
 
-def perform_world_response(step, supplied_id, position, item_name, reference_item, from_inventory):
+def perform_world_response(step, supplied_id, position, item_name, reference_item, from_inventory, elapsed):
     id = supplied_id
     if step == "place":
         session['user_object']["userInfo"]["world"]["globalObjectId"] += 1  # for place only!
@@ -1155,6 +1163,9 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
             else:
                 print("ERROR: Placing", item_name + "(" + item['-code'] + ")", "from inventory but not in inventory. Ignoring for now.")
 
+    if step == "speedUp":
+        lookup_object(id)['lastUpdated'] = lookup_object(id).get('lastUpdated', 0) - elapsed * 1000
+    # TODO: cost of speedup?
 
     perform_world_response = {"errorType": 0, "userId": 1, "metadata": meta,
                     "data": {"id": id}}

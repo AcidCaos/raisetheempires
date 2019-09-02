@@ -29,7 +29,7 @@ def lookup_item_by_code(code):
 
 
 def lookup_reference_item(cur_object):
-    return lookup_item_by_code(cur_object['referenceItem']) if cur_object and 'referenceItem' in cur_object and cur_object['referenceItem'] else None
+    return lookup_item_by_code(cur_object['referenceItem'].split(":")[0]) if cur_object and 'referenceItem' in cur_object and cur_object['referenceItem'] else None
 
 
 def lookup_items_with_workers_yield():

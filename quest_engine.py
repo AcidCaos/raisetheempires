@@ -42,6 +42,9 @@ def prepopulate_task(task):
         objects = lookup_objects_by_item_name(item['-name'])
         number_placed = len(objects)
         return min(number_placed, int(task["_total"])), number_placed >= int(task["_total"])
+    elif task["_action"] == 'inventoryCount':
+        item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
+        return min(item_inventory.get(task["_item"], 0), int(task["_total"])), item_inventory.get(task["_item"], 0) >= int(task["_total"])
     elif task["_action"] == 'population':
         return min(session['population'], int(task["_total"])), session['population'] >= int(task["_total"])
     elif task["_action"] == 'autoComplete':
@@ -66,7 +69,8 @@ def world_state_change(*state_args):
              progress_place(*state_args)(*args),
              progress_build(*state_args)(*args),
              progress_harvest(*state_args)(*args),
-             progress_state(*state_args)(*args)
+             progress_state(*state_args)(*args),
+             progress_inventory_count()(*args)
              ])
 
 
@@ -77,18 +81,41 @@ def progress_finish_building_count_placed(state, state_machine, game_item, step,
         int(previous_state['-stateName']) < int(state['-stateName'])
 
 
+def progress_inventory_count():
+    return lambda task, progress, i, extra, *args: \
+        task["_action"] == "inventoryCount" and  progress_inventory(task["_item"], task["_total"], extra, progress) \
+        and progress < int(task["_total"])
+
+
+def progress_inventory(item, maximum_total, extra, progress):
+    item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
+    total = min(item_inventory.get(item, 0), int(maximum_total))
+    extra["total"] = total
+    return total != progress
+
+
 #cancels?
 def progress_build(state, state_machine, game_item, step, previous_state, reference_item, previous_reference_item, *state_args):
     return lambda task, progress, i, *args: \
-        task["_action"] == "build" and (reference_item in task.get("_item", "").split(',') or
-                                        (reference_item is not None and progress_parameter_equals("_resourceType", lookup_item_by_code(reference_item).get("-resourceType","")))) \
+        task["_action"] == "build" and reference_item is not None and (
+                reference_item.split(":")[0] in task.get("_item", "").split(',') or
+                progress_parameter_equals("_resourceType",
+                                          lookup_item_by_code(reference_item.split(":")[0]).get("-resourceType", ""))(
+                    task, progress, i, *args)
+        ) \
         and previous_reference_item == None
 
 
 def progress_harvest(state, state_machine, game_item, step, previous_state, reference_item, previous_reference_item, *state_args):
     return lambda task, progress, i, *args: \
-        task["_action"] == "harvest" and (previous_reference_item in  task.get("_item", "").split(',') or
-                                          (previous_reference_item is not None and progress_parameter_equals("_subtype", lookup_item_by_code(previous_reference_item).get("-subtype","")))) \
+        task["_action"] == "harvest" and previous_reference_item is not None and (
+                previous_reference_item.split(":")[0] in  task.get("_item", "").split(',') or
+                   progress_parameter_equals("_subtype", lookup_item_by_code(previous_reference_item.split(":")[0]).get("-subtype",""))(task, progress, i, *args)
+                   or all_lambda(progress_parameter_equals("_isUpgrade", "true"),
+                                 lambda *args: lookup_item_by_code(previous_reference_item.split(":")[0]).get("-type","upgrade"),
+                                 progress_nested_parameter_implies("unit", "_subtype", lookup_item_by_code(previous_reference_item.split(":")[1]).get("-subtype",""))
+                                 )(task, progress, i, *args)
+                        ) \
         and reference_item == None
 
 
@@ -120,7 +147,15 @@ def progress_action(action):
 
 
 def progress_parameter_equals(key, value):
-    return lambda task, *args: task.get(key) == value
+    return lambda task, *args: task.get(key, "_NO_MATCH_") == value
+
+
+def progress_parameter_implies(key, value):
+    return lambda task, *args: task.get(key) == None or task.get(key, "_NO_MATCH_") == value
+
+
+def progress_nested_parameter_implies(key, key2, value):
+    return lambda task, *args: task.get(key, {}).get(key2) == None or task.get(key, {}).get(key2, "_NO_MATCH_") == value
 
 
 # deprogress functions?
@@ -139,7 +174,7 @@ def handle_quest_progress(meta, progress_function):
                     if task['_action'] == 'population':
                         session_quest['progress'][i] = min(lookup_yield(), int(task["_total"]))  # session['population']
                     else:
-                        session_quest['progress'][i] += 1
+                        session_quest['progress'][i] = extra.get("total", session_quest['progress'][i] + extra["yield"])
                     print("Task progress", task["_action"])
                     if session_quest['progress'][i] >= int(task["_total"]):
                         session_quest["completedTasks"] = session_quest["completedTasks"] | 1 << i
