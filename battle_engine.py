@@ -47,6 +47,23 @@ def battle_complete_response(params):
         damage = base_damage * (3 * baddie_max_strength + friendly_strength) / (3 * friendly_strength + baddie_max_strength)
         damage = damage / 100 * friendly_max_strength
 
+    consumable_extra_damage = 0
+    damage += max(consumable_extra_damage, 0)
+
+    if player_turn:
+        research = session['user_object']["userInfo"]["world"]["research"]
+        upgrades = research.get(friendlies[player_unit_id]["-code"],[])
+        for upgrade in upgrades:
+            upgrade_item = lookup_item_by_code(upgrade)
+            mod_damage = upgrade_item["modifier"].get("-damage")
+            if mod_damage:
+                if upgrade_item["modifier"].get("-percent"):
+                    damage *= 1 + float(mod_damage) / 100
+                    print("Applying damage upgrade for", mod_damage, "percent")
+                else:
+                    damage += int(mod_damage)
+                    print("Applying damage upgrade for", mod_damage, "more")
+
     damage = math.floor(damage * 10 ** 3) / 10 ** 3
 
     glance = 0.10

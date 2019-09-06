@@ -156,6 +156,17 @@ def do_state_rewards(state, reference_item):
         else:
             print("ERROR: Buildable present but no reference item")
 
+    research = world["research"]
+    if int(state.get('-upgrade', '0')):
+        if reference_item:
+            if reference_item.split(":")[0] not in research.get(reference_item.split(":")[1],[]):
+                research[reference_item.split(":")[1]] = research.get(reference_item.split(":")[1],[])  + [reference_item.split(":")[0]]
+                print("Adding", reference_item, "to research")
+            else:
+                print("ERROR: Upgrade already added")
+        else:
+            print("ERROR: Upgrade present but no reference item")
+
     level_cash = 0
     levels_count = 0
     levels = [level for level in game_settings['settings']['levels']['level'] if
