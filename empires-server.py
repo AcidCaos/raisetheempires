@@ -203,7 +203,7 @@ def post_gateway():
         elif reqq.functionName == 'DataServicesService.getSuggestedNeighbors':
             resps.append(neighbor_suggestion_response())
         elif reqq.functionName == 'UserService.setSeenFlag':
-            resps.append(seen_flag_response())
+            resps.append(seen_flag_response(reqq.params[0]))
         elif reqq.functionName == 'PVPService.createRandomFleetChallenge':
             resps.append(random_fleet_challenge_response())
         elif reqq.functionName == 'WorldService.spawnFleet':
@@ -992,6 +992,12 @@ def user_response():
     if item_inventory.get("B01",0) < 20:
         item_inventory["B01"] = 20
         print("Refilling upgrade blueprints to 20") #until friend gift mechanisms are working
+    if item_inventory.get("B05",0) < 25:
+        item_inventory["B05"] = 25
+        print("Refilling advanced hull plating to 25") #until friend gift mechanisms are working
+    if item_inventory.get("B18",0) < 25:
+        item_inventory["B18"] = 25
+        print("Refilling propeller to 25") #until friend gift mechanisms are working
 
     meta = {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]}
     handle_quest_progress(meta, progress_inventory_count())
@@ -1178,7 +1184,12 @@ def neighbor_suggestion_response():
                     "data": []}
     return neighbor_suggestion_response
 
-def seen_flag_response():
+
+def seen_flag_response(flag):
+    seen_flags = session['user_object']["userInfo"]["player"]["seenFlags"]
+
+    seen_flags[flag] = seen_flags.get(flag, 0) + 1
+
     seen_flag_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                     "data": []}
     return seen_flag_response
