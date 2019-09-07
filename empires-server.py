@@ -6,8 +6,7 @@ from pyamf import remoting
 import pyamf
 
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response
-from game_settings import get_zid
-from questsettings import quest_settings
+from game_settings import game_settings, get_zid
 import threading, webbrowser
 import pyamf.amf0
 import json
@@ -16,6 +15,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_compress import Compress
 from flask_socketio import SocketIO
 from quest_engine import *
+from quest_settings import quest_settings
 from state_machine import *
 import copy
 # import logging.config

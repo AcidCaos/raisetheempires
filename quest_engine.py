@@ -1,4 +1,4 @@
-from questsettings import quest_settings
+from quest_settings import quest_settings
 from game_settings import game_settings, lookup_item_by_code, lookup_state_machine, replenish_energy, lookup_yield
 from flask import session
 from functools import reduce
