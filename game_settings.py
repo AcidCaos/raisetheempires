@@ -1,5 +1,6 @@
 import copy
 import json
+import os
 
 import libscrc
 from flask import session
@@ -8,6 +9,20 @@ from datetime import datetime
 with open("gamesettings-converted.json", 'r') as f:
     game_settings = json.load(f)
     print("Gamesettings loaded: ",  len(game_settings['settings']), " setting sections loaded")
+
+with open("allies/initial-island.json", 'r') as f:
+    initial_island = json.load(f)
+    print("Initial island template", len(initial_island["objects"]), "objects loaded", len(initial_island["roads"]),
+          "roads loaded")
+    # game_objects = [o for o in game_objects_2 if int(o["position"].split(",")[0]) > 62 and int(o["position"].split(",")[1]) > 58]
+
+allies = {str(e["info"]["uid"] if e["info"] else e["friend"]["uid"]): e for e in
+          [json.load(open(os.path.join(root, file_name), 'r')) for root, _, file_names in os.walk("allies") for
+           file_name in
+           file_names if 'island.json' in file_name and file_name != "initial-island.json"]}
+print("Ally islands", len(allies.keys()), "allies loaded",
+      sum([len(ally["objects"]) for ally in allies.values() if ally["objects"]]), "objects loaded",
+      sum([len(ally["roads"]) for ally in allies.values() if ally["roads"]]), "roads loaded")
 
 
 def lookup_item_by_name(item_name):
@@ -91,6 +106,7 @@ def repl_dict(d, replacements):
                 if ":" in v:
                     d[k] = d[k].split(':', 1)[1 if "$" in d[k] else 0]
                     # print('r3', d[k])
+
 
 def replenish_energy():
     player = session['user_object']["userInfo"]["player"]

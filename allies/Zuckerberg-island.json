@@ -1,0 +1,27 @@
+{
+  "info": null,
+  "friend": {
+    "zid": 190,
+    "uid": 190,
+    "first_name": "Mark",
+    "name": "Mark Zuckerberg",
+    "sex": "M",
+    "portrait": "assets/game/GeneralAssetGroup_UI.swf/CV_Goblin_50.png",
+    "pic": "assets/game/GeneralAssetGroup_UI.swf/CV_Goblin_50.png",
+    "pic_square": "assets/game/GeneralAssetGroup_UI.swf/CV_Goblin_50.png"
+  },
+  "neighbor": false,
+  "recommendedFriends": false,
+  "zyngaFriends": false,
+  "empireFriends": false,
+  "sevenDayFriends": false,
+  "fourteenDayFriends": false,
+  "thirtyDayFriends": false,
+  "payerFriends": false,
+  "allFriends": true,
+  "zyngaFriendsByEngagement": false,
+  "empireFriendsByEngagement": false,
+  "appFriendId": null,
+  "objects": null,
+  "roads": null
+}

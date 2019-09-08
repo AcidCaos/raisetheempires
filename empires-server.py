@@ -6,7 +6,7 @@ from pyamf import remoting
 import pyamf
 
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response
-from game_settings import game_settings, get_zid
+from game_settings import game_settings, get_zid, allies, initial_island
 import threading, webbrowser
 import pyamf.amf0
 import json
@@ -18,16 +18,18 @@ from quest_engine import *
 from quest_settings import quest_settings
 from state_machine import *
 import copy
+
 # import logging.config
 
 version = "0.2"
 
-COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript', 'application/x-amf']
+COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
+                      'application/x-amf']
 COMPRESS_LEVEL = 6
 COMPRESS_MIN_SIZE = 500
 
-#STATE todo statemachine class
-rand_seed_w = 5445 # very random
+# STATE todo statemachine class
+rand_seed_w = 5445  # very random
 rand_seed_z = 844
 
 compress = Compress()
@@ -37,17 +39,12 @@ db = SQLAlchemy()
 
 start = datetime.now()
 
-with open("initial-island.json", 'r') as f:
-    game_objects = json.load(f)
-    print("Initial island template",  len(game_objects), "objects loaded")
-    # game_objects = [o for o in game_objects_2 if int(o["position"].split(",")[0]) > 62 and int(o["position"].split(",")[1]) > 58]
-
-
 app = Flask(__name__)
 
-app.config['SESSION_TYPE']  = 'sqlalchemy'
+app.config['SESSION_TYPE'] = 'sqlalchemy'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///save.db'
 app.config['SESSION_SQLALCHEMY'] = db
+
 
 @app.route("/old")
 def home():
@@ -57,14 +54,18 @@ def home():
 @app.route("/")
 def index():
     print("index")
-    return render_template("home.html", time=datetime.now().timestamp(), zid=str(get_zid()))
-
+    return render_template("home.html", time=datetime.now().timestamp(), zid=str(get_zid()),
+                           allies=json.dumps([ally["friend"] for ally in allies.values()
+                                              if "friend" in ally and ally["friend"] and ally["neighbor"]],
+                                             default=lambda o: '<not serializable>', sort_keys=False, indent=2),
+                           app_friends=json.dumps([ally["appFriendId"] for ally in allies.values()
+                                                   if "appFriendId" in ally and ally["appFriendId"] is not None]))
 
 
 @app.route("/nodebug.html")
 def no_debug():
     print("index")
-    return render_template("nodebug.html", time=datetime.now().timestamp(),zid=str(get_zid()))
+    return render_template("nodebug.html", time=datetime.now().timestamp(), zid=str(get_zid()))
 
 
 @app.route("/wipe_session", methods=['GET', 'POST'])
@@ -73,6 +74,7 @@ def wipe_session():
     response = make_response(redirect('/'))
     # response.set_cookie('session', '', expires=0)
     return response
+
 
 @app.route("/gazillionaire", methods=['GET', 'POST'])
 def more_money():
@@ -87,15 +89,16 @@ def more_money():
 
 @app.route("/save-editor", methods=['GET'])
 def save_editor():
-    return render_template("save-editor.html", savegame = json.dumps(
+    return render_template("save-editor.html", savegame=json.dumps(
         {
             'user_object': session['user_object'] if 'user_object' in session else None,
             'quests': session['quests'] if 'quests' in session else None,
             'battle': session['battle'] if 'battle' in session else None,
             'fleets': session['fleets'] if 'fleets' in session else None,
             'population': session['population'] if 'population' in session else None
-         }
-        , default=lambda o: '<not serializable>', sort_keys = False, indent = 2), uid = get_zid())
+        }
+        , default=lambda o: '<not serializable>', sort_keys=False, indent=2), uid=get_zid())
+
 
 @app.route("/save-editor", methods=['POST'])
 def save_savegame():
@@ -108,11 +111,10 @@ def save_savegame():
     session['fleets'] = save_game['fleets']
     session['population'] = save_game['population']
 
-
     response = make_response(redirect('/'))
     return response
-
     # return ('', 400)
+
 
 @app.route("/127.0.0.1record_stats.php", methods=['GET', 'POST'])
 def record_stats():
@@ -129,8 +131,8 @@ def flashFile():
 def game_settings_file():
     # return send_from_directory("assets/32995", "gameSettings.xml")
     # return send_from_directory("assets/32995", "gameSettings.xml")
-    #return send_from_directory("assets/29oct2012", "gameSettings.xml")
-    #return send_from_directory("assets/29oct2012", "gameSettings_placeholders.xml")
+    # return send_from_directory("assets/29oct2012", "gameSettings.xml")
+    # return send_from_directory("assets/29oct2012", "gameSettings_placeholders.xml")
     return send_from_directory("assets/29oct2012", "gameSettings_with_fixes.xml")
 
 
@@ -158,6 +160,10 @@ def quest_settings_file():
 def send_sol_assets(path):
     return send_from_directory('assets/sol_assets_octdict/assets', path)
 
+
+@app.route('/assets/<path:path>')
+def send_sol_assets_alternate(path):
+    return send_from_directory('assets/sol_assets_octdict/assets', path)
 
 
 @app.route('/files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php', methods=['POST'])
@@ -198,7 +204,8 @@ def post_gateway():
                                         reqq.params[2][0].get('isGift') if len(reqq.params[2]) > 0 else None,
                                         reqq.params[2][0].get('elapsed') if len(reqq.params[2]) > 0 else None)
             resps.append(wr)
-            report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position, wr["data"]["id"], reqq.params, reqq.sequence, resp_msg.bodies[0][0],
+            report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position,
+                             wr["data"]["id"], reqq.params, reqq.sequence, resp_msg.bodies[0][0],
                              wr["metadata"].get('QuestComponent'), wr["metadata"].get('newPVE'))
         elif reqq.functionName == 'DataServicesService.getSuggestedNeighbors':
             resps.append(neighbor_suggestion_response())
@@ -591,11 +598,11 @@ def post_gateway():
     req = remoting.Response(emsg)
     ev = remoting.Envelope(pyamf.AMF0)
     ev[resp_msg.bodies[0][0]] = req
-  #  print(ev.headers)
-   # print(ev.bodies)
+    #  print(ev.headers)
+    # print(ev.bodies)
 
-    ret_body = remoting.encode(ev, strict=True, logger=True).getvalue() #.read()
-   # print(ret_body)
+    ret_body = remoting.encode(ev, strict=True, logger=True).getvalue()  # .read()
+    # print(ret_body)
     return Response(ret_body, mimetype='application/x-amf')
 
     # return ('', 204)
@@ -603,43 +610,6 @@ def post_gateway():
 
 def init_user():
     # global game_objects
-
-    roads_data = [
-        "54,55|54,55",
-        "55,55|55,55",
-        "56,55|56,55",
-        "57,55|57,55",
-        "58,55|58,55",
-        "58,56|58,56",
-        "58,57|58,57",
-        "58,58|58,58",
-        "58,59|58,59",
-        "57,59|57,59",
-        "56,59|56,59",
-        "55,59|55,59",
-        "54,59|54,59",
-        "54,58|54,58",
-        "54,57|54,57",
-        "54,56|54,56",
-        "56,54|56,54",
-        "56,53|56,53",
-        "56,52|56,52",
-        "56,51|56,51",
-        "56,60|56,60",
-        "56,61|56,61",
-        "56,62|56,62",
-        "56,63|56,63",
-        "59,57|59,57",
-        "60,57|60,57",
-        "61,57|61,57",
-        "62,57|62,57",
-        "53,57|53,57",
-        "52,57|52,57",
-        "51,57|51,57",
-        "50,57|50,57",
-
-    ]
-
     unit = "U01,,,,"
 
     # resources = {"energy": 100, "coins": 100000, "oil": 7000, "wood": 5000, "aluminum": 9000,
@@ -650,7 +620,7 @@ def init_user():
 
     # xp = 20000
     # level =100
-    #zcash = 1000
+    # zcash = 1000
     # energy = 200
     # energy_max = 400
     xp = 0
@@ -705,7 +675,11 @@ def init_user():
                 "newInstallExperiments": None,
                 "staticWorkers": 20,
                 "staticWorkersCap": 100,
-                "expansions": {"data":[4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295]},
+                "expansions": {
+                    "data": [4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
+                             4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
+                             4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
+                             4294967295, 4294967295]},
                 "questTrees": {},
                 "questTreeUnlocks": {},
                 "questTreeData": {},
@@ -747,7 +721,8 @@ def init_user():
                 "miniGameRewards": [],
                 "miniGameTotalFuel": 1500,
                 "mgrsData": "",
-                "seenFlags": {},    #seen "introCine":True otherwise blackscreen but no startepisode then ->  either false (ZGlobal.noIntroCineVariant != ZGlobal.EXPERIMENT_NO_INTRO_CINE && Zlab.getFlashVar("mute") == null)
+                "seenFlags": {},
+                # seen "introCine":True otherwise blackscreen but no startepisode then ->  either false (ZGlobal.noIntroCineVariant != ZGlobal.EXPERIMENT_NO_INTRO_CINE && Zlab.getFlashVar("mute") == null)
                 "motdsViewed": [],
                 "motdsAccepted": [],
                 "m_mayhemEvents": None,
@@ -811,10 +786,10 @@ def init_user():
             "bookmarkReward": 0,
             "iconCodes": None,
 
-            "world": {"fleets": [], "enemies": [], "globalFleetId": 0, "battleStatus": {},  #user_fleet
+            "world": {"fleets": [], "enemies": [], "globalFleetId": 0, "battleStatus": {},  # user_fleet
                       "research": {}, "research2": {"buildingTypesUpgraded": None, "treesUnlocked": None},
                       "resourceOrder": ["aluminum", "copper", "gold", "iron", "uranium"],
-                      "globalObjectId": 10000, #initial id high enough not to overlap with preloaded objects
+                      "globalObjectId": 10000,  # initial id high enough not to overlap with preloaded objects
                       "sizeX": 200,
                       "sizeY": 200,
                       "ownerId": 0,
@@ -822,8 +797,8 @@ def init_user():
                       "randSeedZ": rand_seed_z,
                       "unitDropData": {"unclaimedUnits": []},
                       "islands": 1,
-                      "roadData": roads_data,
-                      "objects": game_objects,
+                      "roadData": initial_island["roads"],
+                      "objects": initial_island["objects"],
                       "rewardRandSeedW": 484584,
                       "rewardRandSeedZ": 7549,
                       "ransomRandSeedW": 456647,
@@ -831,15 +806,11 @@ def init_user():
                       "scrapRandSeedW": 5646,
                       "scrapRandSeedZ": 3567,
                       "resources": resources,
-                      "campaign": {"current": "camp001", "active":{}, "mastery": {}}
+                      "campaign": {"current": "camp001", "active": {}, "mastery": {}}
                       }
 
         },
-        "neighbors": [
-            {"uid": 123, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
-             "socialXpBad": 0, "socialLevelBad": 1, "profilePic": None, "dominanceRank": 1, "tending": {"actions": 3}},
-            {"uid": -1, "resource": 3, "coins": 100, "xp": 10, "level": 6, "socialXpGood": 0, "socialLevelGood": 20,
-             "socialXpBad": 0, "socialLevelBad": 1, "profilePic": "assets/game/GeneralAssetGroup_UI.swf/NeighborOneCP.png", "dominanceRank": 1, "tending": {"actions": 3}}],
+        "neighbors": [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neigbor")],
         "unlockedResource": {"aluminum": 3, "copper": 4, "gold": 5, "iron": 6},
         "showBookmark": True,
         "firstDay": True,
@@ -876,7 +847,7 @@ def init_user():
         "researchPartsVariantArmy": 0,
         "researchPartsVariantNavy": 0,
         "researchPartsVariantAir": 0,
-        "noIntroCineVariant": 2, #disable intro cinematics (we don't have yet)
+        "noIntroCineVariant": 2,  # disable intro cinematics (we don't have yet)
         "energyRewardVariant_v2": 0,
         "energyRewardVariant_v3": 0,
         "allyTimeoutVariant": 0,
@@ -921,7 +892,8 @@ def init_user():
     }
     return user
 
-#Q0516 ? start
+
+# Q0516 ? start
 def user_response():
     if 'user_object' in session:
         user = session['user_object']
@@ -929,16 +901,19 @@ def user_response():
         qc = session['quests']
         print("Loading user from save")
         if session.get('save_version') != version:
-            print("WARNING: Save game was saved with version", session.get('save_version'), "while game is version", version)
+            print("WARNING: Save game was saved with version", session.get('save_version'), "while game is version",
+                  version)
 
-        user["neighbors"] = [
-            {"uid": 123, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
-             "socialXpBad": 0, "socialLevelBad": 1, "profilePic": None, "dominanceRank": 1, "tending": {"actions": 3}},
-            # {"uid": -2, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
-            #  "socialXpBad": 0, "socialLevelBad": 1, "profilePic": None, "dominanceRank": 1, "tending": {"actions": 3}},
-            {"uid": -1, "resource": 3, "coins": 100, "xp": 10, "level": 6, "socialXpGood": 0, "socialLevelGood": 20,
-             "socialXpBad": 0, "socialLevelBad": 1, "profilePic": "assets/game/GeneralAssetGroup_UI.swf/NeighborOneCP.png", "dominanceRank": 1, "tending": {"actions": 3}}]
-
+        user["neighbors"] = [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neighbor")]
+        #
+        # [
+        # {"uid": 123, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
+        #  "socialXpBad": 0, "socialLevelBad": 1, "profilePic": None, "dominanceRank": 1, "tending": {"actions": 3}},
+        # # {"uid": -2, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
+        # #  "socialXpBad": 0, "socialLevelBad": 1, "profilePic": None, "dominanceRank": 1, "tending": {"actions": 3}},
+        # {"uid": -1, "resource": 3, "coins": 100, "xp": 10, "level": 6, "socialXpGood": 0, "socialLevelGood": 20,
+        #  "socialXpBad": 0, "socialLevelBad": 1, "profilePic": "assets/game/GeneralAssetGroup_UI.swf/NeighborOneCP.png", "dominanceRank": 1, "tending": {"actions": 3}}]
+        #
 
     else:
         user = copy.deepcopy(init_user())
@@ -956,7 +931,7 @@ def user_response():
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_remindCombatUIWaitForPreBattleUI'
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_remindCombatUIClearCircles'
     # session['user_object']["userInfo"]["player"]["lastEnergyCheck"] = datetime.now().timestamp()
-    #save migration only
+    # save migration only
     # if "lastEnergyCheck" not in session['user_object']["userInfo"]["player"]:
     #     session['user_object']["userInfo"]["player"]["lastEnergyCheck"] = datetime.now().timestamp()
 
@@ -965,7 +940,6 @@ def user_response():
     session["battle"] = None
     session["fleets"] = {}
     session['population'] = lookup_yield()
-
 
     # #temp migration
     # battle_status = 0
@@ -989,104 +963,132 @@ def user_response():
     user["completedQuests"] = [e["name"] for e in qc if e["complete"] == True]
 
     item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
-    if item_inventory.get("B01",0) < 20:
+    if item_inventory.get("B01", 0) < 20:
         item_inventory["B01"] = 20
-        print("Refilling upgrade blueprints to 20") #until friend gift mechanisms are working
-    if item_inventory.get("B05",0) < 25:
+        print("Refilling upgrade blueprints to 20")  # until friend gift mechanisms are working
+    if item_inventory.get("B05", 0) < 25:
         item_inventory["B05"] = 25
-        print("Refilling advanced hull plating to 25") #until friend gift mechanisms are working
-    if item_inventory.get("B18",0) < 25:
+        print("Refilling advanced hull plating to 25")  # until friend gift mechanisms are working
+    if item_inventory.get("B18", 0) < 25:
         item_inventory["B18"] = 25
-        print("Refilling propeller to 25") #until friend gift mechanisms are working
+        print("Refilling propeller to 25")  # until friend gift mechanisms are working
 
     meta = {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]}
     handle_quest_progress(meta, progress_inventory_count())
+    handle_quest_progress(meta, progress_neighbor_count())
+
+
 
 
     # for e in session['user_object']["userInfo"]["world"]["objects"]:
     #     e['lastUpdated'] = 1308211628  #1 minute earlier to test
-    user_response = {"errorType": 0, "userId": get_zid(), "metadata": meta,  # {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0},{"name": "QW120", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
-                    "data": user}
+    user_response = {"errorType": 0, "userId": get_zid(), "metadata": meta,
+                     # {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0},{"name": "QW120", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
+                     "data": user}
     return user_response
 
+
 def friend_response():
-    friend = {
-        "recommendedFriends":{"data":[]},
-        "zyngaFriends":{"data":[]},
-        "empireFriends":{"data":[]},
-        "sevenDayFriends":{"data":[]},
-        "fourteenDayFriends":{"data":[]},
-        "thirtyDayFriends":{"data":[]},
-        "payerFriends":{"data":[]},
-        "allFriends":{"data":[]},
-        "zyngaFriendsByEngagement":{"data":[]},
-        "empireFriendsByEngagement":{"data":[]},
-              }
+    friend_types = ["recommendedFriends", "zyngaFriends", "empireFriends", "sevenDayFriends", "fourteenDayFriends",
+                    "thirtyDayFriends", "payerFriends", "allFriends", "zyngaFriendsByEngagement", "empireFriendsByEngagement"]
+    friend = {friend_type: {"data": [ally["friend"] for ally in allies.values() if ally.get("friend") and ally.get(friend_type)]} for friend_type in friend_types}
+
+
+
+    #     "recommendedFriends": {"data": [{"zid": 124, "uid":124, "first_name": "MissTery", "sex": 'F',"portrait": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    # "pic": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    # "pic_square": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png"}]},
+    #     "zyngaFriends": {"data": [{"zid": 124,"uid":124, "first_name": "MissTery", "sex": 'F', "portrait": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    # "pic": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    # "pic_square": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png"}]},
+    #     "empireFriends": {"data": [{"zid": 124,"uid":124, "first_name": "MissTery", "sex": 'F', "portrait": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    # "pic": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    # "pic_square": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png"}]},
+    #     "sevenDayFriends": {"data": [{"zid": 124, "uid":124,"first_name": "MissTery", "sex": 'F', "portrait": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    # "pic": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    # "pic_square": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png"}]},
+    #     "fourteenDayFriends": {"data": []},
+    #     "thirtyDayFriends": {"data": []},
+    #     "payerFriends": {"data": []},
+    #     "allFriends": {"data": [{"zid": 124,"uid":124, "first_name": "MissTery", "sex": 'F',"portrait": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    # "pic": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    # "pic_square": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png"}]},
+    #     "zyngaFriendsByEngagement": {"data": []},
+    #     "empireFriendsByEngagement": {"data": []},
+
 
     friend_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": friend}
+                       "data": friend}
     return friend_response
+
 
 def invader_response():
     invader_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": None}
+                        "data": None}
     return invader_response
+
 
 def zlingshot_response():
     zlingshot_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": {   }}
+                          "data": {}}
     return zlingshot_response
+
 
 def recent_response():
     recent_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": []}
+                       "data": []}
     return recent_response
+
 
 def friend_info_response():
     friend_info_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": {"nonAppFriends":[{"zid":100,"first_name":"MissTery","sex":'F',"portrait":None}]}}
+                            "data": {"nonAppFriends": [
+                                ]}}
     return friend_info_response
+
 
 def tutorial_response(step, sequence, endpoint):
     meta = {"newPVE": 0}
-    qz = {"name": "Q0516", "complete":True, "expired":False,"progress":[1],"completedTasks":1}
-    qz_cadets_start = {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
-    #complete cadets?
-    qz_cadets_start = {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
-    qz_cadets_done = {"name": "Q0531", "complete":True, "expired":False,"progress":[1],"completedTasks":1}
-    qz_invasion_start = {"name": "Q6016", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
-    qz_invasion_done = {"name": "Q6016", "complete":True, "expired":False,"progress":[1],"completedTasks":1}
-    flag_Q1098_start = {"name": "Q1098", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
-    flag_Q1098_done = {"name": "Q1098", "complete":True, "expired":False,"progress":[1],"completedTasks":1}
-    cadets_Q0611_start = {"name": "Q0611", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
-    cadets_Q0611_done = {"name": "Q0611", "complete":True, "expired":False,"progress":[1],"completedTasks":1}
-    flag_Q6011_start = {"name": "Q6011", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
-    flag_Q6011_done = {"name": "Q6011", "complete":True, "expired":False,"progress":[1],"completedTasks":1}
+    qz = {"name": "Q0516", "complete": True, "expired": False, "progress": [1], "completedTasks": 1}
+    qz_cadets_start = {"name": "Q0531", "complete": False, "expired": False, "progress": [0], "completedTasks": 0}
+    # complete cadets?
+    qz_cadets_start = {"name": "Q0531", "complete": False, "expired": False, "progress": [0], "completedTasks": 0}
+    qz_cadets_done = {"name": "Q0531", "complete": True, "expired": False, "progress": [1], "completedTasks": 1}
+    qz_invasion_start = {"name": "Q6016", "complete": False, "expired": False, "progress": [0], "completedTasks": 0}
+    qz_invasion_done = {"name": "Q6016", "complete": True, "expired": False, "progress": [1], "completedTasks": 1}
+    flag_Q1098_start = {"name": "Q1098", "complete": False, "expired": False, "progress": [0], "completedTasks": 0}
+    flag_Q1098_done = {"name": "Q1098", "complete": True, "expired": False, "progress": [1], "completedTasks": 1}
+    cadets_Q0611_start = {"name": "Q0611", "complete": False, "expired": False, "progress": [0], "completedTasks": 0}
+    cadets_Q0611_done = {"name": "Q0611", "complete": True, "expired": False, "progress": [1], "completedTasks": 1}
+    flag_Q6011_start = {"name": "Q6011", "complete": False, "expired": False, "progress": [0], "completedTasks": 0}
+    flag_Q6011_done = {"name": "Q6011", "complete": True, "expired": False, "progress": [1], "completedTasks": 1}
 
-    sergeant_Q0671_start = {"name": "Q0671", "complete":False, "expired":False,"progress":[0,0],"completedTasks":0}#after 6011
-    sergeant_Q0671_done = {"name": "Q0671", "complete":True, "expired":False,"progress":[1,1],"completedTasks":2}
-    flag_Q0591_start = {"name": "Q0591", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
-    flag_Q0591_done = {"name": "Q0591", "complete":True, "expired":False,"progress":[1],"completedTasks":1}
-    farm_Q0571_start = {"name": "Q0571", "complete":False, "expired":False,"progress":[0,0],"completedTasks":0}
-    farm_Q0571_done = {"name": "Q0571", "complete":True, "expired":False,"progress":[1,1],"completedTasks":2}
-    corn_Q0521_start = {"name": "Q0521", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
-    corn_Q0521_done = {"name": "Q0521", "complete":True, "expired":False,"progress":[1],"completedTasks":1}
-    parliament_Q0691_start = {"name": "Q0691", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
-    parliament_Q0691_done = {"name": "Q0691", "complete":True, "expired":False,"progress":[1],"completedTasks":1}
+    sergeant_Q0671_start = {"name": "Q0671", "complete": False, "expired": False, "progress": [0, 0],
+                            "completedTasks": 0}  # after 6011
+    sergeant_Q0671_done = {"name": "Q0671", "complete": True, "expired": False, "progress": [1, 1], "completedTasks": 2}
+    flag_Q0591_start = {"name": "Q0591", "complete": False, "expired": False, "progress": [0], "completedTasks": 0}
+    flag_Q0591_done = {"name": "Q0591", "complete": True, "expired": False, "progress": [1], "completedTasks": 1}
+    farm_Q0571_start = {"name": "Q0571", "complete": False, "expired": False, "progress": [0, 0], "completedTasks": 0}
+    farm_Q0571_done = {"name": "Q0571", "complete": True, "expired": False, "progress": [1, 1], "completedTasks": 2}
+    corn_Q0521_start = {"name": "Q0521", "complete": False, "expired": False, "progress": [0], "completedTasks": 0}
+    corn_Q0521_done = {"name": "Q0521", "complete": True, "expired": False, "progress": [1], "completedTasks": 1}
+    parliament_Q0691_start = {"name": "Q0691", "complete": False, "expired": False, "progress": [0],
+                              "completedTasks": 0}
+    parliament_Q0691_done = {"name": "Q0691", "complete": True, "expired": False, "progress": [1], "completedTasks": 1}
 
     # if step == 'tut_step_placeBarracksServer':
     #     meta['QuestComponent'] = [qz, qz_cadets_start]
     # if step == 'tut_step_cadetsComplete':
     #     pass
-        # handle_quest_progress(meta, progress_action("build")) build is covered
-        # meta['QuestComponent'] = [qz_cadets_done, qz_invasion_start]  #what starts invasion?
-       ## meta["newPVE"] = {"status": 2, "pos": "60,63,0", "villain":"v18", "quest":"Q6016"}
+    # handle_quest_progress(meta, progress_action("build")) build is covered
+    # meta['QuestComponent'] = [qz_cadets_done, qz_invasion_start]  #what starts invasion?
+    ## meta["newPVE"] = {"status": 2, "pos": "60,63,0", "villain":"v18", "quest":"Q6016"}
     # if step == 'tut_step_firstInvasionEnd':
     # if step == 'tut_step_postFirstInvasionResumeQuests':
     #     handle_quest_progress(meta, progress_action(
     #         "fight"))
-        # meta['QuestComponent'] = [qz_invasion_done,flag_Q1098_start,cadets_Q0611_start]
-      #  meta["newPVE"] = {"status": 2, "pos": "60,66,0", "villain":"v18", "quest":"Q6016"}  #contineous battle mode experience QT01_05b_2
+    # meta['QuestComponent'] = [qz_invasion_done,flag_Q1098_start,cadets_Q0611_start]
+    #  meta["newPVE"] = {"status": 2, "pos": "60,66,0", "villain":"v18", "quest":"Q6016"}  #contineous battle mode experience QT01_05b_2
     # if step == 'tut_step_placeFlagQuestDialog':
     #     meta['QuestComponent'] = [flag_Q1098_done, flag_Q6011_start]
 
@@ -1102,11 +1104,12 @@ def tutorial_response(step, sequence, endpoint):
     #     meta['QuestComponent'] = [farm_Q0571_done, corn_Q0521_start, parliament_Q0691_start, sergeant_Q0671_start]
 
     merge_quest_progress(meta['QuestComponent'] if 'QuestComponent' in meta else [], session['quests'], "session quest")
-    session['user_object']["userInfo"]["player"]["tutorialProgress"] = step # TODO: revert step when loading if needed
+    session['user_object']["userInfo"]["player"]["tutorialProgress"] = step  # TODO: revert step when loading if needed
 
-    report_tutorial_step(step, meta['QuestComponent'] if 'QuestComponent' in meta else None, meta['newPVE'], sequence, endpoint);
+    report_tutorial_step(step, meta['QuestComponent'] if 'QuestComponent' in meta else None, meta['newPVE'], sequence,
+                         endpoint)
     tutorial_response = {"errorType": 0, "userId": 1, "metadata": meta,
-                    "data": []}
+                         "data": []}
     return tutorial_response
 
 
@@ -1167,21 +1170,22 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
                     del item_inventory[item['-code']]
                 print("Placing", item_name + "(" + item['-code'] + ")", "from inventory")
             else:
-                print("ERROR: Placing", item_name + "(" + item['-code'] + ")", "from inventory but not in inventory. Ignoring for now.")
+                print("ERROR: Placing", item_name + "(" + item['-code'] + ")",
+                      "from inventory but not in inventory. Ignoring for now.")
 
     if step == "speedUp":
         lookup_object(id)['lastUpdated'] = lookup_object(id).get('lastUpdated', 0) - elapsed * 1000
     # TODO: cost of speedup?
 
     perform_world_response = {"errorType": 0, "userId": 1, "metadata": meta,
-                    "data": {"id": id}}
-    print("perform_world_response" , repr(perform_world_response))
+                              "data": {"id": id}}
+    print("perform_world_response", repr(perform_world_response))
     return perform_world_response
 
 
 def neighbor_suggestion_response():
     neighbor_suggestion_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": []}
+                                    "data": []}
     return neighbor_suggestion_response
 
 
@@ -1191,7 +1195,7 @@ def seen_flag_response(flag):
     seen_flags[flag] = seen_flags.get(flag, 0) + 1
 
     seen_flag_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": []}
+                          "data": []}
     return seen_flag_response
 
 
@@ -1244,75 +1248,83 @@ def random_fleet_challenge_response():
         "ransomRandom": None,
         "ransomResource": None,
         "ransomAmount": None,
-        "units": [unit], # only one unit for tutorial [unit, unit, unit],
-        "store": [0], #[0, 0, 0],
+        "units": [unit],  # only one unit for tutorial [unit, unit, unit],
+        "store": [0],  # [0, 0, 0],
         "fleets": [user_fleet],
         "upgrades": None,
         "hp": None
     }
 
     random_fleet_challenge_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": {
-                        "state": 0,
-                        "challengerFleet" : fleet,
-                        "challengeInfo": {"status": 0, "state": 1},
-                        "maxUnits": 1
-                    }}
+                                       "data": {
+                                           "state": 0,
+                                           "challengerFleet": fleet,
+                                           "challengeInfo": {"status": 0, "state": 1},
+                                           "maxUnits": 1
+                                       }}
     return random_fleet_challenge_response
 
 
 def load_challenge_response():
     load_challenge_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": {"eFID":"pve", "state":1}}  #CHALLENGE_STATE_IN_PROGRESS
+                               "data": {"eFID": "pve", "state": 1}}  # CHALLENGE_STATE_IN_PROGRESS
     return load_challenge_response
 
 
 def generic_string_response(param):
     meta = {"newPVE": 0}
-    handle_quest_progress(meta, all_lambda(progress_action("genericString"), progress_parameter_equals("_string", str(param))))
+    handle_quest_progress(meta, all_lambda(progress_action("genericString"),
+                                           progress_parameter_equals("_string", str(param))))
 
     generic_string_response = {"errorType": 0, "userId": 1, "metadata": meta,
-                    "data": []}
+                               "data": []}
     return generic_string_response
+
 
 def streak_bonus_response():
     streak_bonus_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": []}
+                             "data": []}
     return streak_bonus_response
+
 
 def world_name_response(name):
     world_name_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": []}
+                           "data": []}
     session['user_object']["userInfo"]["worldName"] = name
 
     return world_name_response
 
+
 def update_roads_response():
     update_roads_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": []}
+                             "data": []}
     return update_roads_response
+
 
 def stream_publish_response():
     stream_publish_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": []}
+                               "data": []}
     return stream_publish_response
+
 
 def stop_mayhem_response():
     stop_mayhem_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": []}
+                            "data": []}
     return stop_mayhem_response
+
 
 def save_options_response(options):
     save_options_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": []}
+                             "data": []}
     session['user_object']["userInfo"]["player"]["options"] = options
     return save_options_response
+
 
 def full_screen_response():
     meta = {"newPVE": 0}
     handle_quest_progress(meta, progress_action("fullscreen"))
     full_screen_response = {"errorType": 0, "userId": 1, "metadata": meta,
-                    "data": []}
+                            "data": []}
     return full_screen_response
 
 
@@ -1320,14 +1332,15 @@ def view_zoom_response(zoom):
     meta = {"newPVE": 0}
     handle_quest_progress(meta, all_lambda(progress_action("zoom"), progress_parameter_equals("_zoom", str(zoom))))
     view_zoom_response = {"errorType": 0, "userId": 1, "metadata": meta,
-                    "data": []}
+                          "data": []}
     return view_zoom_response
+
 
 def load_world_response(params):
     meta = {"newPVE": 0}
     handle_quest_progress(meta, progress_action("visit"))
 
-    print("world resp", int(params[0]) , session['user_object']["userInfo"]["player"]["uid"])
+    print("world resp", int(params[0]), session['user_object']["userInfo"]["player"]["uid"])
     if int(params[0]) == session['user_object']["userInfo"]["player"]["uid"]:
         ally = session['user_object']["userInfo"]
         # qc = session['quests']
@@ -1335,6 +1348,10 @@ def load_world_response(params):
     else:
         ally = copy.deepcopy(init_user()["userInfo"])
         ally["player"]["uid"] = int(params[0])
+        if allies[str(params[0])]["objects"]:
+            ally["world"]["objects"] = allies[str(params[0])]["objects"]
+        if allies[str(params[0])]["roads"]:
+            ally["world"]["roadData"] = allies[str(params[0])]["roads"]
         # ally["gf"] = False
         # ally["yimf"] = ""
         # ally["novisit"] = False
@@ -1347,7 +1364,7 @@ def load_world_response(params):
     ally["visitorEnergy"] = 5
 
     load_world_response = {"errorType": 0, "userId": 1, "metadata": meta,
-                    "data": ally}
+                           "data": ally}
     return load_world_response
 
 
@@ -1355,7 +1372,7 @@ def tend_ally_response():
     meta = {"newPVE": 0}
     handle_quest_progress(meta, progress_action("tending"))
     tend_ally_response = {"errorType": 0, "userId": 1, "metadata": meta,
-                    "data": []}
+                          "data": []}
     return tend_ally_response
 
 
@@ -1363,7 +1380,7 @@ def add_fleet_response(param):
     meta = {"newPVE": 0}
 
     add_fleet_response = {"errorType": 0, "userId": 1, "metadata": meta,
-                    "data": []}
+                          "data": []}
 
     session["fleets"][param['name']] = param['units']
     print("Player fleet:", param['units'])
@@ -1372,8 +1389,9 @@ def add_fleet_response(param):
 
 def dummy_response():
     dummy_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                    "data": []}
+                      "data": []}
     return dummy_response
+
 
 # @app.after_request
 # def add_header(r):
@@ -1405,10 +1423,11 @@ def delete_save(message):
     # print('deleted save: ' + message)
     print("Save will be deleted after redirect " + message)
 
+
 def report_tutorial_step(step, response, new_pve, sequence, endpoint):
     quest_names = [r['name'] for r in response] if response else []
     quests = [r for r in quest_settings['quests']['quest'] if r['_name'] in quest_names]
-    socketio.emit('tutorial_step', [step, response, new_pve , describe_step(step), quests, sequence, endpoint])
+    socketio.emit('tutorial_step', [step, response, new_pve, describe_step(step), quests, sequence, endpoint])
 
 
 def describe_step(step):
@@ -1420,7 +1439,7 @@ def report_world_log(operation, response, req, sequence, endpoint, response2, ne
     quest_names = [r['name'] for r in response2] if response2 else []
     quests = [r for r in quest_settings['quests']['quest'] if r['_name'] in quest_names]
     req2 = json.loads(json.dumps(req, default=lambda o: '<not serializable>'))
-    socketio.emit('world_log', [operation, response, req2, sequence, endpoint, response2, new_pve,quests])
+    socketio.emit('world_log', [operation, response, req2, sequence, endpoint, response2, new_pve, quests])
 
 
 def report_other_log(service, response, req, endpoint):

@@ -1,0 +1,42 @@
+{
+  "info": {
+    "uid": 123,
+    "resource": 3,
+    "coins": 100,
+    "xp": 10,
+    "level": 1,
+    "socialXpGood": 0,
+    "socialLevelGood": 1,
+    "socialXpBad": 0,
+    "socialLevelBad": 1,
+    "profilePic": null,
+    "dominanceRank": 1,
+    "tending": {
+      "actions": 3
+    }
+  },
+  "friend": {
+    "zid": 123,
+    "uid": 123,
+    "first_name": "Natalie",
+    "name": "Natalie Portman",
+    "sex": "F",
+    "portrait": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    "pic": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    "pic_square": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png"
+  },
+  "neighbor": true,
+  "recommendedFriends": true,
+  "zyngaFriends": false,
+  "empireFriends": true,
+  "sevenDayFriends": false,
+  "fourteenDayFriends": false,
+  "thirtyDayFriends": false,
+  "payerFriends": false,
+  "allFriends": true,
+  "zyngaFriendsByEngagement": false,
+  "empireFriendsByEngagement": false,
+  "appFriendId": 123,
+  "objects": null,
+  "roads": null
+}

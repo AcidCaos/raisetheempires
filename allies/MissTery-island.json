@@ -1,0 +1,27 @@
+{
+  "info": null,
+  "friend": {
+    "zid": 124,
+    "uid": 124,
+    "first_name": "Miss",
+    "name": "MissTery",
+    "sex": "F",
+    "portrait": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    "pic": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
+    "pic_square": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png"
+  },
+  "neighbor": false,
+  "recommendedFriends": true,
+  "zyngaFriends": false,
+  "empireFriends": true,
+  "sevenDayFriends": false,
+  "fourteenDayFriends": false,
+  "thirtyDayFriends": false,
+  "payerFriends": false,
+  "allFriends": true,
+  "zyngaFriendsByEngagement": false,
+  "empireFriendsByEngagement": false,
+  "appFriendId": 124,
+  "objects": null,
+  "roads": null
+}

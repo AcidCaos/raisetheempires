@@ -1,5 +1,6 @@
 from quest_settings import quest_settings
-from game_settings import game_settings, lookup_item_by_code, lookup_state_machine, replenish_energy, lookup_yield
+from game_settings import game_settings, lookup_item_by_code, lookup_state_machine, replenish_energy, lookup_yield, \
+    allies
 from flask import session
 from functools import reduce
 import math
@@ -90,6 +91,19 @@ def progress_inventory_count():
 def progress_inventory(item, maximum_total, extra, progress):
     item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
     total = min(item_inventory.get(item, 0), int(maximum_total))
+    extra["total"] = total
+    return total != progress
+
+
+def progress_neighbor_count():
+    return lambda task, progress, i, extra, *args: \
+        task["_action"] == "neighborsAdded" and  progress_neighbors(task["_total"], extra, progress) \
+        and progress < int(task["_total"])
+
+
+def progress_neighbors(maximum_total, extra, progress):
+    neighbor_count = len([ally for ally in allies.values() if ally.get("friend") and ally.get("neighbor")])
+    total = min(neighbor_count, int(maximum_total))
     extra["total"] = total
     return total != progress
 

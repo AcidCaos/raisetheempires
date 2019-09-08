@@ -10,12 +10,12 @@
 		}
 		function getFriendData() {
 		    console.log("getFriendData called")
-			return [{'zid':123, 'uid':123, 'first_name': 'Natalie', 'name':'Portman', "sex":'F'}];
-		//    ,{'zid':-2, 'uid':-2, 'first_name': 'Sergeant', 'name':'Cross', "sex":'M'},{'zid':-1, 'uid':-1, 'first_name': 'Steele', 'name':'Steele', "sex":'M'}
+			return {{ allies | safe | default([]) }};
+			// return  [{'zid':123, 'uid':123, 'first_name': 'Natalie', 'name':'Portman', "sex":'F'} ,{'zid':-2, 'uid':-2, 'first_name': 'Sergeant', 'name':'Cross', "sex":'M'},{'zid':-1, 'uid':-1, 'first_name': 'Steele', 'name':'Steele', "sex":'M'}];
 		}
 		function getAppFriendIds() {
 			console.log("getAppFriendIds called")
-			return [123];
+			return {{ app_friends | safe | default([]) }};
 		}
 
 		function onGameLoaded(seen, popp, canvas) {
