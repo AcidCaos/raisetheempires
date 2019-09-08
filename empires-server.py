@@ -1,4 +1,5 @@
 from builtins import print
+from time import sleep
 
 from flask import Flask, render_template, send_from_directory, request, Response, make_response, redirect
 from flask_session import Session
@@ -137,8 +138,8 @@ def record_stats():
 
 @app.route("/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf")
 def flashFile():
-    # return send_from_directory("assets", "ZGame.109338.swf")
-    return send_from_directory("assets", "ZGame.109338_tracer.swf")
+    return send_from_directory("assets", "ZGame.109338.swf")
+    # return send_from_directory("assets", "ZGame.109338_tracer.swf")
 
 
 @app.route("/gameSettings.xml")
@@ -993,7 +994,7 @@ def user_response():
     handle_quest_progress(meta, progress_inventory_count())
     handle_quest_progress(meta, progress_neighbor_count())
 
-
+    sleep(0.05)  # bugfix required delay for loading entire screen
 
 
     # for e in session['user_object']["userInfo"]["world"]["objects"]:
