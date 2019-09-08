@@ -89,6 +89,13 @@ def more_money():
 
 @app.route("/save-editor", methods=['GET'])
 def save_editor():
+    backups = []
+    s = session
+    while "backup" in s:
+        backups.append(str(datetime.fromtimestamp(s["backup"].get('saved_on', 0))) + ' - ' \
+        + str(datetime.fromtimestamp(s["backup"].get('replaced_on', 0))) + ' @' + s["backup"].get('save_version'))
+        s = s["backup"]
+
     return render_template("save-editor.html", savegame=json.dumps(
         {
             'user_object': session['user_object'] if 'user_object' in session else None,
@@ -96,8 +103,7 @@ def save_editor():
             'battle': session['battle'] if 'battle' in session else None,
             'fleets': session['fleets'] if 'fleets' in session else None,
             'population': session['population'] if 'population' in session else None
-        }
-        , default=lambda o: '<not serializable>', sort_keys=False, indent=2), uid=get_zid())
+        }, default=lambda o: '<not serializable>', sort_keys=False, indent=2), uid=get_zid(), backups=backups)
 
 
 @app.route("/save-editor", methods=['POST'])
@@ -105,11 +111,19 @@ def save_savegame():
     print("Going to save:")
     save_game = json.loads(request.form['savegame'])
     print(repr(save_game))
+    session["backup"] = {k: v for k, v in session.items() if
+                         k in ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on',
+                               'save_version', 'backup']}  # nested backups
+
     session['user_object'] = save_game['user_object']
     session['quests'] = save_game['quests']
     session['battle'] = save_game['battle']
     session['fleets'] = save_game['fleets']
     session['population'] = save_game['population']
+    session['saved'] = True
+    timestamp = datetime.now().timestamp()
+    session['saved_on'] = timestamp
+    session["backup"]['replaced_on'] = timestamp
 
     response = make_response(redirect('/'))
     return response
@@ -905,6 +919,8 @@ def user_response():
                   version)
 
         user["neighbors"] = [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neighbor")]
+
+        session['saved_on'] = datetime.now().timestamp()
         #
         # [
         # {"uid": 123, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
