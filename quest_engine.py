@@ -48,6 +48,9 @@ def prepopulate_task(task):
         return min(item_inventory.get(task["_item"], 0), int(task["_total"])), item_inventory.get(task["_item"], 0) >= int(task["_total"])
     elif task["_action"] == 'population':
         return min(session['population'], int(task["_total"])), session['population'] >= int(task["_total"])
+    elif task["_action"] == 'neighborsAdded':
+        neighbor_count = len([ally for ally in allies.values() if ally.get("friend") and ally.get("neighbor")])
+        return min(neighbor_count, int(task["_total"])), neighbor_count >= int(task["_total"])
     elif task["_action"] == 'autoComplete':
         return 1, True
     else:
