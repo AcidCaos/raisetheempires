@@ -19,1281 +19,1768 @@
   "neighbor": true,
   "objects": [
     {
-      "id": 0,
+      "id": 1000,
+      "itemName": "Small Farm",
+      "position": "55,43,0",
+      "referenceItem": "WH",
+      "state": 10
+    },
+    {
+      "id": 1001,
       "itemName": "tree01",
       "position": "47,50,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1002,
       "itemName": "tree01",
       "position": "47,51,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1003,
       "itemName": "tree01",
       "position": "47,52,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1004,
       "itemName": "tree01",
       "position": "47,53,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1005,
       "itemName": "tree01",
       "position": "47,54,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1006,
       "itemName": "tree01",
       "position": "47,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1007,
       "itemName": "tree01",
       "position": "47,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1008,
       "itemName": "tree01",
       "position": "47,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1009,
       "itemName": "tree01",
       "position": "47,58,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1010,
       "itemName": "tree01",
       "position": "47,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1011,
       "itemName": "tree01",
       "position": "49,48,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1012,
       "itemName": "tree01",
       "position": "50,48,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1013,
       "itemName": "tree01",
       "position": "51,48,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1014,
       "itemName": "tree01",
       "position": "52,48,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1015,
       "itemName": "tree01",
       "position": "53,48,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1016,
       "itemName": "tree01",
       "position": "54,48,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1017,
       "itemName": "tree01",
       "position": "54,47,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1018,
       "itemName": "tree01",
       "position": "54,46,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1019,
       "itemName": "tree01",
       "position": "56,45,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1020,
       "itemName": "tree01",
       "position": "56,46,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1021,
       "itemName": "tree01",
       "position": "56,47,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1022,
       "itemName": "tree01",
       "position": "56,48,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1023,
       "itemName": "tree01",
       "position": "57,48,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1024,
       "itemName": "tree01",
       "position": "58,48,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1025,
       "itemName": "tree01",
       "position": "59,48,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1026,
       "itemName": "tree01",
       "position": "60,48,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1027,
       "itemName": "tree01",
       "position": "61,48,0",
       "referenceItem": null
     },
     {
-      "id": 0,
-      "itemName": "tree21",
-      "position": "54,45,0",
-      "referenceItem": null
-    },
-    {
-      "id": 0,
-      "itemName": "tree21",
-      "position": "53,47,0",
-      "referenceItem": null
-    },
-    {
-      "id": 0,
+      "id": 1028,
       "itemName": "bricks_beige",
       "position": "49,54,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1029,
       "itemName": "Lamp 02",
       "position": "49,54,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1030,
       "itemName": "bricks_pink",
       "position": "50,54,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1031,
       "itemName": "bricks_beige",
       "position": "51,54,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1032,
       "itemName": "Lamp 02",
       "position": "51,54,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1033,
       "itemName": "bricks_beige",
       "position": "53,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1034,
       "itemName": "Lamp 02",
       "position": "53,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1035,
       "itemName": "bricks_pink",
       "position": "53,54,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1036,
       "itemName": "bricks_pink",
       "position": "53,53,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1037,
       "itemName": "bricks_beige",
       "position": "53,52,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1038,
       "itemName": "Lamp 02",
       "position": "53,52,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1039,
       "itemName": "bricks_pink",
       "position": "54,52,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1040,
       "itemName": "bricks_pink",
       "position": "55,52,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1041,
       "itemName": "bricks_pink",
       "position": "55,51,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1042,
       "itemName": "bricks_beige",
       "position": "55,50,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1043,
       "itemName": "Lamp 02",
       "position": "55,50,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1044,
       "itemName": "bricks_pink",
       "position": "56,50,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1045,
       "itemName": "bricks_pink",
       "position": "57,50,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1046,
       "itemName": "bricks_beige",
       "position": "58,50,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1047,
       "itemName": "Lamp 02",
       "position": "58,50,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1048,
       "itemName": "bricks_pink",
       "position": "58,51,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1049,
       "itemName": "bricks_pink",
       "position": "58,52,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1050,
       "itemName": "bricks_pink",
       "position": "59,52,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1051,
       "itemName": "bricks_beige",
       "position": "60,52,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1052,
       "itemName": "Lamp 02",
       "position": "60,52,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1053,
       "itemName": "bricks_pink",
       "position": "60,53,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1054,
       "itemName": "bricks_pink",
       "position": "60,54,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1055,
       "itemName": "bricks_beige",
       "position": "60,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1056,
       "itemName": "Lamp 02",
       "position": "60,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1057,
       "itemName": "bricks_pink",
       "position": "59,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1058,
       "itemName": "bricks_pink",
       "position": "58,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1059,
       "itemName": "bricks_pink",
       "position": "58,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1060,
       "itemName": "bricks_pink",
       "position": "58,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1061,
       "itemName": "bricks_pink",
       "position": "57,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1062,
       "itemName": "bricks_pink",
       "position": "56,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1063,
       "itemName": "bricks_pink",
       "position": "55,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1064,
       "itemName": "bricks_pink",
       "position": "55,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1065,
       "itemName": "bricks_pink",
       "position": "55,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1066,
       "itemName": "bricks_pink",
       "position": "54,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1067,
       "itemName": "Daisy Blue",
       "position": "53,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1068,
       "itemName": "Daisy Purple",
       "position": "53,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1069,
       "itemName": "Daisy Blue",
       "position": "54,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1070,
       "itemName": "Daisy Purple",
       "position": "54,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1071,
       "itemName": "Daisy Blue",
       "position": "53,50,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1072,
       "itemName": "Daisy Purple",
       "position": "53,51,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1073,
       "itemName": "Daisy Blue",
       "position": "54,51,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1074,
       "itemName": "Daisy Purple",
       "position": "54,50,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1075,
       "itemName": "Daisy Blue",
       "position": "59,51,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1076,
       "itemName": "Daisy Purple",
       "position": "59,50,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1077,
       "itemName": "Daisy Blue",
       "position": "60,50,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1078,
       "itemName": "Daisy Purple",
       "position": "60,51,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1079,
       "itemName": "Daisy Blue",
       "position": "59,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1080,
       "itemName": "Daisy Purple",
       "position": "59,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1081,
       "itemName": "Daisy Blue",
       "position": "60,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1082,
       "itemName": "Daisy Purple",
       "position": "60,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1083,
       "itemName": "bricks_beige",
       "position": "58,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1084,
       "itemName": "bricks_beige",
       "position": "58,63,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1085,
       "itemName": "bricks_beige",
       "position": "58,62,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1086,
       "itemName": "bricks_beige",
       "position": "58,61,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1087,
       "itemName": "bricks_beige",
       "position": "58,60,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1088,
       "itemName": "bricks_beige",
       "position": "58,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1089,
       "itemName": "bricks_beige",
       "position": "59,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1090,
       "itemName": "bricks_beige",
       "position": "60,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1091,
       "itemName": "bricks_beige",
       "position": "61,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1092,
       "itemName": "bricks_beige",
       "position": "62,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1093,
       "itemName": "bricks_beige",
       "position": "62,63,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1094,
       "itemName": "bricks_beige",
       "position": "62,62,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1095,
       "itemName": "bricks_beige",
       "position": "62,61,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1096,
       "itemName": "bricks_beige",
       "position": "62,60,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1097,
       "itemName": "bricks_beige",
       "position": "62,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1098,
       "itemName": "bricks_beige",
       "position": "62,58,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1099,
       "itemName": "bricks_beige",
       "position": "62,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1100,
       "itemName": "bricks_beige",
       "position": "62,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1101,
       "itemName": "bricks_beige",
       "position": "62,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1102,
       "itemName": "bricks_beige",
       "position": "62,54,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1103,
       "itemName": "bricks_beige",
       "position": "62,53,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1104,
       "itemName": "bricks_beige",
       "position": "63,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1105,
       "itemName": "bricks_beige",
       "position": "63,63,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1106,
       "itemName": "bricks_beige",
       "position": "63,62,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1107,
       "itemName": "bricks_beige",
       "position": "63,61,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1108,
       "itemName": "bricks_beige",
       "position": "63,60,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1109,
       "itemName": "bricks_beige",
       "position": "63,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1110,
       "itemName": "bricks_beige",
       "position": "63,58,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1111,
       "itemName": "bricks_beige",
       "position": "63,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1112,
       "itemName": "bricks_beige",
       "position": "63,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1113,
       "itemName": "bricks_beige",
       "position": "63,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1114,
       "itemName": "bricks_beige",
       "position": "63,54,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1115,
       "itemName": "bricks_beige",
       "position": "63,53,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1116,
       "itemName": "bricks_beige",
       "position": "59,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1117,
       "itemName": "bricks_beige",
       "position": "60,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1118,
       "itemName": "bricks_beige",
       "position": "61,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1119,
       "itemName": "bricks_beige",
       "position": "59,63,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1120,
       "itemName": "bricks_beige",
       "position": "60,63,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1121,
       "itemName": "bricks_beige",
       "position": "61,63,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1122,
       "itemName": "statue04",
       "position": "59,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1123,
       "itemName": "statue04",
       "position": "61,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1124,
       "itemName": "bricks_beige",
       "position": "64,63,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1125,
       "itemName": "bricks_beige",
       "position": "64,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1126,
       "itemName": "statue05",
       "position": "64,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1127,
       "itemName": "Bush02",
       "position": "62,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1128,
       "itemName": "Bush02",
       "position": "63,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1129,
       "itemName": "statue01",
       "position": "63,60,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1130,
       "itemName": "bricks_beige",
       "position": "65,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1131,
       "itemName": "bricks_beige",
       "position": "66,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1132,
       "itemName": "bricks_beige",
       "position": "67,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1133,
       "itemName": "bricks_beige",
       "position": "68,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1134,
       "itemName": "statue05",
       "position": "68,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1135,
       "itemName": "bricks_beige",
       "position": "64,62,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1136,
       "itemName": "bricks_beige",
       "position": "64,61,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1137,
       "itemName": "bricks_beige",
       "position": "64,60,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1138,
       "itemName": "bricks_beige",
       "position": "64,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1139,
       "itemName": "bricks_beige",
       "position": "64,58,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1140,
       "itemName": "bricks_beige",
       "position": "64,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1141,
       "itemName": "bricks_beige",
       "position": "64,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1142,
       "itemName": "bricks_beige",
       "position": "64,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1143,
       "itemName": "bricks_beige",
       "position": "65,60,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1144,
       "itemName": "bricks_beige",
       "position": "66,60,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1145,
       "itemName": "bricks_beige",
       "position": "67,60,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1146,
       "itemName": "bricks_beige",
       "position": "65,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1147,
       "itemName": "bricks_beige",
       "position": "66,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1148,
       "itemName": "bricks_beige",
       "position": "67,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1149,
       "itemName": "bricks_beige",
       "position": "64,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1150,
       "itemName": "Column 01",
       "position": "63,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1151,
       "itemName": "bricks_beige",
       "position": "64,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1152,
       "itemName": "bricks_beige",
       "position": "65,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1153,
       "itemName": "bricks_beige",
       "position": "66,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1154,
       "itemName": "bricks_beige",
       "position": "67,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1155,
       "itemName": "bricks_beige",
       "position": "68,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1156,
       "itemName": "bricks_beige",
       "position": "68,63,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1157,
       "itemName": "bricks_beige",
       "position": "68,62,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1158,
       "itemName": "bricks_beige",
       "position": "68,61,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1159,
       "itemName": "bricks_beige",
       "position": "68,60,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1160,
       "itemName": "bricks_beige",
       "position": "68,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1161,
       "itemName": "bricks_beige",
       "position": "68,58,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1162,
       "itemName": "bricks_beige",
       "position": "68,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1163,
       "itemName": "bricks_beige",
       "position": "68,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1164,
       "itemName": "bricks_beige",
       "position": "68,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1165,
       "itemName": "Bush02",
       "position": "58,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1166,
       "itemName": "Bush02",
       "position": "58,63,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1167,
       "itemName": "Bush02",
       "position": "58,62,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1168,
       "itemName": "Bush02",
       "position": "58,61,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1169,
       "itemName": "Bush02",
       "position": "58,60,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1170,
       "itemName": "Bush02",
       "position": "58,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1171,
       "itemName": "Bush02",
       "position": "59,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1172,
       "itemName": "Bush02",
       "position": "60,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1173,
       "itemName": "Bush02",
       "position": "61,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1174,
       "itemName": "Bush02",
       "position": "62,58,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1175,
       "itemName": "Mail Box Blue",
       "position": "62,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1176,
       "itemName": "Bush02",
       "position": "62,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1177,
       "itemName": "Bush02",
       "position": "62,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1178,
       "itemName": "Bush02",
       "position": "62,54,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1179,
       "itemName": "Bush02",
       "position": "62,53,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1180,
       "itemName": "Bush02",
       "position": "63,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1181,
       "itemName": "Bush02",
       "position": "63,54,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1182,
       "itemName": "Bush02",
       "position": "63,53,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1183,
       "itemName": "Bush02",
       "position": "64,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1184,
       "itemName": "Bush02",
       "position": "65,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1185,
       "itemName": "Bush02",
       "position": "66,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1186,
       "itemName": "Bush02",
       "position": "67,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1187,
       "itemName": "Bush02",
       "position": "68,55,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1188,
       "itemName": "Bush02",
       "position": "68,56,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1189,
       "itemName": "Bush02",
       "position": "68,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1190,
       "itemName": "Bush02",
       "position": "68,58,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1191,
       "itemName": "Bush02",
       "position": "68,59,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1192,
       "itemName": "Bush02",
       "position": "68,60,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1193,
       "itemName": "Bush02",
       "position": "68,61,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1194,
       "itemName": "Bush02",
       "position": "68,62,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1195,
       "itemName": "Bush02",
       "position": "68,63,0",
       "referenceItem": null
     },
     {
-      "id": 0,
-      "itemName": "National Archives",
-      "position": "65,61,0",
-      "referenceItem": null
-    },
-    {
-      "id": 0,
+      "id": 1196,
       "itemName": "Park Amphitheater",
       "position": "62,51,0",
-      "referenceItem": null
+      "referenceItem": null,
+      "state": 1
     },
     {
-      "id": 0,
+      "id": 1197,
       "itemName": "Large Cottage",
       "position": "49,63,0",
-      "referenceItem": null
+      "referenceItem": null,
+      "state": 9
     },
     {
-      "id": 0,
+      "id": 1198,
       "itemName": "Cottage",
       "position": "52,63,0",
-      "referenceItem": null
+      "referenceItem": null,
+      "state": 9
     },
     {
-      "id": 0,
+      "id": 1199,
       "itemName": "Small Cottage",
       "position": "55,63,0",
-      "referenceItem": null
+      "referenceItem": null,
+      "state": 9
     },
     {
-      "id": 0,
+      "id": 1200,
       "itemName": "Large Stilt House",
       "position": "49,59,0",
-      "referenceItem": null
+      "referenceItem": null,
+      "state": 9
     },
     {
-      "id": 0,
+      "id": 1201,
       "itemName": "Stilt House",
       "position": "52,59,0",
-      "referenceItem": null
+      "referenceItem": null,
+      "state": 9
     },
     {
-      "id": 0,
+      "id": 1202,
       "itemName": "Small Stilt House",
       "position": "55,59,0",
-      "referenceItem": null
+      "referenceItem": null,
+      "state": 9
     },
     {
-      "id": 0,
+      "id": 1203,
       "itemName": "Large Greek House",
       "position": "49,56,0",
+      "referenceItem": null,
+      "state": 9
+    },
+    {
+      "id": 1204,
+      "itemName": "Hedge 05",
+      "position": "51,57,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1205,
+      "itemName": "Hedge 04",
+      "position": "51,56,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1206,
       "itemName": "BirdBath",
       "position": "47,60,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1207,
       "itemName": "BirdBath",
       "position": "47,63,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1208,
       "itemName": "tree01",
       "position": "47,64,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1209,
       "itemName": "tree01",
       "position": "47,65,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1210,
       "itemName": "tree01",
       "position": "47,66,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1211,
       "itemName": "tree01",
       "position": "47,67,0",
       "referenceItem": null
     },
     {
-      "id": 0,
+      "id": 1212,
+      "itemName": "Park Animal Garden",
+      "position": "56,55,0",
+      "referenceItem": null,
+      "state": 1
+    },
+    {
+      "id": 1213,
+      "itemName": "Park Fountain",
+      "position": "56,53,0",
+      "referenceItem": null,
+      "state": 1
+    },
+    {
+      "id": 1214,
+      "itemName": "Park Rose Garden",
+      "position": "56,51,0",
+      "referenceItem": null,
+      "state": 1
+    },
+    {
+      "id": 1215,
+      "itemName": "Park Pond",
+      "position": "54,53,0",
+      "referenceItem": null,
+      "state": 1
+    },
+    {
+      "id": 1216,
+      "itemName": "ParkPlay Fountain",
+      "position": "58,53,0",
+      "referenceItem": null,
+      "state": 1
+    },
+    {
+      "id": 1217,
+      "itemName": "National Archives",
+      "position": "65,61,0",
+      "referenceItem": null,
+      "state": 10
+    },
+    {
+      "id": 1218,
+      "itemName": "Intelligence HQ",
+      "position": "65,56,0",
+      "referenceItem": null,
+      "state": 10
+    },
+    {
+      "id": 1219,
+      "itemName": "State Media",
+      "position": "49,50,0",
+      "referenceItem": null,
+      "state": 10
+    },
+    {
+      "id": 1220,
+      "itemName": "Drydocks 01",
+      "position": "63,69,0",
+      "referenceItem": null,
+      "state": 10
+    },
+    {
+      "id": 1221,
+      "itemName": "Drydocks 03",
+      "position": "47,69,0",
+      "referenceItem": null,
+      "state": 10
+    },
+    {
+      "id": 1222,
+      "itemName": "PVPImmunityBldg",
+      "position": "59,60,0",
+      "referenceItem": null,
+      "state": 2
+    },
+    {
+      "id": 1223,
+      "itemName": "Park Roads Corner 01",
+      "position": "43,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1224,
+      "itemName": "Park Roads Corner 02",
+      "position": "45,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1225,
+      "itemName": "Park Roads T Junction 02",
+      "position": "43,61,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1226,
+      "itemName": "Park Roads Corner",
+      "position": "43,59,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1227,
+      "itemName": "Park Roads Corner 03",
+      "position": "45,59,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1228,
+      "itemName": "Park Gazebo",
+      "position": "45,61,0",
+      "referenceItem": null,
+      "state": 1
+    },
+    {
+      "id": 1229,
+      "itemName": "Hedge 05",
+      "position": "46,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1230,
+      "itemName": "Hedge 01",
+      "position": "45,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1231,
+      "itemName": "Hedge 01",
+      "position": "44,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1232,
+      "itemName": "Hedge 01",
+      "position": "43,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1233,
+      "itemName": "Hedge 06",
+      "position": "42,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1234,
+      "itemName": "Hedge 08",
+      "position": "42,64,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1235,
+      "itemName": "Hedge 08",
+      "position": "42,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1236,
+      "itemName": "Hedge 08",
+      "position": "42,62,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1237,
+      "itemName": "Hedge 08",
+      "position": "42,61,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1238,
+      "itemName": "Hedge 08",
+      "position": "42,60,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1239,
+      "itemName": "Hedge 08",
+      "position": "42,59,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1240,
+      "itemName": "Hedge 03",
+      "position": "42,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1241,
+      "itemName": "Hedge 07",
+      "position": "43,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1242,
+      "itemName": "Hedge 07",
+      "position": "44,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1243,
+      "itemName": "Hedge 07",
+      "position": "45,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1244,
+      "itemName": "Hedge 04",
+      "position": "46,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1245,
+      "itemName": "tree07",
+      "position": "57,46,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1246,
+      "itemName": "tree07",
+      "position": "57,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1247,
+      "itemName": "tree07",
+      "position": "57,42,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1248,
+      "itemName": "tree10",
+      "position": "60,46,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1249,
+      "itemName": "tree10",
+      "position": "60,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1250,
+      "itemName": "tree10",
+      "position": "60,42,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1251,
+      "itemName": "Lumbermill 02",
+      "position": "43,47,0",
+      "referenceItem": "L07",
+      "state": 9
+    },
+    {
+      "id": 1252,
+      "itemName": "Ore Mine 02",
+      "position": "46,45,0",
+      "referenceItem": "G07",
+      "state": 9
+    },
+    {
+      "id": 1253,
+      "itemName": "Oil Derrick 02",
+      "position": "48,42,0",
+      "referenceItem": "Q07",
+      "state": 9
+    },
+    {
+      "id": 1254,
+      "itemName": "Ore Mine 03",
+      "position": "46,42,0",
+      "referenceItem": "G07",
+      "state": 9
+    },
+    {
+      "id": 1255,
+      "itemName": "ship22",
+      "position": "43,67,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1256,
+      "itemName": "ship25",
+      "position": "47,73,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1257,
+      "itemName": "ship13",
+      "position": "51,70,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1258,
+      "itemName": "ship11",
+      "position": "59,69,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1259,
+      "itemName": "ship03",
+      "position": "63,72,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1260,
+      "itemName": "ship01",
+      "position": "67,69,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1261,
       "itemName": "Shrub Green",
       "position": "65,53,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1262,
+      "itemName": "Shrub Green",
+      "position": "64,68,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1263,
+      "itemName": "Shrub Green",
+      "position": "65,68,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1264,
+      "itemName": "tree21",
+      "position": "54,45,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1265,
+      "itemName": "tree21",
+      "position": "53,47,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1266,
+      "itemName": "tree25",
+      "position": "49,66,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1267,
+      "itemName": "tree22",
+      "position": "49,67,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1268,
+      "itemName": "tree28",
+      "position": "49,68,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1269,
+      "itemName": "tree25",
+      "position": "62,66,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1270,
+      "itemName": "tree27",
+      "position": "62,67,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1271,
+      "itemName": "tree28",
+      "position": "62,68,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1272,
+      "itemName": "tree28",
+      "position": "62,69,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1273,
+      "itemName": "tree26",
+      "position": "64,66,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1274,
+      "itemName": "tree25",
+      "position": "65,52,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1275,
+      "itemName": "plant01",
+      "position": "65,51,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1276,
+      "itemName": "tree28",
+      "position": "65,50,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1277,
+      "itemName": "tree25",
+      "position": "56,42,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1278,
+      "itemName": "tree25",
+      "position": "55,42,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1279,
+      "itemName": "tree25",
+      "position": "54,42,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1280,
+      "itemName": "tree27",
+      "position": "54,43,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1281,
+      "itemName": "tree25",
+      "position": "54,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1282,
+      "itemName": "tree27",
+      "position": "49,47,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1283,
+      "itemName": "tree27",
+      "position": "49,45,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1284,
+      "itemName": "tree27",
+      "position": "49,46,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1285,
+      "itemName": "tree27",
+      "position": "52,47,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1286,
+      "itemName": "tree29",
+      "position": "50,46,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1287,
+      "itemName": "tree26",
+      "position": "45,47,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1288,
+      "itemName": "tree22",
+      "position": "42,48,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1289,
+      "itemName": "tree24",
+      "position": "42,49,0",
       "referenceItem": null
     }
   ],

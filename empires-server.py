@@ -1378,6 +1378,7 @@ def load_world_response(params):
 
         # ally["world"]["yimf"] = ""
     ally["pvpMode"] = params[2]
+    ally["pvpImmunity"] = {"expTS": None}
     ally["visitorEnergy"] = 5
 
     load_world_response = {"errorType": 0, "userId": 1, "metadata": meta,
