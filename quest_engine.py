@@ -51,6 +51,24 @@ def prepopulate_task(task):
     elif task["_action"] == 'neighborsAdded':
         neighbor_count = len([ally for ally in allies.values() if ally.get("friend") and ally.get("neighbor")])
         return min(neighbor_count, int(task["_total"])), neighbor_count >= int(task["_total"])
+    elif task["_action"] == 'countUpgrades':
+        research = session['user_object']["userInfo"]["world"]["research"]
+        total = 0
+        unit = task["unit"]
+        for k, v in research.items():
+            if "_item" in unit:
+                if k == unit["_item"]:
+                    total += len(v)
+            elif "_unitClass" in unit:
+                item = lookup_item_by_code(k)
+                if item["-unitClass"] == unit["_unitClass"]:
+                    total += len(v)
+            elif "_subtype" in unit:
+                item = lookup_item_by_code(k)
+                if item["-subtype"] == unit["_subtype"]:
+                    total += len(v)
+
+        return min(total, int(task["_total"])), total >= int(task["_total"])
     elif task["_action"] == 'autoComplete':
         return 1, True
     else:
@@ -109,6 +127,33 @@ def progress_neighbors(maximum_total, extra, progress):
     total = min(neighbor_count, int(maximum_total))
     extra["total"] = total
     return total != progress
+
+
+def progress_upgrades_count():
+    return lambda task, progress, i, extra, *args: \
+        task["_action"] == "countUpgrades" and  progress_upgrades(task["unit"], task["_total"], extra, progress) \
+        and progress < int(task["_total"])
+
+
+def progress_upgrades(unit, maximum_total, extra, progress):
+    research = session['user_object']["userInfo"]["world"]["research"]
+    total = 0
+    for k, v in research.items():
+        if "_item" in unit:
+            if k == unit["_item"]:
+                total += len(v)
+        elif "_unitClass" in unit:
+            item = lookup_item_by_code(k)
+            if item["-unitClass"] == unit["_unitClass"]:
+                total += len(v)
+        elif "_subtype" in unit:
+            item = lookup_item_by_code(k)
+            if item["-subtype"] == unit["_subtype"]:
+                total += len(v)
+
+    extra["total"] = min(total, int(maximum_total))
+    return total != progress
+
 
 
 #cancels?

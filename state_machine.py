@@ -1,4 +1,5 @@
-from quest_engine import handle_world_state_change, roll_reward_random_float
+from quest_engine import handle_world_state_change, roll_reward_random_float, handle_quest_progress, \
+    progress_upgrades_count
 from datetime import datetime
 from flask import session
 from game_settings import game_settings, lookup_item_by_name, lookup_state_machine, lookup_reference_item, \
@@ -31,7 +32,7 @@ def click_next_state(id, meta, step, reference_item):
                 previous_state = state
                 state = lookup_state(state_machine, next_state_id, cur_object)
                 check_state(state_machine, state, cur_object)
-                do_state_rewards(state, cur_object.get('referenceItem'))
+                do_state_rewards(state, cur_object.get('referenceItem'), meta)
                 if 'lastUpdated' not in cur_object:
                     cur_object['lastUpdated'] = 0  #init?
                 cur_object['lastUpdated'] += duration * 1000
@@ -52,7 +53,7 @@ def click_next_state(id, meta, step, reference_item):
             next_click_state = lookup_state(state_machine, next_state_id, cur_object)
             check_state(state_machine, next_click_state, cur_object)
             print("next_click_state:", repr(next_click_state))
-            do_state_rewards(next_click_state, cur_object.get('referenceItem'))
+            do_state_rewards(next_click_state, cur_object.get('referenceItem'), meta)
             handle_world_state_change(meta, next_click_state, state_machine, game_item, step, state, reference_item,  cur_object.get('referenceItem'))
 
             while '-autoNext' in next_click_state and next_state_id != next_click_state['-autoNext'] and next_click_state.get('-duration', '0') in ['0', '0s']:   #'-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
@@ -61,7 +62,7 @@ def click_next_state(id, meta, step, reference_item):
                 next_click_state = lookup_state(state_machine, next_state_id, cur_object)
                 check_state(state_machine, next_click_state, cur_object)
                 print("auto_next_state:", repr(next_click_state))
-                do_state_rewards(next_click_state, reference_item)
+                do_state_rewards(next_click_state, reference_item, meta)
                 handle_world_state_change(meta, next_click_state, state_machine, game_item, step, previous_state, reference_item, reference_item)
 
             cur_object['state'] = next_state_id
@@ -125,7 +126,7 @@ def parse_duration(duration):
         return float(duration)
 
 
-def do_state_rewards(state, reference_item):
+def do_state_rewards(state, reference_item, meta):
     player = session['user_object']["userInfo"]["player"]
     player['xp'] += int(state.get('-xp', 0))
     player['energy'] += int(state.get('-energy', 0))
@@ -162,6 +163,7 @@ def do_state_rewards(state, reference_item):
             if reference_item.split(":")[0] not in research.get(reference_item.split(":")[1],[]):
                 research[reference_item.split(":")[1]] = research.get(reference_item.split(":")[1],[])  + [reference_item.split(":")[0]]
                 print("Adding", reference_item, "to research")
+                handle_quest_progress(meta, progress_upgrades_count())
             else:
                 print("ERROR: Upgrade already added")
         else:

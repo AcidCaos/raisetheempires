@@ -993,6 +993,7 @@ def user_response():
     meta = {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]}
     handle_quest_progress(meta, progress_inventory_count())
     handle_quest_progress(meta, progress_neighbor_count())
+    handle_quest_progress(meta, progress_upgrades_count())
 
     sleep(0.05)  # bugfix required delay for loading entire screen
 
