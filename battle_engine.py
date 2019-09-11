@@ -20,11 +20,11 @@ def battle_complete_response(params):
         enemy_unit_id, _, player_unit_id = ai_best_attack(friendlies, friendly_strengths, baddies, baddie_strengths)
 
     # print("repr baddies", baddies)
-    baddie_max_strength = get_unit_max_strength(baddies[enemy_unit_id], params)
+    baddie_max_strength = get_unit_max_strength(baddies[enemy_unit_id], False, params)
     baddie_weak = get_unit_weak(baddies[enemy_unit_id])
     baddie_unit_type = get_unit_type(baddies[enemy_unit_id])
 
-    friendly_max_strength = get_unit_max_strength(friendlies[player_unit_id])
+    friendly_max_strength = get_unit_max_strength(friendlies[player_unit_id], True)
     friendly_weak = get_unit_weak(friendlies[player_unit_id])
     friendly_unit_type = get_unit_type(friendlies[player_unit_id])
 
@@ -34,7 +34,9 @@ def battle_complete_response(params):
     init_seed = ["init seed", get_seed_w(), get_seed_z()]
     roll = unit_roll(friendly_weak if player_turn else baddie_weak, baddie_weak if player_turn else friendly_weak)
 
-    (crit, direct) = get_hit_value(friendly_unit_type if player_turn else baddie_unit_type, baddie_unit_type if player_turn else friendly_unit_type)
+    crit, direct = get_hit_value(friendly_unit_type if player_turn else baddie_unit_type, baddie_unit_type if player_turn else friendly_unit_type)
+    if player_turn:
+        crit, direct = handle_accurancy_upgrades(crit, direct, friendlies, player_unit_id)
 
     hit = roll >= direct
 
@@ -51,18 +53,7 @@ def battle_complete_response(params):
     damage += max(consumable_extra_damage, 0)
 
     if player_turn:
-        research = session['user_object']["userInfo"]["world"]["research"]
-        upgrades = research.get(friendlies[player_unit_id]["-code"],[])
-        for upgrade in upgrades:
-            upgrade_item = lookup_item_by_code(upgrade)
-            mod_damage = upgrade_item["modifier"].get("-damage")
-            if mod_damage:
-                if upgrade_item["modifier"].get("-percent"):
-                    damage *= 1 + float(mod_damage) / 100
-                    print("Applying damage upgrade for", mod_damage, "percent")
-                else:
-                    damage += int(mod_damage)
-                    print("Applying damage upgrade for", mod_damage, "more")
+        damage = handle_damage_upgrades(damage, friendlies, player_unit_id)
 
     damage = math.floor(damage * 10 ** 3) / 10 ** 3
 
@@ -131,6 +122,52 @@ def battle_complete_response(params):
     return battle_complete_response
 
 
+def handle_damage_upgrades(damage, friendlies, player_unit_id):
+    research = session['user_object']["userInfo"]["world"]["research"]
+    upgrades = research.get(friendlies[player_unit_id]["-code"], [])
+    for upgrade in upgrades:
+        upgrade_item = lookup_item_by_code(upgrade)
+        mod_damage = upgrade_item["modifier"].get("-damage")
+        if mod_damage:
+            if upgrade_item["modifier"].get("-percent"):
+                damage *= 1 + float(mod_damage) / 100
+                print("Applying damage upgrade for", mod_damage, "percent")
+            else:
+                damage += int(mod_damage)
+                print("Applying damage upgrade for", mod_damage, "more")
+    return damage
+
+
+def handle_accurancy_upgrades(crit, direct, friendlies, player_unit_id):
+    research = session['user_object']["userInfo"]["world"]["research"]
+    upgrades = research.get(friendlies[player_unit_id]["-code"], [])
+    for upgrade in upgrades:
+        upgrade_item = lookup_item_by_code(upgrade)
+        mod_accuracy = upgrade_item["modifier"].get("-accuracy")
+        if mod_accuracy:
+            crit -= float(mod_accuracy) / 100
+            direct -= float(mod_accuracy) / 100
+            print("Applying hit chance upgrade for", mod_accuracy, "percent")
+
+    return crit, direct
+
+
+def handle_strength_upgrades(strength, unit):
+    research = session['user_object']["userInfo"]["world"]["research"]
+    upgrades = research.get(unit["-code"], [])
+    for upgrade in upgrades:
+        upgrade_item = lookup_item_by_code(upgrade)
+        mod_damage = upgrade_item["modifier"].get("-strength")
+        if mod_damage:
+            if upgrade_item["modifier"].get("-percent"):
+                strength *= 1 + float(mod_damage) / 100
+                print("Applying strength upgrade for", mod_damage, "percent")
+            else:
+                strength += int(mod_damage)
+                print("Applying strength upgrade for", mod_damage, "more")
+    return strength
+
+
 def init_battle(params):
     if 'target' not in params:
         baddies = [lookup_item_by_code(friendly[1:]) for friendly, count in session['fleets'][params['fleet']].items()
@@ -152,8 +189,8 @@ def init_battle(params):
                       range(int(count))]
 
     if "battle" not in session or not session["battle"]:
-        baddie_strengths = [get_unit_max_strength(baddie, params) for baddie in baddies]
-        friendly_strengths = [get_unit_max_strength(friendly) for friendly in friendlies]
+        baddie_strengths = [get_unit_max_strength(baddie, False, params) for baddie in baddies]
+        friendly_strengths = [get_unit_max_strength(friendly, True) for friendly in friendlies]
         session["battle"] = (friendly_strengths, baddie_strengths)
     else:
         (friendly_strengths, baddie_strengths) = session["battle"]
@@ -341,13 +378,15 @@ def get_unit_terrain(unit):
     return unit["unit"].get("-type", ",").split(',')[1]
 
 
-def get_unit_max_strength(unit, params=None):
+def get_unit_max_strength(unit, ally, params=None):
     strength = int(unit["unit"].get("-strength", "0"))
     _, island, map_item = get_current_island(params)
     if island != None and "strength" in map_item["island"][island]:
         strengths = simple_list(map_item["island"][island]["strength"])
         strength = apply_map_mod_strength(unit, strength, strengths)
         # print("Mod strenghts",repr(strengths))
+    elif ally:
+        strength = handle_strength_upgrades(strength, unit)
     return strength
 
 

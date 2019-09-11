@@ -155,7 +155,6 @@ def progress_upgrades(unit, maximum_total, extra, progress):
     return total != progress
 
 
-
 #cancels?
 def progress_build(state, state_machine, game_item, step, previous_state, reference_item, previous_reference_item, *state_args):
     return lambda task, progress, i, *args: \
