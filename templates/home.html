@@ -108,16 +108,6 @@
         $('#other_log').scrollTop(0)
     });
 
-     // $('*').scroll(function (e) {return false;})
-
-    $('embed').focusin(function (e) {
-        console.log("focusing")
-        $('html, body').css({
-            overflow: 'hidden',
-            height: '100%'
-        })
-
-    });
 </script>
 <style>
 		.logbox {
@@ -192,9 +182,15 @@
 			border-color: black transparent transparent transparent;
 		}
 
+	body:focus-within {
+		overflow: hidden;
+		padding-right: 17px;
+		/*position: fixed;*/
+		/*z-index: 3;*/
+	 	/*height: 100%;*/
+	}
 
-
-
+/*body::-webkit-scrollbar{ width: 0}*/
 	</style>
 
 	<title id="pageTitle">Empires &amp; Allies on Facebook | Facebook</title>
@@ -315,7 +311,7 @@
 								<img class="mtl img" src="https://web.archive.org/web/20130619115711im_/https://fbstatic-a.akamaihd.net/rsrc.php/v2/y9/r/jKEcVPZFk-2.gif" alt="" width="32" height="32"/>
 							</div>
 
-							<center>
+							<div style="text-align: center">
 								<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" WIDTH="1000" HEIGHT="750" id="ea" ALIGN="">
 									<param NAME=movie VALUE="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf">
 									<param name=FlashVars value="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1">  <!--serverTime=1565300889& mute=true& &zlingshot_zoom= skipFacebook=false&decouple_from_facebook=false&decoupled_facebook_id=5452 -->
@@ -336,7 +332,7 @@
 								</table>
 
 
-							</center>
+							</div>
 						</div>
 					</div>
 				</div>
