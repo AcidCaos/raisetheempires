@@ -1012,6 +1012,15 @@ def user_response():
     if item_inventory.get("B18", 0) < 25:
         item_inventory["B18"] = 25
         print("Refilling propeller to 25")  # until friend gift mechanisms are working
+    if item_inventory.get("B04", 0) < 25:
+        item_inventory["B04"] = 25
+        print("Refilling mission map to 25")  # until friend gift mechanisms are working
+    if item_inventory.get("B23", 0) < 25:
+        item_inventory["B23"] = 25
+        print("Refilling blast shield to 25")  # until friend gift mechanisms are working
+    if item_inventory.get("B17", 0) < 25:
+        item_inventory["B17"] = 25
+        print("Refilling deck turret to 25")  # until friend gift mechanisms are working
 
     meta = {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]}
     handle_quest_progress(meta, progress_inventory_count())

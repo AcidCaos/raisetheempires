@@ -131,7 +131,7 @@ def progress_neighbors(maximum_total, extra, progress):
 
 def progress_upgrades_count():
     return lambda task, progress, i, extra, *args: \
-        task["_action"] == "countUpgrades" and  progress_upgrades(task["unit"], task["_total"], extra, progress) \
+        task["_action"] == "countUpgrades" and progress_upgrades(task["unit"], task["_total"], extra, progress) \
         and progress < int(task["_total"])
 
 
@@ -153,6 +153,26 @@ def progress_upgrades(unit, maximum_total, extra, progress):
 
     extra["total"] = min(total, int(maximum_total))
     return total != progress
+
+
+def progress_battle_damage_count(action, damage, ally_unit, baddy_unit):
+    return lambda task, progress, i, extra, *args: \
+        task["_action"] == action and \
+    all_lambda(
+        progress_parameter_implies("_subtype", ally_unit.get("-subtype", "")),
+        progress_parameter_implies("_unitClass", ally_unit.get("-unitClass", "")),
+        progress_parameter_implies("_item", ally_unit.get("-code", "")),
+        progress_nested_parameter_implies("targetInfo", "_unitClass", baddy_unit.get("-unitClass", "")),
+        progress_nested_parameter_implies_contains("targetInfo", "_unitType",
+                                                   baddy_unit.get("unit", {}).get("-type", ""))
+    )(task, progress, i, extra, *args) \
+        and progress_battle_damage(damage, task["_total"], extra, progress) \
+        and progress < int(task["_total"])
+
+
+def progress_battle_damage(damage, maximum_total, extra,  progress):
+    extra["total"] = min(damage, int(maximum_total))
+    return damage != progress
 
 
 #cancels?
@@ -217,6 +237,10 @@ def progress_parameter_implies(key, value):
 
 def progress_nested_parameter_implies(key, key2, value):
     return lambda task, *args: task.get(key, {}).get(key2) == None or task.get(key, {}).get(key2, "_NO_MATCH_") == value
+
+
+def progress_nested_parameter_implies_contains(key, key2, value):
+    return lambda task, *args: task.get(key, {}).get(key2) == None or any(i in task.get(key, {}).get(key2, "_NO_MATCH_").split(",") for i in value.split(","))
 
 
 # deprogress functions?

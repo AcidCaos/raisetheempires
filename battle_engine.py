@@ -5,7 +5,7 @@ from flask import session
 from game_settings import lookup_item_by_code, game_settings, get_zid
 from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_seed_z, roll_random_between, \
     handle_quest_progress, progress_action, roll_random_float, all_lambda, progress_parameter_equals, do_rewards, \
-    roll_reward_random_float
+    roll_reward_random_float, progress_battle_damage_count
 
 
 def battle_complete_response(params):
@@ -81,9 +81,11 @@ def battle_complete_response(params):
             baddie_strengths[enemy_unit_id] = 0 #dead
             print("Enemy unit", enemy_unit_id, "down")
             hit_type = "kill" if hit_type != "criticalhit" else "criticalkill"
+            handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, friendlies[player_unit_id], baddies[enemy_unit_id]))
             # session["battle"] = None
         print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
         doBattleRewards(hit_type, baddie_max_strength, damage, friendly_max_strength)
+        handle_quest_progress(meta, progress_battle_damage_count("battleDamage", damage, friendlies[player_unit_id], baddies[enemy_unit_id]))
     else:
         friendly_strengths[player_unit_id] -= damage
         if friendly_strengths[player_unit_id] <= 0:
