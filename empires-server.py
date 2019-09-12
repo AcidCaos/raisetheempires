@@ -47,14 +47,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///save.db'
 app.config['SESSION_SQLALCHEMY'] = db
 
 
-@app.route("/old")
-def home():
-    return render_template("home.html")
-
-
 @app.route("/")
 def index():
-    print("index")
+    return render_template("index.html")
+
+
+@app.route("/home.html")
+def home():
+    print("home")
     return render_template("home.html", time=datetime.now().timestamp(), zid=str(get_zid()),
                            allies=json.dumps([ally["friend"] for ally in allies.values()
                                               if "friend" in ally and ally["friend"] and ally["neighbor"]],
@@ -72,7 +72,7 @@ def no_debug():
 @app.route("/wipe_session", methods=['GET', 'POST'])
 def wipe_session():
     session.clear()
-    response = make_response(redirect('/'))
+    response = make_response(redirect('/home.html'))
     # response.set_cookie('session', '', expires=0)
     return response
 
@@ -82,7 +82,7 @@ def more_money():
     if 'user_object' in session:
         player = session['user_object']["userInfo"]["player"]
         player['cash'] += 10000
-        response = make_response(redirect('/'))
+        response = make_response(redirect('/home.html'))
         return response
     else:
         return ('Nope', 403)
@@ -126,7 +126,7 @@ def save_savegame():
     session['saved_on'] = timestamp
     session["backup"]['replaced_on'] = timestamp
 
-    response = make_response(redirect('/'))
+    response = make_response(redirect('/home.html'))
     return response
     # return ('', 400)
 
@@ -161,15 +161,38 @@ def en_us_file():
 def quest_settings_file():
     return send_from_directory("assets/29oct2012", "questSettings.xml")
 
+@app.route("/releases.html")
+def releases():
+    return render_template("releases.html")
 
-# @app.route("/nullassets/game/terrain/Island3_Tileset_ENV.swf")
-# def flash_fiddle():
-# 	return send_from_directory("assets", "ZGame.109338.swf")
+@app.route("/changelog.txt")
+def change_log():
+    return render_template("changelog.txt")
 
-# @app.route("/nullassets/game/terrain/Island3_Tileset_ENV.swf")
-# def flash_fiddle():
-#     return send_from_directory("assets/cooking", "cw2_runtimeSharedAssets__6f788.swf")
-#
+@app.route("/layouts/yc_r.css")
+def fb_ccs_1():
+    return send_from_directory("templates/layouts", "yc_r.css")
+
+
+@app.route("/layouts/yz_r.css")
+def fb_ccs_2():
+    return send_from_directory("templates/layouts", "yz_r.css")
+
+
+@app.route("/layouts/yC2_r.css")
+def fb_ccs_3():
+    return send_from_directory("templates/layouts", "yC2_r.css")
+
+
+@app.route("/layouts/icon.png")
+def icon_image():
+    return send_from_directory("templates/layouts", "icon.png")
+
+
+@app.route("/layouts/logo.png")
+def logo_image():
+    return send_from_directory("templates/layouts", "logo.png")
+
 
 @app.route('/nullassets/<path:path>')
 def send_sol_assets(path):

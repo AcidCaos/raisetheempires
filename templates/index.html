@@ -85,46 +85,42 @@
 						<div id="contentArea" role="main" aria-describedby="pageTitle">
 							
 
-							<div class="mvl ptm uiInterstitial canvas_error_page uiBoxWhite" title="" style="margin-left: 70px; margin-right: 50px">
+							<div class="mvl ptm uiInterstitial canvas_error_page uiInterstitialLarge uiBoxWhite" title="">
 								<div class="uiHeader uiHeaderBottomBorder mhl mts uiHeaderPage interstitialHeader">
 									<div class="clearfix uiHeaderTop">
 										<div>
-											<h2 class="uiHeaderTitle" aria-hidden="true"> Raise The Empires Save Editor uid: {{uid}}</h2>
+											<h2 class="uiHeaderTitle" aria-hidden="true"> Empires &amp; Allies</h2>
 										</div>
 									</div>
 								</div>
-								
-
-								<form action="/save-editor" method="post">
-									<div class="phl ptm uiInterstitialContent">
-								        <textarea rows="30" cols="135" name="savegame" >
-{{ savegame | default("ERROR: No savegame present!")}}
-								        </textarea>
-								        <br>
-								        <span style="color: crimson"><b>Warning:</b> This can corrupt your savegame!</span>
-									</div>
-									<div class="uiInterstitialBar uiBoxGray topborder">
-										<div class="clearfix">
-											<div class="rfloat">
-												<a class="uiButton uiButtonConfirm" href="home.html" role="button" name="try_again_button">
-													<span class="uiButtonText"></span>
-													<input type="submit" value="Save game">
-												</a>
-											</div>
-											<div class="pts">
-											</div>
+								<div class="phl ptm uiInterstitialContent">
+									By Raise the Empires team
+									<br>
+									<br>
+									<b>Game version:</b> pre-alpha 0.2a
+									<br>
+									<b>Release date:</b> UNKNOWN. [format: Sunday, 21 Jul 2019 ]
+									<br>
+									<br>
+								</div>
+								<div class="uiInterstitialBar uiBoxGray topborder">
+									<div class="clearfix">
+										<div class="rfloat">
+											<a class="uiButton uiButtonConfirm" href="home.html" role="button" name="try_again_button">
+												<span class="uiButtonText">Play now</span>
+											</a>
+											<a class="inputaux uiButton" href="https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2" role="button" name="exit_button" target="_blank">
+												<span class="uiButtonText">E&amp;A Wiki</span>
+											</a>
+											<a class="inputaux uiButton" href="releases.html" role="button" name="exit_button">
+												<span class="uiButtonText">Change log</span>
+											</a>
+										</div>
+										<div class="pts">
 										</div>
 									</div>
-    							</form>
+								</div>
 							</div>
-
-							<div class="mvl ptm uiInterstitial canvas_error_page uiInterstitialLarge uiBoxWhite" id="backup-list" style=" padding: 9px">
-								<h2 class="uiHeaderTitle" aria-hidden="true"> Backups:</h2>
-								{{ backups }} <a class="inputaux uiButton" href="#" role="button" name="exit_button">
-												<span class="">Restore this backup</span>
-											</a>
-							</div>
-
 							<div id="canvas_throbber">
 								<div class="mbl fsl fwb" id="canvas_throbber_text">Loading...</div>
 								<img class="mtl img" src="https://web.archive.org/web/20130619115711im_/https://fbstatic-a.akamaihd.net/rsrc.php/v2/y9/r/jKEcVPZFk-2.gif" alt="" width="32" height="32"/>

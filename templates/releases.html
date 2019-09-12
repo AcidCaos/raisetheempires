@@ -85,46 +85,34 @@
 						<div id="contentArea" role="main" aria-describedby="pageTitle">
 							
 
-							<div class="mvl ptm uiInterstitial canvas_error_page uiBoxWhite" title="" style="margin-left: 70px; margin-right: 50px">
+							<div class="mvl ptm uiInterstitial canvas_error_page uiBoxWhite" title="" style="margin:70px" >
 								<div class="uiHeader uiHeaderBottomBorder mhl mts uiHeaderPage interstitialHeader">
 									<div class="clearfix uiHeaderTop">
 										<div>
-											<h2 class="uiHeaderTitle" aria-hidden="true"> Raise The Empires Save Editor uid: {{uid}}</h2>
+											<h2 class="uiHeaderTitle" aria-hidden="true">ChangeLog</h2>
+											<h3 class="uiHeaderTitle" aria-hidden="true">pre-alpha 0.2a </h3>
 										</div>
 									</div>
 								</div>
-								
+								<div class="phl ptm uiInterstitialContent" style="height:450px">
+									<!-- <?php //include('changelog.txt'); ?> -->
 
-								<form action="/save-editor" method="post">
-									<div class="phl ptm uiInterstitialContent">
-								        <textarea rows="30" cols="135" name="savegame" >
-{{ savegame | default("ERROR: No savegame present!")}}
-								        </textarea>
-								        <br>
-								        <span style="color: crimson"><b>Warning:</b> This can corrupt your savegame!</span>
+									<div style="height:100%; width:100%">
+										<object data="changelog.txt" type="text/plain" style="height:100%; width:100%"></object>
 									</div>
-									<div class="uiInterstitialBar uiBoxGray topborder">
-										<div class="clearfix">
-											<div class="rfloat">
-												<a class="uiButton uiButtonConfirm" href="home.html" role="button" name="try_again_button">
-													<span class="uiButtonText"></span>
-													<input type="submit" value="Save game">
-												</a>
-											</div>
-											<div class="pts">
-											</div>
+								</div>
+								<div class="uiInterstitialBar uiBoxGray topborder">
+									<div class="clearfix">
+										<div class="rfloat">
+											<a class="uiButton uiButtonConfirm" href="/" role="button" name="try_again_button">
+												<span class="uiButtonText">Back</span>
+											</a>
+										</div>
+										<div class="pts">
 										</div>
 									</div>
-    							</form>
+								</div>
 							</div>
-
-							<div class="mvl ptm uiInterstitial canvas_error_page uiInterstitialLarge uiBoxWhite" id="backup-list" style=" padding: 9px">
-								<h2 class="uiHeaderTitle" aria-hidden="true"> Backups:</h2>
-								{{ backups }} <a class="inputaux uiButton" href="#" role="button" name="exit_button">
-												<span class="">Restore this backup</span>
-											</a>
-							</div>
-
 							<div id="canvas_throbber">
 								<div class="mbl fsl fwb" id="canvas_throbber_text">Loading...</div>
 								<img class="mtl img" src="https://web.archive.org/web/20130619115711im_/https://fbstatic-a.akamaihd.net/rsrc.php/v2/y9/r/jKEcVPZFk-2.gif" alt="" width="32" height="32"/>

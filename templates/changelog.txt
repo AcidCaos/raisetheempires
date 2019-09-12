@@ -1,0 +1,51 @@
+Steele island, pvp immunity Nat 10/09/2019 08:14
+neighborsAdded prepopulated quest Nat 10/09/2019 00:46
+bugfix partial loading & back to original main swf Nat 09/09/2019 01:50
+automatic backups of edited saves Nat 08/09/2019 23:45
+episode images Nat 08/09/2019 22:37
+externalized islands, friend types for adding/parts requests, neighbor added quests, code styling Nat 08/09/2019 22:23
+cleanup Nat 07/09/2019 19:12
+externalized quest settings Nat 07/09/2019 17:28
+seen flags, defaulting research parts in inventory Nat 07/09/2019 14:16
+research (part two), damage research Nat 07/09/2019 01:39
+research (part one), inventory count quest task Nat 02/09/2019 23:15
+costs, inventory, versioning, savegame editor Nat 01/09/2019 02:23
+PU_QuestManager.swf text placement fix Nat 31/08/2019 00:00
+battle rewards Nat 29/08/2019 22:32
+campaign reference item (crops,...) specific state values, checkstate overriding future states using current statemachine configuration, reward random dice for prison camp xp buf and doobers(platinum pipes) needed for battle rewards Nat 21/08/2019 23:04
+campaign island tracking, campaign rewards, moving objects Nat 20/08/2019 01:51
+battle fixes, quests by resourcetype or subtype progression Nat 19/08/2019 19:40
+campaign quest progression Nat 18/08/2019 22:40
+AI unit selection, ally consumable, campaign mod damage Nat 18/08/2019 20:13
+E&A PU_InviteIdle.swf replacement Nat 18/08/2019 13:10
+refactored battle engine Nat 17/08/2019 23:15
+campaign battle engine Nat 17/08/2019 23:02
+energy replenishment Nat 17/08/2019 14:21
+allies & population Nat 17/08/2019 01:39
+battle engine Nat 15/08/2019 23:59
+fixes, quest based invasion spawning, cash cheat for testing Nat 15/08/2019 02:49
+leveling cash & energy cap Nat 15/08/2019 01:26
+state&quest rewards, reference item in progress of buildings, quest tasks  build&harvest&zoom, dummy answers for all possible servercalls, world name Nat 15/08/2019 01:07
+refactoring to separate modules, save clearing, auto quest Nat 13/08/2019 21:23
+saving auto quest & task completion based on states Nat 11/08/2019 20:16
+saving buildings, statemachines, timekeeping, quests Nat 10/08/2019 00:59
+blank savegame sqlite database required to persist sessions Nat 07/08/2019 22:55
+saving using flask sessions, merging quest progress, tutorial step, user object, correcting placed building identifiers Nat 07/08/2019 22:54
+gamesettings converted to json Nat 05/08/2019 22:57
+fancy logging events to debug page Nat 05/08/2019 22:48
+logging events to debug page Nat 04/08/2019 13:49
+gamesettings and questsettings xml excerpts converted to json as python dicts Nat 24/07/2019 22:10
+externalized json for world build Nat 24/07/2019 22:08
+empire-server flask server Nat 24/07/2019 22:08
+html templates for webserver page Nat 24/07/2019 22:07
+E&A older? 32995 XML files, not so compatible Nat 24/07/2019 22:02
+E&A october XML with a fix for timed buildables Nat 24/07/2019 22:02
+E&A october XML with placeholders for missing assets, no longer needed Nat 24/07/2019 22:01
+E&A october XML "the most compatible" Nat 24/07/2019 22:00
+E&A cooking example assets Nat 24/07/2019 21:59
+E&A tracer game SWF Nat 24/07/2019 21:58
+E&A original game SWF Nat 24/07/2019 21:57
+E&A unmatched unknown assets Nat 24/07/2019 21:56
+E&A old assets dupes Nat 24/07/2019 21:55
+E&A older dict1 only assets Nat 24/07/2019 21:53
+E&A oct-dict assets Nat 24/07/2019 21:53

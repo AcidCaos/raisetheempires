@@ -1,120 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Application Home Page</title>
-	<script>
-		function getUserInfo() {
-		    console.log("getUserInfo called")
-		    return {'zid': {{ zid | default(-1000) }}, 'uid': {{ zid | default(-1000) }}, 'first_name': 'Natalie', 'name':'Natalie', "sex":'F'};
-		}
-		function getFriendData() {
-		    console.log("getFriendData called")
-			return {{ allies | safe | default([]) }};
-			// return  [{'zid':123, 'uid':123, 'first_name': 'Natalie', 'name':'Portman', "sex":'F'} ,{'zid':-2, 'uid':-2, 'first_name': 'Sergeant', 'name':'Cross', "sex":'M'},{'zid':-1, 'uid':-1, 'first_name': 'Steele', 'name':'Steele', "sex":'M'}];
-		}
-		function getAppFriendIds() {
-			console.log("getAppFriendIds called")
-			return {{ app_friends | safe | default([]) }};
-		}
+<script>
+	function getUserInfo() {
+	    console.log("getUserInfo called")
+	    return {'zid': {{ zid | default(-1000) }}, 'uid': {{ zid | default(-1000) }}, 'first_name': 'Natalie', 'name':'Natalie', "sex":'F'};
+	}
+	function getFriendData() {
+	    console.log("getFriendData called")
+		return {{ allies | safe | default([]) }};
+		// return  [{'zid':123, 'uid':123, 'first_name': 'Natalie', 'name':'Portman', "sex":'F'} ,{'zid':-2, 'uid':-2, 'first_name': 'Sergeant', 'name':'Cross', "sex":'M'},{'zid':-1, 'uid':-1, 'first_name': 'Steele', 'name':'Steele', "sex":'M'}];
+	}
+	function getAppFriendIds() {
+		console.log("getAppFriendIds called")
+		return {{ app_friends | safe | default([]) }};
+	}
 
-		function onGameLoaded(seen, popp, canvas) {
-			console.log("Game is loaded " +seen +", " + popp + ", " + canvas)
-			return
-		}
-		function openInAppPurchaseAPI(gid, snid, snuid,cid,a,b,c) {
-			console.log("Purchase " +gid +", " + snid + ", " + snuid+ ", " + cid+ ", " + a+ ", " + b+ ", " + c)
-			return
-		}
+	function onGameLoaded(seen, popp, canvas) {
+		console.log("Game is loaded " +seen +", " + popp + ", " + canvas)
+		return
+	}
+	function openInAppPurchaseAPI(gid, snid, snuid,cid,a,b,c) {
+		console.log("Purchase " +gid +", " + snid + ", " + snuid+ ", " + cid+ ", " + a+ ", " + b+ ", " + c)
+		return
+	}
 
-		function hasPermission(perm, snuid,name) {
-			console.log("Perm " +perm +", "  +snuid+ ", " + name)
-            return
-        }
+	function hasPermission(perm, snuid,name) {
+		console.log("Perm " +perm +", "  +snuid+ ", " + name)
+        return
+    }
 
-        function showPermissions(d) {
-            console.log("Show Perm " + d)
-            return
-        }
+    function showPermissions(d) {
+        console.log("Show Perm " + d)
+        return
+    }
 
 
-        zynga = {
-		    "ads": {
-                "WatchToEarn": {
-                    "service": {
-                        "available": function () {
-                            console.log("W2E avail");
-              				return false;
-                        },
-						"initializeFlash": function(oid, a,b,c) {
-							console.log("initF " +oid +", " + a+ ", " + b+ ", " + c);
-							return false;
-						}
-                    }
+    zynga = {
+	    "ads": {
+            "WatchToEarn": {
+                "service": {
+                    "available": function () {
+                        console.log("W2E avail");
+          				return false;
+                    },
+					"initializeFlash": function(oid, a,b,c) {
+						console.log("initF " +oid +", " + a+ ", " + b+ ", " + c);
+						return false;
+					}
                 }
             }
-		}
+        }
+	}
 
-		statTracker = {
-		    "logWorldObjectCount":function () {
-                            console.log("World Count");
-              				return;
-                        }
-		}
+	statTracker = {
+	    "logWorldObjectCount":function () {
+                        console.log("World Count");
+          				return;
+                    }
+	}
 
-	</script>
-	<!-- debug websocket connection -->
-	<script src="//code.jquery.com/jquery-3.4.1.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
-			integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-	<script type="text/javascript" charset="utf-8">
-        var socket = io();
-        socket.on('connect', function () {
-            socket.emit('my event', {data: 'I\'m connected!'});
+</script>
 
-            $('#delete_save').click(function(event) {
-				console.log('deleting save');
-				// event.preventDefault();
+<!-- debug websocket connection -->
 
-				socket.emit('delete_save', "Deleting save game");
+<script src="//code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
+		integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function () {
+        socket.emit('my event', {data: 'I\'m connected!'});
 
-				console.log('deleting cookie');
-				// $.cookie("session", null, { path: '/' });
-				// $.removeCookie('the_cookie', { path: '/' });
+        $('#delete_save').click(function(event) {
+			console.log('deleting save');
+			// event.preventDefault();
 
-			});
+			socket.emit('delete_save', "Deleting save game");
 
-        });
-        socket.on('tutorial_step', function (msg) {
-            console.log(msg);
-            // $('#tutorial_step').prepend('<div>' + JSON.stringify(msg) + '</div>');
-            $('#tutorial_step').prepend('<div><span class="req'+msg[6] + ' ' + (parseInt(msg[6].substring(1)) % 2 == 0 ? 'req_even' : 'req_odd' ) + '">' + msg[5] + ': </span><span class="tooltiplink">' + msg[0] + '<span class="tooltip">' + JSON.stringify(msg[3], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>'
-                + (msg[1] || msg[2] ? ' &rarr; ' : '') + (msg[1] ? '<span class="tooltiplink response">' + JSON.stringify(msg[1]) + '<span class="tooltip">' + JSON.stringify(msg[4], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>' : '') +
-                (msg[1] && msg[2] ? ', ' : '') + (msg[2] ? JSON.stringify(msg[2]) : '') + '</div>');
-            $('#tutorial_step').scrollTop(0)
-        });
+			console.log('deleting cookie');
+			// $.cookie("session", null, { path: '/' });
+			// $.removeCookie('the_cookie', { path: '/' });
 
-        socket.on('world_log', function (msg) {
-            console.log(msg);
-            $('#world_log').prepend('<div><span class="req'+msg[4] + ' ' + (parseInt(msg[4].substring(1)) % 2 == 0 ? 'req_even' : 'req_odd' ) + '">' + msg[3] + ': </span><span class="tooltiplink">' + msg[0] + '<span class="tooltip">' + JSON.stringify(msg[2], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") +
-				'</span></span>' + (msg[1] || msg[1] == 0 ? ' &rarr; ' + msg[1] + (msg[5] ? ', <span class="tooltiplink response">' + JSON.stringify(msg[5]) + '<span class="tooltip">'+ JSON.stringify(msg[7], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>' : '') + (msg[6] ? ', ' + JSON.stringify(msg[6]) :'')  : '') + '</div>');
-            $('#world_log').scrollTop(0)
-        });
-         socket.on('other_log', function (msg) {
-            console.log(msg);
-            $('#other_log').prepend('<div><span class="req'+ msg[4] + ' ' + (parseInt(msg[4].substring(1)) % 2 == 0 ? 'req_even' : 'req_odd' ) + '">' + msg[3] + ': </span><span class="tooltiplink">' + msg[0] + '<span class="tooltip">' + JSON.stringify(msg[2], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") +
-				'</span></span>' + (msg[1] ? ' &rarr; <span class="tooltiplink response">response<span class="tooltip">' + JSON.stringify(msg[1], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>' : '')
-				+ '</div>');
-            $('#other_log').scrollTop(0)
-        });
+		});
 
+    });
+    socket.on('tutorial_step', function (msg) {
+        console.log(msg);
+        // $('#tutorial_step').prepend('<div>' + JSON.stringify(msg) + '</div>');
+        $('#tutorial_step').prepend('<div><span class="req'+msg[6] + ' ' + (parseInt(msg[6].substring(1)) % 2 == 0 ? 'req_even' : 'req_odd' ) + '">' + msg[5] + ': </span><span class="tooltiplink">' + msg[0] + '<span class="tooltip">' + JSON.stringify(msg[3], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>'
+            + (msg[1] || msg[2] ? ' &rarr; ' : '') + (msg[1] ? '<span class="tooltiplink response">' + JSON.stringify(msg[1]) + '<span class="tooltip">' + JSON.stringify(msg[4], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>' : '') +
+            (msg[1] && msg[2] ? ', ' : '') + (msg[2] ? JSON.stringify(msg[2]) : '') + '</div>');
+        $('#tutorial_step').scrollTop(0)
+    });
 
+    socket.on('world_log', function (msg) {
+        console.log(msg);
+        $('#world_log').prepend('<div><span class="req'+msg[4] + ' ' + (parseInt(msg[4].substring(1)) % 2 == 0 ? 'req_even' : 'req_odd' ) + '">' + msg[3] + ': </span><span class="tooltiplink">' + msg[0] + '<span class="tooltip">' + JSON.stringify(msg[2], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") +
+			'</span></span>' + (msg[1] || msg[1] == 0 ? ' &rarr; ' + msg[1] + (msg[5] ? ', <span class="tooltiplink response">' + JSON.stringify(msg[5]) + '<span class="tooltip">'+ JSON.stringify(msg[7], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>' : '') + (msg[6] ? ', ' + JSON.stringify(msg[6]) :'')  : '') + '</div>');
+        $('#world_log').scrollTop(0)
+    });
+     socket.on('other_log', function (msg) {
+        console.log(msg);
+        $('#other_log').prepend('<div><span class="req'+ msg[4] + ' ' + (parseInt(msg[4].substring(1)) % 2 == 0 ? 'req_even' : 'req_odd' ) + '">' + msg[3] + ': </span><span class="tooltiplink">' + msg[0] + '<span class="tooltip">' + JSON.stringify(msg[2], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") +
+			'</span></span>' + (msg[1] ? ' &rarr; <span class="tooltiplink response">response<span class="tooltip">' + JSON.stringify(msg[1], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>' : '')
+			+ '</div>');
+        $('#other_log').scrollTop(0)
+    });
 
+     // $('*').scroll(function (e) {return false;})
 
-	</script>
-	<style>
+    $('embed').focusin(function (e) {
+        console.log("focusing")
+        $('html, body').css({
+            overflow: 'hidden',
+            height: '100%'
+        })
+
+    });
+</script>
+<style>
 		.logbox {
-			width: 500px;
+			width: 450px;
 			height: 200px;
 			vertical-align: top;
 			overflow-y: scroll;
@@ -189,33 +196,152 @@
 
 
 	</style>
+
+	<title id="pageTitle">Empires &amp; Allies on Facebook | Facebook</title>
+	<link rel="shortcut icon" href="layouts/icon.png"/>
+	<meta charset="utf-8"/>
+    <link rel="stylesheet" href="layouts/yc_r.css"/>
+    <link rel="stylesheet" href="layouts/yz_r.css"/>
+    <link rel="stylesheet" href="layouts/yC2_r.css"/>
 </head>
-<body>
-    <h2>
-        Raise The Empires pre-alpha 0.2a
-    </h2>
 
-<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" WIDTH="1000" HEIGHT="750" id="ea" ALIGN="">
-				<param NAME=movie VALUE="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf">
-				<param name=FlashVars value="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1">  <!--serverTime=1565300889& mute=true& &zlingshot_zoom= skipFacebook=false&decouple_from_facebook=false&decoupled_facebook_id=5452 -->
-				<param NAME=quality VALUE=high>
-				<param NAME=bgcolor VALUE=#333399>
-                <param name="allowFullScreen" value="true" />
-				<embed src="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf" allowFullScreen="true" FlashVars="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1" quality=high bgcolor=#333399 WIDTH="1000" HEIGHT="750" NAME="ea" ALIGN="" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
-				</embed>
-			</object>
-	<div></div>
+<body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US">
 
-<div>
-	Go to <a href="nodebug.html">nodebug</a> version. <a href="wipe_session" id="delete_save">Delete</a> save game. <a href="save-editor">Edit</a> save game.
+	<!-- TOP BANNER -->
+
+	<div class="-cx-PRIVATE-fbLayout__root">
+	  	<div id="pagelet_bluebar" data-referrer="pagelet_bluebar">
+	  		<div id="blueBarHolder">
+	  			<div id="blueBar">
+	  				<div>
+	  					<div class="loggedout_menubar_container">
+	  						<div class="clearfix loggedout_menubar">
+	  							<a class="lfloat" href="#" title="Go to Facebook Home">
+	  								<i class="fb_logo img sp_e2gpgs sx_584554">
+	  									<u>Facebook logo</u>
+	  								</i>
+	  							</a>
+	  						</div>
+	  					</div>
+	  				<div class="signupBanner">
+	  					<div class="signup_bar_container">
+	  						<div class="signup_box clearfix">
+			  				</div>
+			  			</div>
+			  		</div>
+			  	</div>
+	  		</div>
+		</div>
+	</div>
+
+	<!-- PAGE BODY -->
+
+	<div id="globalContainer" class="uiContextualLayerParent">
+		<div id="content" class="fb_content clearfix">
+			<div>
+				<div id="mainContainer">
+					<div id="contentCol" class="clearfix hasRightCol">
+						<div id="rightCol" role="complementary">
+							<div class="fixedAux">
+								<div class="canvasRHCFooter" id="pagelet_canvas_footer_content" data-referrer="pagelet_canvas_footer_content" data-referrer="pagelet_canvas_footer_content">
+									<div class="mtl">
+										<div class="rhcFooterWrap" role="contentinfo">
+
+											<div class="rhcFooterCopyright fsm fwn fcg">
+												<span>Empires &amp; Allies</span>
+												 · 
+												<a href="#">App Privacy</a>
+												 · 
+												<a href="#">App Terms</a>
+												 · 
+												<a href="#">Report/Contact this App</a>
+											</div>
+
+											<div class="fsm fwn fcg">
+												<a rel="dialog" href="#" title="Use Facebook in another language." role="button">English (US)</a>
+												 · 
+												<a href="http://www.facebook.com/privacy/explanation" title="Learn about your privacy and Facebook.">Privacy</a>
+												 · 
+												<a href="http://www.facebook.com/policies?ref=pf" title="Review our terms and policies.">Terms</a>
+												 · 
+												<a href="http://www.facebook.com/help/cookies?ref_type=sitefooter" title="Cookies">Cookies</a>
+												 · 
+												<div class="-cx-PRIVATE-uiInlineBlock__root uiPopover" id="rhc_footer_selector">
+													<a class="rhcFooterSelectorButton -cx-PRIVATE-uiPopover__trigger" href="#" aria-haspopup="true" aria-expanded="false" rel="toggle" id="u_0_3" role="button">
+														More <i class="img sp_ctntui sx_321d1b"></i>
+													</a>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div id="contentArea" role="main" aria-describedby="pageTitle">
+							<div class="uiInterstitial canvas_error_page " title="" style="margin-bottom: 20px">
+								
+								<div class="uiInterstitialBar uiBoxGray topborder">
+									<div class="clearfix">
+
+										<img src="layouts/logo.png">
+
+
+										<div class="rfloat">
+											<a class="uiButton uiButtonConfirm" href="nodebug.html" role="button" name="try_again_button">
+												<span class="uiButtonText">No debug version</span>
+											</a>
+											
+											<a class="inputaux uiButton" href="wipe_session" role="button" name="exit_button" target="_blank">
+												<span class="uiButtonText">Delete save game</span>
+											</a>
+
+											<a class="inputaux uiButton" href="save-editor.html" role="button" name="exit_button" target="_blank">
+												<span class="uiButtonText">Edit save game</span>
+											</a>
+
+
+											<a class="inputaux uiButton" href="https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2" role="button" name="exit_button" target="_blank">
+												<span class="uiButtonText">E&amp;A Wiki</span>
+											</a>
+										</div>
+										<div class="pts">
+										</div>
+									</div>
+								</div>
+							</div>
+							<div id="canvas_throbber">
+								<div class="mbl fsl fwb" id="canvas_throbber_text">Loading...</div>
+								<img class="mtl img" src="https://web.archive.org/web/20130619115711im_/https://fbstatic-a.akamaihd.net/rsrc.php/v2/y9/r/jKEcVPZFk-2.gif" alt="" width="32" height="32"/>
+							</div>
+
+							<center>
+								<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" WIDTH="1000" HEIGHT="750" id="ea" ALIGN="">
+									<param NAME=movie VALUE="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf">
+									<param name=FlashVars value="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1">  <!--serverTime=1565300889& mute=true& &zlingshot_zoom= skipFacebook=false&decouple_from_facebook=false&decoupled_facebook_id=5452 -->
+									<param NAME=quality VALUE=high>
+									<param NAME=bgcolor VALUE=#333399>
+					                <param name="allowFullScreen" value="true" />
+									<embed src="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf" allowFullScreen="true" FlashVars="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1" quality=high bgcolor=#333399 WIDTH="1000" HEIGHT="750" NAME="ea" ALIGN="" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
+									</embed>
+								</object>
+
+
+								<table>
+									<tr>
+										<td><div class="logbox" id="tutorial_step">&nbsp;</div></td>
+										<td><div class="logbox" id="world_log">&nbsp;</div></td>
+										<td><div class="logbox" id="other_log">&nbsp;</div></td>
+									</tr>
+								</table>
+
+
+							</center>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
-<table>
-	<tr>
-		<td><div class="logbox" id="tutorial_step">&nbsp;</div></td>
-		<td><div class="logbox" id="world_log">&nbsp;</div></td>
-		<td><div class="logbox" id="other_log">&nbsp;</div></td>
-	</tr>
-</table>
 
-</body>
-</html>
