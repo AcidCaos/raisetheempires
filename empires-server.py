@@ -94,7 +94,7 @@ def save_editor():
     s = session
     while "backup" in s:
         backups.append(str(datetime.fromtimestamp(s["backup"].get('saved_on', 0))) + ' - ' \
-        + str(datetime.fromtimestamp(s["backup"].get('replaced_on', 0))) + ' @' + s["backup"].get('save_version'))
+        + str(datetime.fromtimestamp(s["backup"].get('replaced_on', 0))) + ' @' + s["backup"].get('save_version', 'UNKNOWN VERSION'))
         s = s["backup"]
 
     return render_template("save-editor.html", savegame=json.dumps(
@@ -944,7 +944,7 @@ def user_response():
 
         user["neighbors"] = [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neighbor")]
 
-        session['saved_on'] = datetime.now().timestamp()
+
         #
         # [
         # {"uid": 123, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
@@ -966,6 +966,7 @@ def user_response():
         new_quest_with_sequels("Q0516", qc)
         session['quests'] = qc
         session['save_version'] = version
+        session['saved_on'] = datetime.now().timestamp()
 
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = "tut_step_krunsch1Battle2Speeech" #'tut_step_inviteFriendsViral'
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_remindCombatUIWaitForPreBattleUI'
