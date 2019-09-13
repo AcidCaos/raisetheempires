@@ -1,3 +1,11 @@
+consumable poison gas (boss fight only), fixes Nat 14/09/2019 00:21
+new quest precompletion fix Nat 13/09/2019 01:06
+battleDamage, battleKill quest progression Nat 13/09/2019 00:04
+no scrolling the page when zooming in flash Nat 12/09/2019 22:33
+facebook mock screens Nat 12/09/2019 20:16
+accuracy & strength research upgrades effects Nat 12/09/2019 01:05
+countUpgrades quest progression Nat 11/09/2019 20:16
+Missing Level 6 Pvp welcome screen Nat 11/09/2019 00:33
 Steele island, pvp immunity Nat 10/09/2019 08:14
 neighborsAdded prepopulated quest Nat 10/09/2019 00:46
 bugfix partial loading & back to original main swf Nat 09/09/2019 01:50

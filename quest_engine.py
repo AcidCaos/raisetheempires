@@ -211,7 +211,7 @@ def progress_place(state, state_machine, game_item, step, *state_args):
 
 def progress_state(state, state_machine, game_item, step, *state_args):
     return lambda task, progress, i, *args: \
-        task["_action"] in ["state"] and '-stateName' in state and task["_state"] == state['-stateName'] and ("_item" not in task or task["_item"] == game_item['-code'])\
+        task["_action"] in ["state", "countState"] and '-stateName' in state and state['-stateName'] in task["_state"].split(',')  and ("_item" not in task or task["_item"] == game_item['-code'])\
         and ("_subtype" not in task or task["_subtype"] == game_item['-subtype']) and progress < int(task["_total"])
 
 

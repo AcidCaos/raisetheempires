@@ -70,7 +70,7 @@ def lookup_state_machine(state_machine_name, custom_values, custom_reference_val
         custom_reference_values = []
     state_machine = copy.deepcopy(lookup_raw_state_machine(state_machine_name))
     replacements = {e['-name']: e['-value'] for e in custom_values}
-    reference_replacements = {e['-name']: e['-value'] for e in custom_reference_values}
+    reference_replacements = {e['-name']: e['-value'] for e in simple_list(custom_reference_values)}
     print('replacements', repr(replacements))
     if reference_replacements:
         print('reference item replacements', repr(replacements))
@@ -118,6 +118,10 @@ def replenish_energy():
     player["lastEnergyCheck"] = now - (now - player["lastEnergyCheck"] + 1) % 300
     if energy_replenished != 0:
         print("Energy replenished:", energy_replenished)
+
+
+def simple_list(raw_list):
+    return (raw_list if isinstance(raw_list, list) else [raw_list]) if raw_list != '' else []
 
 
 def get_zid():
