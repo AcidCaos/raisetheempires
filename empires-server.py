@@ -66,7 +66,12 @@ def home():
 @app.route("/nodebug.html")
 def no_debug():
     print("index")
-    return render_template("nodebug.html", time=datetime.now().timestamp(), zid=str(get_zid()))
+    return render_template("nodebug.html", time=datetime.now().timestamp(), zid=str(get_zid()),
+                           allies=json.dumps([ally["friend"] for ally in allies.values()
+                                              if "friend" in ally and ally["friend"] and ally["neighbor"]],
+                                             default=lambda o: '<not serializable>', sort_keys=False, indent=2),
+                           app_friends=json.dumps([ally["appFriendId"] for ally in allies.values()
+                                                   if "appFriendId" in ally and ally["appFriendId"] is not None]))
 
 
 @app.route("/wipe_session", methods=['GET', 'POST'])

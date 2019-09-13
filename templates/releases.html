@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="layouts/yc_r.css"/>
     <link rel="stylesheet" href="layouts/yz_r.css"/>
     <link rel="stylesheet" href="layouts/yC2_r.css"/>
+	<script src="//code.jquery.com/jquery-3.4.1.min.js"></script>
+
 </head>
 
 <body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US">
@@ -90,16 +92,19 @@
 									<div class="clearfix uiHeaderTop">
 										<div>
 											<h2 class="uiHeaderTitle" aria-hidden="true">ChangeLog</h2>
-											<h3 class="uiHeaderTitle" aria-hidden="true">pre-alpha 0.2a </h3>
+											<h3 class="uiHeaderTitle" aria-hidden="true">alpha 0.02a </h3>
 										</div>
 									</div>
 								</div>
 								<div class="phl ptm uiInterstitialContent" style="height:450px">
 									<!-- <?php //include('changelog.txt'); ?> -->
 
-									<div style="height:100%; width:100%">
-										<object data="changelog.txt" type="text/plain" style="height:100%; width:100%"></object>
+									<div id="changelog" style="height:100%; width:100%; white-space: pre; overflow-y: scroll">
+										<!--<object data="changelog.txt" type="text/plain" style="height:100%; width:100%"></object>-->
 									</div>
+									<script>
+										$("#changelog").load("/changelog.txt");
+									</script>
 								</div>
 								<div class="uiInterstitialBar uiBoxGray topborder">
 									<div class="clearfix">
