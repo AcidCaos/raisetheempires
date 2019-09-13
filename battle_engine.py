@@ -9,7 +9,7 @@ from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_s
 
 
 def battle_complete_response(params):
-    friendlies, friendly_strengths, baddies, baddie_strengths = init_battle(params)
+    friendlies, friendly_strengths, baddies, baddie_strengths, friendly_consumables, baddie_consumables = init_battle(params)
     meta = {"newPVE": 0}
 
     if 'id' in params:
@@ -94,6 +94,26 @@ def battle_complete_response(params):
             # session["battle"] = None
         print("Taken", damage, "damage, player hp:", friendly_strengths[player_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
 
+
+    result = {"attackerStunned": None, "psh": 0, "esh": 0, "ps": friendly_strengths[player_unit_id], "es": baddie_strengths[enemy_unit_id], "hv": None, "ur": roll,
+     "playerUnit": player_unit_id, "enemyUnit": enemy_unit_id, "seeds": {"w": get_seed_w(), "z": get_seed_z()},
+     "energy": None}
+
+    if not player_turn:
+        for consumable_tuple in baddie_consumables.values():
+            (consumable, dot_damage, tries) = consumable_tuple
+            if consumable["consumable"].get("-type") == "all":
+                print("Assuming non-ally poison gas")
+
+                for i in range(len(baddie_strengths)):
+                    if baddie_strengths[i] > 0:
+                        baddie_strengths[i] -= dot_damage
+                        print("Baddie", i, "strength", baddie_strengths[i])
+                        if baddie_strengths[i] <= 0:
+                            baddie_strengths[i] = 0
+                            print("Baddie", i, "down by consumable")
+                tries -= 1
+
     if sum(baddie_strengths) == 0:
         print("Enemy defeated")
         session["battle"] = None
@@ -116,9 +136,6 @@ def battle_complete_response(params):
         print("Player defeated")
         session["battle"] = None
 
-    result = {"attackerStunned": None, "psh": 0, "esh": 0, "ps": friendly_strengths[player_unit_id], "es": baddie_strengths[enemy_unit_id], "hv": None, "ur": roll,
-     "playerUnit": player_unit_id, "enemyUnit": enemy_unit_id, "seeds": {"w": get_seed_w(), "z": get_seed_z()},
-     "energy": None}
 
     battle_complete_response = {"errorType": 0, "userId": 1, "metadata": meta, "data": result}
     return battle_complete_response
@@ -172,12 +189,14 @@ def handle_strength_upgrades(strength, unit):
 
 def init_battle(params):
     if 'target' not in params:
-        baddies = [lookup_item_by_code(friendly[1:]) for friendly, count in session['fleets'][params['fleet']].items()
+        baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][params['fleet'] if params['fleet'] else params['name']])
+                   for baddy, count in sub_fleet.items()
                    for i in range(int(count))]
         friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                      session['fleets'][get_previous_fleet(params['fleet'])]]
+                      session['fleets'][get_previous_fleet(params['fleet'] if params['fleet'] else params['name'])]]
     elif params['target'].startswith('fleet'):
-        baddies = [lookup_item_by_code(friendly[1:]) for friendly, count in session['fleets'][params['target']].items()
+        baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][params['target']])
+                   for baddy, count in sub_fleet.items()
                    for i in range(int(count))]
         friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
                       session['fleets'][params['fleet']]]
@@ -193,15 +212,17 @@ def init_battle(params):
     if "battle" not in session or not session["battle"]:
         baddie_strengths = [get_unit_max_strength(baddie, False, params) for baddie in baddies]
         friendly_strengths = [get_unit_max_strength(friendly, True) for friendly in friendlies]
-        session["battle"] = (friendly_strengths, baddie_strengths)
+        friendly_consumables = {}
+        baddie_consumables = {}
+        session["battle"] = (friendly_strengths, baddie_strengths, friendly_consumables, baddie_consumables)
     else:
-        (friendly_strengths, baddie_strengths) = session["battle"]
-    return friendlies, friendly_strengths, baddies, baddie_strengths
+        (friendly_strengths, baddie_strengths, friendly_consumables, baddie_consumables) = session["battle"]
+    return friendlies, friendly_strengths, baddies, baddie_strengths, friendly_consumables, baddie_consumables
 
 
 def get_previous_fleet(name):
     print("Using previous fleet as friendlies for ally comsumables")
-    return name[:5] + str(int(name[5]) - 1) + name[6:]
+    return name[:5] + str(int(name[5:name.index('_')]) - 1) + name[6:]
 
 
 def unit_roll(attacker_weak, defender_weak):
@@ -299,18 +320,33 @@ def next_campaign_response(params):
 
 
 def assign_consumable_response(params):
-    friendlies, friendly_strengths, baddies, baddie_strengths = init_battle(params)
+    friendlies, friendly_strengths, baddies, baddie_strengths, friendly_consumables, baddie_consumables = init_battle(params)
 
-    selected_random_consumable = int(roll_random_between(0, 0)) # required roll fixed allyconsumable in tutorialstep
+    if params["code"] != "A0A": # ?? Ally?
+        consumable = lookup_item_by_code(params["code"])
 
-    targeted_baddie = round(roll_random_between(0, round(len(baddies) - 1))) if len(baddies) > 1 else 0
+        # TODO: more consumables
+        #if consumable["consumable"].get("-type") == "all":
+        print("Assuming non-ally poison gas")
 
-    baddie_current_strength = baddie_strengths[targeted_baddie]
+        for i in range(len(baddie_strengths)):
+            baddie_strengths[i] -= 15
+            print("Baddie", i , "strength", baddie_strengths[i])
+            if baddie_strengths[i] <=0:
+                baddie_strengths[i] = 0
+                print("Baddie", i , "down by consumable")
+        baddie_consumables[params["code"]] = (consumable, 15 , 7)
 
-    baddie_strengths[targeted_baddie] = 0 # assume death baddie
-    print("Consumable used to baddie:", targeted_baddie)
+    else:
+        selected_random_consumable = int(roll_random_between(0, 0)) # required roll fixed allyconsumable in tutorialstep
+        targeted_baddie = round(roll_random_between(0, round(len(baddies) - 1))) if len(baddies) > 1 else 0
 
-    doBattleRewards("kill", baddie_current_strength, baddie_current_strength, 0)
+        baddie_current_strength = baddie_strengths[targeted_baddie]
+
+        baddie_strengths[targeted_baddie] = 0 # assume death baddie
+        print("Consumable used to baddie:", targeted_baddie)
+
+        doBattleRewards("kill", baddie_current_strength, baddie_current_strength, 0)
 
     meta = {"newPVE": 0}
     assign_consumable_response = {"errorType": 0, "userId": 1, "metadata": meta,
