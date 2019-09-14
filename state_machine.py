@@ -18,7 +18,7 @@ def click_next_state(id, meta, step, reference_item):
 
     if 'stateMachineValues' in game_item:
         state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'],
-                                             game_item['stateMachineValues']['define'],
+                                             game_item['stateMachineValues'].get('define', []),
                                              (lookup_reference_item(cur_object) or {}).get('referenceValues',{}).get('define'))
 
         print("state_machine used:", repr(state_machine))
@@ -47,7 +47,7 @@ def click_next_state(id, meta, step, reference_item):
             next_state_id = state['-clickNext']
             if reference_item != cur_object.get('referenceItem'):
                 state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'],
-                                                     game_item['stateMachineValues']['define'],
+                                                     game_item['stateMachineValues'].get('define', []),
                                                      (lookup_item_by_code(reference_item.split(":")[0]) if reference_item else {})
                                                      .get('referenceValues', {}).get('define'))
             next_click_state = lookup_state(state_machine, next_state_id, cur_object)

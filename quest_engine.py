@@ -30,7 +30,7 @@ def prepopulate_task(task):
         item = lookup_item_by_code(task["_item"])
         if 'stateMachineValues' in item:
             state_machine = lookup_state_machine(item['stateMachineValues']['-stateMachineName'],
-                                                 item['stateMachineValues']['define'])
+                                                 item['stateMachineValues'].get('define', []))
         else:
             state_machine = None
         objects = lookup_objects_by_item_name(item['-name'])
