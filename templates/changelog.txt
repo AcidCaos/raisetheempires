@@ -1,4 +1,6 @@
 alpha v0.02a
+    changelog, nodebug Nat 14/09/2019 01:47
+    basic countState quest progression Nat 14/09/2019 01:23
     consumable poison gas (boss fight only), fixes Nat 14/09/2019 00:21
     new quest precompletion fix Nat 13/09/2019 01:06
     battleDamage, battleKill quest progression Nat 13/09/2019 00:04

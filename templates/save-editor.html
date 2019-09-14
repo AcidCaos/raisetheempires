@@ -20,7 +20,7 @@
 	  				<div>
 	  					<div class="loggedout_menubar_container">
 	  						<div class="clearfix loggedout_menubar">
-	  							<a class="lfloat" href="#" title="Go to Facebook Home">
+	  							<a class="lfloat" href="/" title="Go to Facebook Home">
 	  								<i class="fb_logo img sp_e2gpgs sx_584554">
 	  									<u>Facebook logo</u>
 	  								</i>
@@ -85,6 +85,7 @@
 						<div id="contentArea" role="main" aria-describedby="pageTitle">
 							
 
+							<form action="/save-editor" method="post">
 							<div class="mvl ptm uiInterstitial canvas_error_page uiBoxWhite" title="" style="margin-left: 70px; margin-right: 50px">
 								<div class="uiHeader uiHeaderBottomBorder mhl mts uiHeaderPage interstitialHeader">
 									<div class="clearfix uiHeaderTop">
@@ -93,19 +94,19 @@
 										</div>
 									</div>
 								</div>
-								
 
-								<form action="/save-editor" method="post">
+
 									<div class="phl ptm uiInterstitialContent">
-								        <textarea rows="30" cols="135" name="savegame" >
-{{ savegame | default("ERROR: No savegame present!")}}
-								        </textarea>
-								        <br>
+								        <textarea rows="30" cols="135" name="savegame" >{{ savegame | default("ERROR: No savegame present!")}}</textarea><br>
+										<input type="text" size="135" name="message" placeholder="What did you change?"><br>
 								        <span style="color: crimson"><b>Warning:</b> This can corrupt your savegame!</span>
 									</div>
 									<div class="uiInterstitialBar uiBoxGray topborder">
 										<div class="clearfix">
 											<div class="rfloat">
+												<a class="inputaux uiButton" href="home.html" role="button" name="exit_button">
+													<span class="uiButtonText">Cancel</span>
+												</a>
 												<a class="uiButton uiButtonConfirm" href="home.html" role="button" name="try_again_button">
 													<span class="uiButtonText"></span>
 													<input type="submit" value="Save game">
@@ -115,15 +116,20 @@
 											</div>
 										</div>
 									</div>
-    							</form>
+
 							</div>
 
 							<div class="mvl ptm uiInterstitial canvas_error_page uiInterstitialLarge uiBoxWhite" id="backup-list" style=" padding: 9px">
 								<h2 class="uiHeaderTitle" aria-hidden="true"> Backups:</h2>
-								{{ backups }} <a class="inputaux uiButton" href="#" role="button" name="exit_button">
-												<span class="">Restore this backup</span>
+								{% for backup in backups %}
+								{{ backup }} <a class="inputaux uiButton" href="#" role="button" name="exit_button">
+												<input type="submit" name="restore{{ backups.index(backup) }}" value="Restore this backup">
+
 											</a>
+											<br />
+								{% endfor %}
 							</div>
+							</form>
 
 							<div id="canvas_throbber">
 								<div class="mbl fsl fwb" id="canvas_throbber_text">Loading...</div>

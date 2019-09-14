@@ -22,7 +22,7 @@ import copy
 
 # import logging.config
 
-version = "0.2"
+version = "0.02a"
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -87,6 +87,7 @@ def more_money():
     if 'user_object' in session:
         player = session['user_object']["userInfo"]["player"]
         player['cash'] += 10000
+        session['saved'] = True
         response = make_response(redirect('/home.html'))
         return response
     else:
@@ -97,10 +98,12 @@ def more_money():
 def save_editor():
     backups = []
     s = session
+    backup_count = 0
     while "backup" in s:
-        backups.append(str(datetime.fromtimestamp(s["backup"].get('saved_on', 0))) + ' - ' \
-        + str(datetime.fromtimestamp(s["backup"].get('replaced_on', 0))) + ' @' + s["backup"].get('save_version', 'UNKNOWN VERSION'))
+        backups.append(format_backup_message(s["backup"]))
         s = s["backup"]
+        backup_count += 1
+    print("Backups present", backup_count)
 
     return render_template("save-editor.html", savegame=json.dumps(
         {
@@ -108,32 +111,56 @@ def save_editor():
             'quests': session['quests'] if 'quests' in session else None,
             'battle': session['battle'] if 'battle' in session else None,
             'fleets': session['fleets'] if 'fleets' in session else None,
-            'population': session['population'] if 'population' in session else None
+            'population': session['population'] if 'population' in session else None,
+            'saved': session['saved'] if 'saved' in session else None,
+            'save_version': session['save_version'] if 'save_version' in session else None,
+            'original_save_version': session['original_save_version'] if 'original_save_version' in session else None,
         }, default=lambda o: '<not serializable>', sort_keys=False, indent=2), uid=get_zid(), backups=backups)
 
 
 @app.route("/save-editor", methods=['POST'])
 def save_savegame():
     print("Going to save:")
-    save_game = json.loads(request.form['savegame'])
+    restores = [int(key[7:]) for key in request.form.keys() if "restore" in key]
+
+    if restores:
+        save_game = session["backup"]
+        for i in range(restores[0]):
+            save_game = save_game["backup"]
+        save_game = copy.deepcopy(save_game)
+        print("restoring backup")
+        message = "Revert to backup \"" + format_backup_message(save_game) + "\""
+    else:
+        save_game = json.loads(request.form['savegame'])
+        message = "before " + request.form.get("message")
+
     print(repr(save_game))
     session["backup"] = {k: v for k, v in session.items() if
                          k in ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on',
-                               'save_version', 'backup']}  # nested backups
+                               'save_version', 'original_save_version', 'backup']}  # nested backups
 
     session['user_object'] = save_game['user_object']
     session['quests'] = save_game['quests']
     session['battle'] = save_game['battle']
     session['fleets'] = save_game['fleets']
     session['population'] = save_game['population']
+    session['save_version'] = save_game['save_version']
     session['saved'] = True
     timestamp = datetime.now().timestamp()
     session['saved_on'] = timestamp
     session["backup"]['replaced_on'] = timestamp
+    session["backup"]['message'] = message
 
     response = make_response(redirect('/home.html'))
     return response
     # return ('', 400)
+
+
+def format_backup_message(backup):
+    return datetime.fromtimestamp(backup.get('saved_on', 0)).strftime("%d %b %Y %H:%M:%S") + ' - ' \
+           + datetime.fromtimestamp(backup.get('replaced_on', 0)).strftime("%d %b %Y %H:%M:%S") + ' @' \
+           + backup.get('save_version', 'UNKNOWN VERSION') + ' ' \
+           + backup.get("message", "")
 
 
 @app.route("/127.0.0.1record_stats.php", methods=['GET', 'POST'])
@@ -971,6 +998,7 @@ def user_response():
         new_quest_with_sequels("Q0516", qc)
         session['quests'] = qc
         session['save_version'] = version
+        session['original_save_version'] = version
         session['saved_on'] = datetime.now().timestamp()
 
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = "tut_step_krunsch1Battle2Speeech" #'tut_step_inviteFriendsViral'
