@@ -1,3 +1,13 @@
+import getopt
+import sys
+from tendo import singleton
+
+opts, args = getopt.getopt(sys.argv[1:],"",["debug"])
+debug = ("--debug", '') in opts
+
+if not debug:
+    me = singleton.SingleInstance()
+
 from builtins import print
 from time import sleep
 
@@ -1544,7 +1554,7 @@ if __name__ == '__main__':
     # session.app.session_interface.db.create_all()
     # app.session_interface.db.create_all()
     # db.create_all()
-    socketio.run(app, host='127.0.0.1', port=5005, debug=True)
+    socketio.run(app, host='127.0.0.1', port=5005, debug=debug)
     # app.run(host='127.0.0.1', port=5005, debug=True)
     # logging.getLogger('socketio').setLevel(logging.ERROR)
     # logging.getLogger('engineio').setLevel(logging.ERROR)
