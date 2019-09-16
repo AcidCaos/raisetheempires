@@ -2,6 +2,8 @@ import getopt
 import sys
 from tendo import singleton
 
+from save_migration import migrate
+
 opts, args = getopt.getopt(sys.argv[1:],"",["debug"])
 debug = ("--debug", '') in opts
 
@@ -32,7 +34,7 @@ import copy
 
 # import logging.config
 
-version = "0.02a"
+version = "0.03a"
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -976,27 +978,16 @@ def init_user():
 # Q0516 ? start
 def user_response():
     if 'user_object' in session:
+        print("Loading user from save")
         user = session['user_object']
         user["userInfo"]["player"]["uid"] = get_zid()
-        qc = session['quests']
-        print("Loading user from save")
         if session.get('save_version') != version:
             print("WARNING: Save game was saved with version", session.get('save_version'), "while game is version",
                   version)
 
+        qc = session['quests']
+
         user["neighbors"] = [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neighbor")]
-
-
-        #
-        # [
-        # {"uid": 123, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
-        #  "socialXpBad": 0, "socialLevelBad": 1, "profilePic": None, "dominanceRank": 1, "tending": {"actions": 3}},
-        # # {"uid": -2, "resource": 3, "coins": 100, "xp": 10, "level": 1, "socialXpGood": 0, "socialLevelGood": 1,
-        # #  "socialXpBad": 0, "socialLevelBad": 1, "profilePic": None, "dominanceRank": 1, "tending": {"actions": 3}},
-        # {"uid": -1, "resource": 3, "coins": 100, "xp": 10, "level": 6, "socialXpGood": 0, "socialLevelGood": 20,
-        #  "socialXpBad": 0, "socialLevelBad": 1, "profilePic": "assets/game/GeneralAssetGroup_UI.swf/NeighborOneCP.png", "dominanceRank": 1, "tending": {"actions": 3}}]
-        #
-
     else:
         user = copy.deepcopy(init_user())
         print("initialized new")
@@ -1070,6 +1061,9 @@ def user_response():
     handle_quest_progress(meta, progress_inventory_count())
     handle_quest_progress(meta, progress_neighbor_count())
     handle_quest_progress(meta, progress_upgrades_count())
+    if session.get('save_version') != version:
+        print("Trying migration")
+        migrate(meta, session.get('save_version'), version)
 
     sleep(0.05)  # bugfix required delay for loading entire screen
 

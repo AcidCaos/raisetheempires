@@ -22,7 +22,7 @@ def lookup_quest(name):
 def new_quest(quest):
     # progress = [0 for e in quest['tasks']]
     progress, completes = map(list, zip(*[prepopulate_task(e) for e in get_tasks(quest)]))
-    return {"name": quest['_name'], "complete": all(completes), "expired": False, "progress": progress, "completedTasks": reduce((lambda x, y: x << 1 | y), ([False] + completes)[::-1])}
+    return {"name": quest['_name'], "complete": all(completes), "expired": False, "progress": progress, "completedTasks": reduce((lambda x, y: x << 1 | y), [False] + completes[::-1])}
 
 
 def prepopulate_task(task):
