@@ -203,7 +203,7 @@ def en_us_file():
 
 @app.route("/127.0.0.1questSettings.xml")
 def quest_settings_file():
-    return send_from_directory("assets/29oct2012", "questSettings.xml")
+    return send_from_directory("assets/29oct2012", "questSettings_with_fixes.xml")
 
 @app.route("/releases.html")
 def releases():
