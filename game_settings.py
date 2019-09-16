@@ -125,4 +125,4 @@ def simple_list(raw_list):
 
 
 def get_zid():
-    return libscrc.iso(session.sid.encode()) // 1000
+    return libscrc.iso(session.sid.encode()) // 2048
