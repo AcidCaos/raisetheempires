@@ -9,13 +9,14 @@ from game_settings import game_settings, lookup_item_by_name, lookup_state_machi
 # TODO add new reference item from clicknext step, use old one for first autostep, new one for 2nd autonext,
 #  not needed: is handled by checkstates if new one is null then use old reference item in clicknext(harvesting step?)
 # TODO checkState?
-def click_next_state(id, meta, step, reference_item):
+def click_next_state(do_click, id, meta, step, reference_item, speed_up):
     cur_object = lookup_object(id)
     print("cur_object used:", repr(cur_object))
 
     game_item = lookup_item_by_name(cur_object['itemName'])
     print("item used:", repr(game_item))
 
+    timestamp = datetime.now().timestamp()
     if 'stateMachineValues' in game_item:
         state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'],
                                              game_item['stateMachineValues'].get('define', []),
@@ -27,7 +28,10 @@ def click_next_state(id, meta, step, reference_item):
 
         while '-autoNext' in state and state['-stateName'] != state['-autoNext']:   # '-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
             duration =  parse_duration(state.get('-duration', '0'))
-            if cur_object.get('lastUpdated', 0) / 1000 +  duration <= datetime.now().timestamp():
+            if cur_object.get('lastUpdated', 0) / 1000 +  duration <= timestamp or speed_up:
+                if cur_object.get('lastUpdated', 0) / 1000 + duration > timestamp:
+                    speed_up = False  # consumes speed up
+                    print("speed up used")
                 next_state_id = state['-autoNext']  # not all states have this!! end states? autostate after time?
                 previous_state = state
                 state = lookup_state(state_machine, next_state_id, cur_object, True)
@@ -43,7 +47,7 @@ def click_next_state(id, meta, step, reference_item):
                 print("state has autoNext, but not enough time was passed")
                 break
 
-        if '-clickNext' in state:
+        if do_click and '-clickNext' in state:
             next_state_id = state['-clickNext']
             if reference_item != cur_object.get('referenceItem'):
                 state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'],
@@ -66,13 +70,13 @@ def click_next_state(id, meta, step, reference_item):
                 handle_world_state_change(meta, next_click_state, state_machine, game_item, step, previous_state, reference_item, reference_item)
 
             cur_object['state'] = next_state_id
-            cur_object['lastUpdated'] = datetime.now().timestamp() * 1000
+            cur_object['lastUpdated'] = timestamp * 1000
         else:
-            print("state has no clicknext, click does nothing")
-            cur_object['lastUpdated'] = datetime.now().timestamp() * 1000
+            print("state has no clicknext, click does nothing" if do_click else "not clicking, only autonexts")
+            cur_object['lastUpdated'] = timestamp * 1000
     else:
         print("object has no statemachine, click does nothing")
-        cur_object['lastUpdated'] = datetime.now().timestamp() * 1000
+        cur_object['lastUpdated'] = timestamp * 1000
         handle_world_state_change(meta, {}, None, game_item, step, {}, reference_item, reference_item)
 
 
