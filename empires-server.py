@@ -988,6 +988,8 @@ def user_response():
         qc = session['quests']
 
         user["neighbors"] = [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neighbor")]
+
+        meta = {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]}
     else:
         user = copy.deepcopy(init_user())
         print("initialized new")
@@ -996,11 +998,12 @@ def user_response():
         session['quests'] = []
         qc = []
 
-        new_quest_with_sequels("Q0516", qc)
         session['quests'] = qc
         session['save_version'] = version
         session['original_save_version'] = version
         session['saved_on'] = datetime.now().timestamp()
+        meta = {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]}
+        new_quest_with_sequels("Q0516", qc, meta)
 
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = "tut_step_krunsch1Battle2Speeech" #'tut_step_inviteFriendsViral'
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_remindCombatUIWaitForPreBattleUI'
@@ -1057,7 +1060,6 @@ def user_response():
         item_inventory["B17"] = 25
         print("Refilling deck turret to 25")  # until friend gift mechanisms are working
 
-    meta = {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]}
     handle_quest_progress(meta, progress_inventory_count())
     handle_quest_progress(meta, progress_neighbor_count())
     handle_quest_progress(meta, progress_upgrades_count())

@@ -175,7 +175,23 @@ def progress_battle_damage(damage, maximum_total, extra,  progress):
     return damage != progress
 
 
-#cancels?
+def progress_resource_added_count(rewards, prefix):
+    return lambda task, progress, i, extra, *args: \
+        task["_action"] == "resourceAdded" and rewards.get(prefix + task["_type"]) \
+        and progress_yield_amount(rewards[prefix + task["_type"]].split('|')[0], task["_total"], extra, progress)
+
+
+def progress_total_amount(amount, maximum_total, extra, progress):
+    extra["total"] = min(int(amount), int(maximum_total))
+    return amount != progress
+
+
+def progress_yield_amount(amount, maximum_total, extra, progress):
+    extra["yield"] = min(int(amount), int(maximum_total))
+    return amount != progress
+
+
+        #cancels?
 def progress_build(state, state_machine, game_item, step, previous_state, reference_item, previous_reference_item, *state_args):
     return lambda task, progress, i, *args: \
         task["_action"] == "build" and reference_item is not None and (
@@ -270,8 +286,8 @@ def handle_quest_progress(meta, progress_function):
         if session_quest["completedTasks"] >= 2 ** len(tasks) - 1:
             session_quest["complete"] = True
             print("Quest complete", session_quest['name'])
-            do_quest_rewards(lookup_quest(session_quest['name']))
-            activate_sequels(session_quest, new_quests)
+            do_quest_rewards(lookup_quest(session_quest['name']), meta)
+            activate_sequels(session_quest, new_quests, meta)
         if report_quest:
             if "QuestComponent" not in meta:
                 meta['QuestComponent'] = []
@@ -289,15 +305,15 @@ def get_tasks(quest):
 def simple_list(raw_list):
     return (raw_list if isinstance(raw_list, list) else [raw_list]) if raw_list != '' else []
 
-def activate_sequels(session_quest, new_quests):
+def activate_sequels(session_quest, new_quests, meta):
     raw_sequels = lookup_quest(session_quest['name'])['sequels']
     sequels = (raw_sequels["sequel"] if isinstance(raw_sequels["sequel"], list) else [
         raw_sequels["sequel"]]) if raw_sequels != "" and "sequel" in raw_sequels else []
     for sequel in sequels:
-        new_quest_with_sequels(sequel["_name"], new_quests)
+        new_quest_with_sequels(sequel["_name"], new_quests, meta)
 
 
-def new_quest_with_sequels(name, new_quests):
+def new_quest_with_sequels(name, new_quests, meta):
     if name in [e['name'] for e in session['quests']]:
         print("sequel", name, "already in session quests")
     elif new_quests is not None and name in [e['name'] for e in new_quests]:
@@ -309,8 +325,8 @@ def new_quest_with_sequels(name, new_quests):
         new_quests.append(new_sequel_quest)
         if new_sequel_quest["complete"]:
             print("Sequel quest precompleted", name)
-            do_quest_rewards(q)
-            activate_sequels(new_sequel_quest, new_quests)
+            do_quest_rewards(q, meta)
+            activate_sequels(new_sequel_quest, new_quests, meta)
 
 
 
@@ -322,12 +338,13 @@ def new_quest_with_sequels(name, new_quests):
 #         print("auto_next_state:", repr(next_click_state))
 
 
-def do_quest_rewards(quest):
+def do_quest_rewards(quest, meta):
     # TODO: rewardModifier
     raw_rewards = quest['reward']
-    do_rewards("Quest", raw_rewards)
+    do_rewards("Quest", raw_rewards, meta)
 
-def do_rewards(label, raw_rewards):
+
+def do_rewards(label, raw_rewards, meta):
     rewards = simple_list(raw_rewards)
     inc = {r.get("_type", r.get("-type")): int(r.get('_count', r.get('-count', 1))) for r in rewards if r.get("_type") != "item" and r.get("-type") != "item"}
     items = {r.get("_item", r.get("-item")): int(r.get('_count', r.get('-count', 1))) for r in rewards if r.get("_type") == "item" or r.get("-type") == "item"}
@@ -396,7 +413,7 @@ def do_rewards(label, raw_rewards):
 
     if items:
         print(label, "item rewards:", ", ".join([ k + ": " + str(v) for k,v in items.items()]))
-
+    handle_quest_progress(meta, progress_resource_added_count(inc, ""))
         # TODO store them & consumption
 
 def roll_random():

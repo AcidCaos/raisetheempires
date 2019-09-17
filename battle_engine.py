@@ -122,7 +122,7 @@ def battle_complete_response(params):
         if current_island != None:
             handle_quest_progress(meta, all_lambda(progress_action("islandWin"),
                                                    progress_parameter_equals("_island", str(current_island))))
-            do_rewards("Campaign", map_item['island'][current_island].get("reward"))
+            do_rewards("Campaign", map_item['island'][current_island].get("reward"), meta)
             next_island_id = map_item['island'][current_island].get('-unlocks')
             if next_island_id is not None:
                 print("Activating next island", map_name, next_island_id)

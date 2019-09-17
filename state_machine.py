@@ -1,5 +1,5 @@
 from quest_engine import handle_world_state_change, roll_reward_random_float, handle_quest_progress, \
-    progress_upgrades_count
+    progress_upgrades_count, progress_resource_added_count
 from datetime import datetime
 from flask import session
 from game_settings import game_settings, lookup_item_by_name, lookup_state_machine, lookup_reference_item, \
@@ -22,7 +22,7 @@ def click_next_state(id, meta, step, reference_item):
                                              (lookup_reference_item(cur_object) or {}).get('referenceValues',{}).get('define'))
 
         print("state_machine used:", repr(state_machine))
-        state = lookup_state(state_machine, cur_object.get('state', 0), cur_object)
+        state = lookup_state(state_machine, cur_object.get('state', 0), cur_object, True)
         print("cur state:", repr(state))
 
         while '-autoNext' in state and state['-stateName'] != state['-autoNext']:   # '-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
@@ -30,7 +30,7 @@ def click_next_state(id, meta, step, reference_item):
             if cur_object.get('lastUpdated', 0) / 1000 +  duration <= datetime.now().timestamp():
                 next_state_id = state['-autoNext']  # not all states have this!! end states? autostate after time?
                 previous_state = state
-                state = lookup_state(state_machine, next_state_id, cur_object)
+                state = lookup_state(state_machine, next_state_id, cur_object, True)
                 check_state(state_machine, state, cur_object)
                 do_state_rewards(state, cur_object.get('referenceItem'), meta)
                 if 'lastUpdated' not in cur_object:
@@ -50,7 +50,7 @@ def click_next_state(id, meta, step, reference_item):
                                                      game_item['stateMachineValues'].get('define', []),
                                                      (lookup_item_by_code(reference_item.split(":")[0]) if reference_item else {})
                                                      .get('referenceValues', {}).get('define'))
-            next_click_state = lookup_state(state_machine, next_state_id, cur_object)
+            next_click_state = lookup_state(state_machine, next_state_id, cur_object, True)
             check_state(state_machine, next_click_state, cur_object)
             print("next_click_state:", repr(next_click_state))
             do_state_rewards(next_click_state, cur_object.get('referenceItem'), meta)
@@ -59,7 +59,7 @@ def click_next_state(id, meta, step, reference_item):
             while '-autoNext' in next_click_state and next_state_id != next_click_state['-autoNext'] and next_click_state.get('-duration', '0') in ['0', '0s']:   #'-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
                 next_state_id = next_click_state['-autoNext']
                 previous_state = next_click_state
-                next_click_state = lookup_state(state_machine, next_state_id, cur_object)
+                next_click_state = lookup_state(state_machine, next_state_id, cur_object, True)
                 check_state(state_machine, next_click_state, cur_object)
                 print("auto_next_state:", repr(next_click_state))
                 do_state_rewards(next_click_state, reference_item, meta)
@@ -76,9 +76,9 @@ def click_next_state(id, meta, step, reference_item):
         handle_world_state_change(meta, {}, None, game_item, step, {}, reference_item, reference_item)
 
 
-def lookup_state(state_machine, i, cur_object):
+def lookup_state(state_machine, i, cur_object, check_state):
     [state] = [e for e in state_machine['state'] if e['-stateName'] == str(i)]
-    if 'check_state' in cur_object and str(i) in cur_object['check_state']:
+    if check_state and 'check_state' in cur_object and str(i) in cur_object['check_state']:
         state = cur_object['check_state'][str(i)]
         print("Overridden state used", str(i))
     return state
@@ -97,7 +97,7 @@ def lookup_object(id):
 #use state from current statemachine as replacement state for that state (with values and 2 random numbers
 def check_state(state_machine, state, cur_object):
     if '-checkState' in state:
-        check_state = lookup_state(state_machine, state["-checkState"], cur_object) # possibly overriding using already overridden state
+        check_state = lookup_state(state_machine, state["-checkState"], cur_object, False)
         if 'check_state' not in cur_object:
             cur_object['check_state'] = {}
         cur_object['check_state'][state["-checkState"]] = check_state
@@ -184,29 +184,31 @@ def do_state_rewards(state, reference_item, meta):
             player['cash'] += int(level["reward"]["-count"])
             level_cash += int(level["reward"]["-count"])
 
-    log_rewards = ", ".join([label + " " + ("+" if int(increment) > 0 else "") + str(increment) + " (" + str(total) + ")" for
-                     (label, increment, total)
-                     in
-                     [("xp:", state.get('-xp', '0'), player['xp']),
-                      ("energy:", state.get('-energy', '0'), player['energy']),
-                      ("coins:", state.get('-coins', '0'), resources['coins']),
-                      ("oil:", state.get('-oil', '0'), resources['oil']),
-                      ("wood:", state.get('-wood', '0'), resources['wood']),
-                      ("cash:", state.get('-cash', '0'), player['cash']),
-                      ("cash (level):", str(level_cash), player['cash']),
-                      ("levels:", str(levels_count), player['level']),
-                      ("socialXpGood:", state.get('-socialXpGood', '0'), player['socialXpGood']),
-                      ("socialXpBad:", state.get('-socialXpBad', '0'), player['socialXpBad']),
-                      ("buildable:", state.get('-buildable', '0'), sum(item_inventory.values())),
-                      (resource_order[0] + ":", state.get('-rare', '0'), resources[resource_order[0]]),
-                      (resource_order[0] + ":", state.get('-nrare0', '0'), resources[resource_order[0]]),
-                      (resource_order[1] + ":", state.get('-nrare1', '0'), resources[resource_order[1]]),
-                      (resource_order[2] + ":", state.get('-nrare2', '0'), resources[resource_order[2]]),
-                      (resource_order[3] + ":", state.get('-nrare3', '0'), resources[resource_order[3]]),
-                      (resource_order[4] + ":", state.get('-nrare4', '0'), resources[resource_order[4]])
-                      ] if int(increment.split('|')[0]) != 0])
+    log_rewards = ", ".join(
+        [label + " " + ("+" if int(increment) > 0 else "") + str(increment) + " (" + str(total) + ")" for
+         (label, increment, total)
+         in
+         [("xp:", state.get('-xp', '0'), player['xp']),
+          ("energy:", state.get('-energy', '0'), player['energy']),
+          ("coins:", state.get('-coins', '0'), resources['coins']),
+          ("oil:", state.get('-oil', '0'), resources['oil']),
+          ("wood:", state.get('-wood', '0'), resources['wood']),
+          ("cash:", state.get('-cash', '0'), player['cash']),
+          ("cash (level):", str(level_cash), player['cash']),
+          ("levels:", str(levels_count), player['level']),
+          ("socialXpGood:", state.get('-socialXpGood', '0'), player['socialXpGood']),
+          ("socialXpBad:", state.get('-socialXpBad', '0'), player['socialXpBad']),
+          ("buildable:", state.get('-buildable', '0'), sum(item_inventory.values())),
+          (resource_order[0] + ":", state.get('-rare', '0'), resources[resource_order[0]]),
+          (resource_order[0] + ":", state.get('-nrare0', '0'), resources[resource_order[0]]),
+          (resource_order[1] + ":", state.get('-nrare1', '0'), resources[resource_order[1]]),
+          (resource_order[2] + ":", state.get('-nrare2', '0'), resources[resource_order[2]]),
+          (resource_order[3] + ":", state.get('-nrare3', '0'), resources[resource_order[3]]),
+          (resource_order[4] + ":", state.get('-nrare4', '0'), resources[resource_order[4]])
+          ] if int(increment.split('|')[0]) != 0])
     if log_rewards:
         print("State rewards:", log_rewards)
+    handle_quest_progress(meta, progress_resource_added_count(state, "-"))
         
         
 def do_costs(costs):
