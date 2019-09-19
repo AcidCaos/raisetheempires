@@ -1020,6 +1020,8 @@ def user_response():
     session['population'] = lookup_yield()
 
     # #temp migration
+    # session['user_object']["experiments"]["empire_store_sorting_rev_enhanced"] = 0
+    # session['user_object']["experiments"]["empires_shop_improvements"] = 0
     # battle_status = 0
     # island = 2
     # replay_island = 0
