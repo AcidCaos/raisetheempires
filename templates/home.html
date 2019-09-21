@@ -97,7 +97,7 @@
     socket.on('world_log', function (msg) {
         console.log(msg);
         $('#world_log').prepend('<div><span class="req'+msg[4] + ' ' + (parseInt(msg[4].substring(1)) % 2 == 0 ? 'req_even' : 'req_odd' ) + '">' + msg[3] + ': </span><span class="tooltiplink">' + msg[0] + '<span class="tooltip">' + JSON.stringify(msg[2], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") +
-			'</span></span>' + (msg[1] || msg[1] == 0 ? ' &rarr; ' + msg[1] + (msg[5] ? ', <span class="tooltiplink response">' + JSON.stringify(msg[5]) + '<span class="tooltip">'+ JSON.stringify(msg[7], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>' : '') + (msg[6] ? ', ' + JSON.stringify(msg[6]) :'')  : '') + '</div>');
+			'</span></span>' + (msg[1] || msg[1] == 0 ? ' &rarr; <span class="tooltiplink response">' + msg[1] + '<span class="tooltip">' + JSON.stringify(msg[8], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>' + (msg[5] ? ', <span class="tooltiplink response">' + JSON.stringify(msg[5]) + '<span class="tooltip">'+ JSON.stringify(msg[7], null, 4).replace(/\n/g, "<br>").replace(/[ ]/g, "&nbsp;") + '</span></span>' : '') + (msg[6] ? ', ' + JSON.stringify(msg[6]) :'')  : '') + '</div>');
         $('#world_log').scrollTop(0)
     });
      socket.on('other_log', function (msg) {

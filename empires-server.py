@@ -284,10 +284,11 @@ def post_gateway():
                                         reqq.params[1].itemName,
                                         reqq.params[2][0].get('referenceItem') if len(reqq.params[2]) > 0 else None,
                                         reqq.params[2][0].get('isGift') if len(reqq.params[2]) > 0 else None,
-                                        reqq.params[2][0].get('elapsed') if len(reqq.params[2]) > 0 else None)
+                                        reqq.params[2][0].get('elapsed') if len(reqq.params[2]) > 0 else None,
+                                        reqq.params[2][0] if len(reqq.params[2]) > 0 else None)
             resps.append(wr)
             report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position,
-                             wr["data"]["id"], reqq.params, reqq.sequence, resp_msg.bodies[0][0],
+                             wr["data"], reqq.params, reqq.sequence, resp_msg.bodies[0][0],
                              wr["metadata"].get('QuestComponent'), wr["metadata"].get('newPVE'))
         elif reqq.functionName == 'DataServicesService.getSuggestedNeighbors':
             resps.append(neighbor_suggestion_response())
@@ -892,7 +893,7 @@ def init_user():
                       }
 
         },
-        "neighbors": [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neigbor")],
+        "neighbors": [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neighbor")],
         "unlockedResource": {"aluminum": 3, "copper": 4, "gold": 5, "iron": 6},
         "showBookmark": True,
         "firstDay": True,
@@ -1019,6 +1020,8 @@ def user_response():
     session["fleets"] = {}
     session['population'] = lookup_yield()
 
+    if "market" not in session:
+        session["market"] = {}
     # #temp migration
     # session['user_object']["experiments"]["empire_store_sorting_rev_enhanced"] = 0
     # session['user_object']["experiments"]["empires_shop_improvements"] = 0
@@ -1205,7 +1208,7 @@ def tutorial_response(step, sequence, endpoint):
     return tutorial_response
 
 
-def perform_world_response(step, supplied_id, position, item_name, reference_item, from_inventory, elapsed):
+def perform_world_response(step, supplied_id, position, item_name, reference_item, from_inventory, elapsed, req2):
     id = supplied_id
     if step == "place":
         session['user_object']["userInfo"]["world"]["globalObjectId"] += 1  # for place only!
@@ -1270,10 +1273,57 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
         click_next_state(False, id, meta, step, reference_item, True)
     # TODO: cost of speedup?
 
+    if step == "add":
+        market = lookup_object(id)
+        refund_market_order(market)
+        place_market_order(market, req2, meta)
+
     perform_world_response = {"errorType": 0, "userId": 1, "metadata": meta,
                               "data": {"id": id}}
+    if step == "list":
+        market = lookup_object(id)
+        # perform_world_response["data"].update(session['market'].get(str(id), {}))
+        perform_world_response["data"] = [market]
+        # perform_world_response["data"][0]["id"] = id
+
+    if step == "remove":
+        market = lookup_object(id)
+        perform_world_response["data"] = ["success"]  #  TODO fail if bought
+        refund_market_order(market)
+
     print("perform_world_response", repr(perform_world_response))
     return perform_world_response
+
+
+def refund_market_order(market):
+    world = session['user_object']["userInfo"]["world"]
+    resources = world['resources']
+    if market.get("type") == "resource":
+        standard_resources = ["coins", "oil" , "wood", "aluminum", "copper", "gold", "iron", "uranium"]
+        resources[standard_resources[int(market["item"])]] += market["units"]
+        print("Market: Refunded", standard_resources[int(market["item"])] + ":", str(market["units"]) +
+              "(" + str(resources[standard_resources[int(market["item"])]]) + ")")
+    else:
+        print("TODO: Can't refund market type", market.get("type"), "yet")
+    market["type"] = None
+    market["item"] = None
+    market["units"] = None
+
+
+def place_market_order(market, order, meta):
+    world = session['user_object']["userInfo"]["world"]
+    resources = world['resources']
+    if order["type"] == "resource":
+        standard_resources = ["coins", "oil", "wood", "aluminum", "copper", "gold", "iron", "uranium"]
+        resources[standard_resources[int(order["item"])]] -= order["units"]
+        print("Market: Order placed & removed", standard_resources[int(order["item"])] + ":", str(order["units"])
+              + "(" + str(resources[standard_resources[int(order["item"])]]) + ")")
+        handle_quest_progress(meta, progress_market_added_count(order["units"]))
+    else:
+        print("TODO: Can't reserve market type", order.get("type"), "yet")
+    market["type"] = order["type"]
+    market["item"] = order["item"]
+    market["units"] = order["units"]
 
 
 def neighbor_suggestion_response():
@@ -1533,7 +1583,8 @@ def report_world_log(operation, response, req, sequence, endpoint, response2, ne
     quest_names = [r['name'] for r in response2] if response2 else []
     quests = [r for r in quest_settings['quests']['quest'] if r['_name'] in quest_names]
     req2 = json.loads(json.dumps(req, default=lambda o: '<not serializable>'))
-    socketio.emit('world_log', [operation, response, req2, sequence, endpoint, response2, new_pve, quests])
+    res = response[0] if isinstance(response, list) else response
+    socketio.emit('world_log', [operation, res.get("id", "response") if not isinstance(res, str) else res, req2, sequence, endpoint, response2, new_pve, quests, response])
 
 
 def report_other_log(service, response, req, endpoint):

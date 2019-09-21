@@ -181,6 +181,13 @@ def progress_resource_added_count(rewards, prefix):
         and progress_yield_amount(rewards[prefix + task["_type"]].split('|')[0], task["_total"], extra, progress)
 
 
+def progress_market_added_count(amount):
+    return lambda task, progress, i, extra, *args: \
+        task["_action"] == "marketAdd" and \
+        progress_parameter_implies("_item", "rare") and \
+        progress_total_amount(amount,task["_total"], extra, progress)
+
+
 def progress_total_amount(amount, maximum_total, extra, progress):
     extra["total"] = min(int(amount), int(maximum_total))
     return amount != progress
