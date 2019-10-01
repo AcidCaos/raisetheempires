@@ -26,10 +26,10 @@ import json
 import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_compress import Compress
-from flask_socketio import SocketIO
 from quest_engine import *
 from quest_settings import quest_settings
 from state_machine import *
+from logger import socketio, report_tutorial_step, report_world_log, report_other_log
 import copy
 
 # import logging.config
@@ -46,7 +46,6 @@ rand_seed_w = 5445  # very random
 rand_seed_z = 844
 
 compress = Compress()
-socketio = SocketIO()
 sess = Session()
 db = SQLAlchemy()
 
@@ -915,7 +914,7 @@ def init_user():
         "DEATHMATCH_DURATION": None,
         "clansInfo": None,
         "immunityTimeVariant": 0,
-        "experiments": {},
+        "experiments": {"empire_combataicancritical": 2},
         "completedQuests": [],
         "decorationsInfo": None,
         "treasureVaultHighlights": None,
@@ -1025,6 +1024,7 @@ def user_response():
     # #temp migration
     # session['user_object']["experiments"]["empire_store_sorting_rev_enhanced"] = 0
     # session['user_object']["experiments"]["empires_shop_improvements"] = 0
+    session['user_object']["experiments"]["empire_combataicancritical"] = 2
     # battle_status = 0
     # island = 2
     # replay_island = 0
@@ -1567,29 +1567,6 @@ def delete_save(message):
     # print('deleted save: ' + message)
     print("Save will be deleted after redirect " + message)
 
-
-def report_tutorial_step(step, response, new_pve, sequence, endpoint):
-    quest_names = [r['name'] for r in response] if response else []
-    quests = [r for r in quest_settings['quests']['quest'] if r['_name'] in quest_names]
-    socketio.emit('tutorial_step', [step, response, new_pve, describe_step(step), quests, sequence, endpoint])
-
-
-def describe_step(step):
-    [descr] = [e for e in game_settings['settings']['tutorial']['step'] if e['-id'] == step]
-    return descr
-
-
-def report_world_log(operation, response, req, sequence, endpoint, response2, new_pve):
-    quest_names = [r['name'] for r in response2] if response2 else []
-    quests = [r for r in quest_settings['quests']['quest'] if r['_name'] in quest_names]
-    req2 = json.loads(json.dumps(req, default=lambda o: '<not serializable>'))
-    res = response[0] if isinstance(response, list) else response
-    socketio.emit('world_log', [operation, res.get("id", "response") if not isinstance(res, str) else res, req2, sequence, endpoint, response2, new_pve, quests, response])
-
-
-def report_other_log(service, response, req, endpoint):
-    req2 = json.loads(json.dumps(req, default=lambda o: '<not serializable>'))
-    socketio.emit('other_log', [service, response, req2, req.sequence, endpoint])
 
 
 if __name__ == '__main__':

@@ -108,6 +108,12 @@
         $('#other_log').scrollTop(0)
     });
 
+  	socket.on('battle_log', function (msg) {
+        console.log(msg);
+        $('#world_log').prepend('<div>' + msg + '</div>');
+        $('#world_log').scrollTop(0)
+    });
+
 </script>
 <style>
 		.logbox {

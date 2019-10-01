@@ -16,7 +16,6 @@ def migrate(meta, version, target_version):
         session['save_version'] = version
 
 
-
 def zero_yield(extra):
     extra["yield"] = 0
     return True

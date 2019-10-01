@@ -3,6 +3,7 @@ import math
 from flask import session
 
 from game_settings import lookup_item_by_code, game_settings, get_zid
+from logger import report_battle_log
 from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_seed_z, roll_random_between, \
     handle_quest_progress, progress_action, roll_random_float, all_lambda, progress_parameter_equals, do_rewards, \
     roll_reward_random_float, progress_battle_damage_count
@@ -136,7 +137,7 @@ def battle_complete_response(params):
         print("Player defeated")
         session["battle"] = None
 
-
+    report_battle_log(friendly_strengths, baddie_strengths, player_turn, player_unit_id, enemy_unit_id)
     battle_complete_response = {"errorType": 0, "userId": 1, "metadata": meta, "data": result}
     return battle_complete_response
 
