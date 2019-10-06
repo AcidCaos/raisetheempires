@@ -18,7 +18,8 @@ from flask_session import Session
 from pyamf import remoting
 import pyamf
 
-from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response
+from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
+    get_active_island_by_map, set_active_island_by_map
 from game_settings import game_settings, get_zid, allies, initial_island
 import threading, webbrowser
 import pyamf.amf0
@@ -35,6 +36,7 @@ import copy
 # import logging.config
 
 version = "0.03a"
+release_date = 'Saturday, 05 Oct 2019'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -60,13 +62,14 @@ app.config['SESSION_SQLALCHEMY'] = db
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", version=version, release_date=release_date)
 
 
 @app.route("/home.html")
 def home():
     print("home")
     return render_template("home.html", time=datetime.now().timestamp(), zid=str(get_zid()),
+                           version=version,
                            allies=json.dumps([ally["friend"] for ally in allies.values()
                                               if "friend" in ally and ally["friend"] and ally["neighbor"]],
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
@@ -78,6 +81,7 @@ def home():
 def no_debug():
     print("index")
     return render_template("nodebug.html", time=datetime.now().timestamp(), zid=str(get_zid()),
+                           version=version,
                            allies=json.dumps([ally["friend"] for ally in allies.values()
                                               if "friend" in ally and ally["friend"] and ally["neighbor"]],
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
@@ -96,9 +100,29 @@ def wipe_session():
 @app.route("/gazillionaire", methods=['GET', 'POST'])
 def more_money():
     if 'user_object' in session:
+        create_backup("gazillionaire cheat")
         player = session['user_object']["userInfo"]["player"]
         player['cash'] += 10000
-        session['saved'] = True
+        session['saved'] = str(session.get('saved', "")) +  "gazillionaire"
+        response = make_response(redirect('/home.html'))
+        return response
+    else:
+        return ('Nope', 403)
+
+
+@app.route("/deprogress", methods=['GET', 'POST'])
+def deprogress_battle_map():
+    if 'user_object' in session:
+        create_backup("deprogress battle map")
+        session['saved'] = str(session.get('saved', "")) + "deprogress"
+        # player = session['user_object']["userInfo"]["player"]
+        campaign = session['user_object']['userInfo']['world']['campaign']
+        # if map_name not in campaign['active'].keys():
+        #     campaign['active'][map_name] = {"status": 0, "fleets": []}
+        list = sorted(campaign['active'].keys())
+
+        map, island = get_active_island_by_map(list[-1])
+        set_active_island_by_map(map, island - 1)
         response = make_response(redirect('/home.html'))
         return response
     else:
@@ -146,25 +170,29 @@ def save_savegame():
         message = "before " + request.form.get("message")
 
     print(repr(save_game))
-    session["backup"] = {k: v for k, v in session.items() if
-                         k in ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on',
-                               'save_version', 'original_save_version', 'backup']}  # nested backups
 
+    create_backup(message)
+    session['saved'] = str(session.get('saved', "")) + "edit"
     session['user_object'] = save_game['user_object']
     session['quests'] = save_game['quests']
     session['battle'] = save_game['battle']
     session['fleets'] = save_game['fleets']
     session['population'] = save_game['population']
     session['save_version'] = save_game['save_version']
-    session['saved'] = True
-    timestamp = datetime.now().timestamp()
-    session['saved_on'] = timestamp
-    session["backup"]['replaced_on'] = timestamp
-    session["backup"]['message'] = message
 
     response = make_response(redirect('/home.html'))
     return response
     # return ('', 400)
+
+
+def create_backup(message):
+    timestamp = datetime.now().timestamp()
+    session["backup"] = {k: v for k, v in session.items() if
+                         k in ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on',
+                               'save_version', 'original_save_version', 'backup']}  # nested backups
+    session['saved_on'] = timestamp
+    session["backup"]['replaced_on'] = timestamp
+    session["backup"]['message'] = message
 
 
 def format_backup_message(backup):

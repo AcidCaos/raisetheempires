@@ -1,3 +1,14 @@
+alpha v0.03a
+    fix AI can crit after level 10, battle logging, logging module Nat 01/10/2019 18:55
+    market part 1, market quest progression, fixed neighbor bar on new game Nat 21/09/2019 17:20
+    ordering some limited edition items to prevent a stuck hut quest Nat 19/09/2019 23:42
+    speedup fix Nat 18/09/2019 00:29
+    resourceadded quest progress and statemachine fix no checkstate during checkstate Nat 18/09/2019 00:28
+    setting quest & game settings end dates Nat 17/09/2019 00:10
+    quest progression and save migration Nat 16/09/2019 23:22
+    uid to Javascript's 54 bit precision (stability) Nat 16/09/2019 20:57
+    run only one instance of the server when not in debug mode, made debug mode a command line argument Nat 15/09/2019 20:22
+    decorations statemachine fix Nat 15/09/2019 01:50
 alpha v0.02a
     backup & restore, versiontag Nat 14/09/2019 14:20
     changelog, nodebug Nat 14/09/2019 01:47
