@@ -2,6 +2,7 @@ import getopt
 import sys
 from tendo import singleton
 
+from save_engine import create_backup
 from save_migration import migrate
 
 opts, args = getopt.getopt(sys.argv[1:],"",["debug"])
@@ -28,7 +29,6 @@ import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_compress import Compress
 from quest_engine import *
-from quest_settings import quest_settings
 from state_machine import *
 from logger import socketio, report_tutorial_step, report_world_log, report_other_log
 import copy
@@ -113,8 +113,6 @@ def more_money():
 @app.route("/deprogress", methods=['GET', 'POST'])
 def deprogress_battle_map():
     if 'user_object' in session:
-        create_backup("deprogress battle map")
-        session['saved'] = str(session.get('saved', "")) + "deprogress"
         # player = session['user_object']["userInfo"]["player"]
         campaign = session['user_object']['userInfo']['world']['campaign']
         # if map_name not in campaign['active'].keys():
@@ -122,7 +120,14 @@ def deprogress_battle_map():
         list = sorted(campaign['active'].keys())
 
         map, island = get_active_island_by_map(list[-1])
-        set_active_island_by_map(map, island - 1)
+
+        create_backup("before deprogress battle map " + str(island+1) + "=>" + str(island))
+        session['saved'] = str(session.get('saved', "")) + "deprogress"
+        if island <= 0:
+            del campaign['active'][map]
+            deprogress_battle_map()
+        else:
+            set_active_island_by_map(map, island - 1)
         response = make_response(redirect('/home.html'))
         return response
     else:
@@ -183,16 +188,6 @@ def save_savegame():
     response = make_response(redirect('/home.html'))
     return response
     # return ('', 400)
-
-
-def create_backup(message):
-    timestamp = datetime.now().timestamp()
-    session["backup"] = {k: v for k, v in session.items() if
-                         k in ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on',
-                               'save_version', 'original_save_version', 'backup']}  # nested backups
-    session['saved_on'] = timestamp
-    session["backup"]['replaced_on'] = timestamp
-    session["backup"]['message'] = message
 
 
 def format_backup_message(backup):

@@ -1,6 +1,7 @@
 from quest_settings import quest_settings
 from game_settings import game_settings, lookup_item_by_code, lookup_state_machine, replenish_energy, lookup_yield, \
     allies
+from save_engine import lookup_objects_by_item_name, create_backup
 from flask import session
 from functools import reduce
 import math
@@ -73,10 +74,6 @@ def prepopulate_task(task):
         return 1, True
     else:
         return 0, False
-
-
-def lookup_objects_by_item_name(id):
-    return [e for e in session['user_object']["userInfo"]["world"]["objects"] if e['itemName'] == id]
 
 
 # "autoComplete","battleDamage","battleKill","build","buyExpansion","challengeCreate","clear","countPlaced","expandIsland","fight","finishBuilding","fullscreen","genericString","harvest","inventoryAdded","islandWin","marketAdd","marketBuy","move","neighborsAdded","openDialog","ownObjects","ownResource","place","population","pillage","pvpCombat","resourceAdded","seenFlag","select","socialXPAdded","startImmunity","state","tending","tendingRewardDropped","unlockTutorial","useConsumable","visit","zoom"
@@ -394,6 +391,7 @@ def do_rewards(label, raw_rewards, meta):
         if "reward" in level and level["reward"]["-type"] == "cash":
             player['cash'] += int(level["reward"]["-count"])
             level_cash += int(level["reward"]["-count"])
+        create_backup("Level " + level["-num"])
 
     if inc:
         print(label, "rewards:", ", ".join(

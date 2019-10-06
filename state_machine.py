@@ -4,6 +4,7 @@ from datetime import datetime
 from flask import session
 from game_settings import game_settings, lookup_item_by_name, lookup_state_machine, lookup_reference_item, \
     lookup_item_by_code
+from save_engine import lookup_object, create_backup
 
 
 # TODO add new reference item from clicknext step, use old one for first autostep, new one for 2nd autonext,
@@ -86,16 +87,6 @@ def lookup_state(state_machine, i, cur_object, check_state):
         state = cur_object['check_state'][str(i)]
         print("Overridden state used", str(i))
     return state
-
-
-def lookup_object(id):
-    [game_object] = [e for e in  session['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
-    return game_object
-
-
-def lookup_object(id):
-    [game_object] = [e for e in  session['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
-    return game_object
 
 
 #use state from current statemachine as replacement state for that state (with values and 2 random numbers
@@ -187,6 +178,7 @@ def do_state_rewards(state, reference_item, meta):
         if "reward" in level and level["reward"]["-type"] == "cash":
             player['cash'] += int(level["reward"]["-count"])
             level_cash += int(level["reward"]["-count"])
+        create_backup("Level " + level["-num"])
 
     log_rewards = ", ".join(
         [label + " " + ("+" if int(increment) > 0 else "") + str(increment) + " (" + str(total) + ")" for
