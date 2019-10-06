@@ -437,9 +437,11 @@ def post_gateway():
         elif reqq.functionName == 'UserService.buyFullHeal':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.buyItem':
-            resps.append(dummy_response())
+            resps.append(buy_item_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyItems':
             resps.append(dummy_response())
+        elif reqq.functionName == 'UserService.useItem':
+            resps.append(use_item_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyMOTDItem':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.buyQuestRestartTask':
@@ -547,7 +549,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.purchaseContractUnlock':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.purchaseEnergyRefill':
-            resps.append(dummy_response())
+            resps.append(purchase_energy_refill_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.purchaseManaRefill':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.purchaseUnlock':
@@ -597,7 +599,7 @@ def post_gateway():
         elif reqq.functionName == 'RequestService.allianceJoinRequest':
             resps.append(dummy_response())
         elif reqq.functionName == 'RequestService.crewRequest':
-            resps.append(dummy_response())
+            resps.append(crew_request_response(reqq.params[0]))
         elif reqq.functionName == 'RequestService.invasionHelpRequest':
             resps.append(dummy_response())
         elif reqq.functionName == 'RequestService.neighborRequest':
@@ -1553,11 +1555,83 @@ def add_fleet_response(param):
     print("Player fleet:", param['units'])
     return add_fleet_response
 
+def buy_item_response(param):
+    print(repr(param))
+
+    item = lookup_item_by_code(param["code"])
+    print('this is item :',item)
+    print('this is itemcode :', repr(param["code"])[1:-1])
+    player = session['user_object']["userInfo"]["player"]
+    print(player['energyMax'])
+    world = session['user_object']["userInfo"]["world"]
+    resources = world['resources']
+
+    # standard_resources = ["coins", "oil", "wood", "aluminum", "copper", "gold", "iron", "uranium"]
+
+    # resources[standard_resources[int(market["item"])]] += market["units"]
+
+    if item["-resourceType"] != "energy":
+        resources[item["-resourceType"]] += param["amount"]
+
+        print("Buy: received", item["-resourceType"] + ":", str(param["amount"]) +
+                  "(" + str(resources[item["-resourceType"]]) + ")")
+    else:
+    # param["useCash"]
+        if repr(param["code"])[1:-1] in item_inventory:
+            item_inventory["{}".format(repr(param["code"])[1:-1])] += 1
+        else:
+            item_inventory["{}".format(repr(param["code"])[1:-1])] = 1
+
+    player['cash'] -= int(float(item["cost"]["-cash"]) * param["amount"])
+
+    buy_item_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                      "data": []}
+    return buy_item_response
+
+
+def use_item_response(param):
+    print(repr(param))
+
+    item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
+    if item_inventory.get(repr(param), 0) > 0:
+        item_inventory[repr(param)] -= 1
+    # TODO from inventory player['energy']
+    use_item_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                      "data": []}
+
+    return use_item_response
+
+
+
+# TODO
+def purchase_energy_refill_response(param):
+    print(repr(param))
+
+    item = lookup_item_by_code(param["code"])
+    player = session['user_object']["userInfo"]["player"]
+    world = session['user_object']["userInfo"]["world"]
+    resources = world['resources']
+
+    player['energy'] += int(player['energyMax']-player['energy'])  # TODO put item in inventory (storable?)
+
+    player['cash'] -= int(player['energyMax']-player['energy'])
+
+    purchase_energy_refill_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                      "data": []}
+    return purchase_energy_refill_response
+
+
 
 def dummy_response():
     dummy_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
     return dummy_response
+
+def crew_request_response(param):
+    print(repr(param))
+    crew_request_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                      "data": []}
+    return crew_request_response
 
 
 # @app.after_request
