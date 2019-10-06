@@ -234,7 +234,7 @@ def quest_settings_file():
 
 @app.route("/releases.html")
 def releases():
-    return render_template("releases.html")
+    return render_template("releases.html", version=version)
 
 @app.route("/changelog.txt")
 def change_log():
