@@ -439,7 +439,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.buyItem':
             resps.append(buy_item_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyItems':
-            resps.append(dummy_response())
+            resps.append(buy_items_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.useItem':
             resps.append(use_item_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyMOTDItem':
@@ -447,7 +447,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.buyQuestRestartTask':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.buyQuestTask':
-            resps.append(dummy_response())
+            resps.append(buy_quest_task_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyRewardItem':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.calculateRansom':
@@ -599,7 +599,7 @@ def post_gateway():
         elif reqq.functionName == 'RequestService.allianceJoinRequest':
             resps.append(dummy_response())
         elif reqq.functionName == 'RequestService.crewRequest':
-            resps.append(crew_request_response(reqq.params[0]))
+            resps.append(dummy_response())
         elif reqq.functionName == 'RequestService.invasionHelpRequest':
             resps.append(dummy_response())
         elif reqq.functionName == 'RequestService.neighborRequest':
@@ -1559,10 +1559,7 @@ def buy_item_response(param):
     print(repr(param))
 
     item = lookup_item_by_code(param["code"])
-    print('this is item :',item)
-    print('this is itemcode :', repr(param["code"])[1:-1])
     player = session['user_object']["userInfo"]["player"]
-    print(player['energyMax'])
     world = session['user_object']["userInfo"]["world"]
     resources = world['resources']
 
@@ -1577,6 +1574,7 @@ def buy_item_response(param):
                   "(" + str(resources[item["-resourceType"]]) + ")")
     else:
     # param["useCash"]
+        item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
         if repr(param["code"])[1:-1] in item_inventory:
             item_inventory["{}".format(repr(param["code"])[1:-1])] += 1
         else:
@@ -1587,6 +1585,13 @@ def buy_item_response(param):
     buy_item_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
     return buy_item_response
+
+def  buy_items_response(param):
+    print(repr(param))
+
+    buy_items_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                      "data": []}
+    return buy_items_response
 
 
 def use_item_response(param):
@@ -1607,7 +1612,6 @@ def use_item_response(param):
 def purchase_energy_refill_response(param):
     print(repr(param))
 
-    item = lookup_item_by_code(param["code"])
     player = session['user_object']["userInfo"]["player"]
     world = session['user_object']["userInfo"]["world"]
     resources = world['resources']
@@ -1620,18 +1624,25 @@ def purchase_energy_refill_response(param):
                       "data": []}
     return purchase_energy_refill_response
 
+def buy_quest_task_response(param):
+    print(repr(param))
 
+   # reqq.params[2][0].get('referenceItem')
+
+    player = session['user_object']["userInfo"]["player"]
+    world = session['user_object']["userInfo"]["world"]
+
+
+
+    buy_quest_task_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                      "data": []}
+    return buy_quest_task_response
 
 def dummy_response():
     dummy_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
     return dummy_response
 
-def crew_request_response(param):
-    print(repr(param))
-    crew_request_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                      "data": []}
-    return crew_request_response
 
 
 # @app.after_request
