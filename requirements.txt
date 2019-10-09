@@ -1,0 +1,8 @@
+pyinstaller
+tendo
+py3amf
+flask
+flask_sqlalchemy
+flask_compress
+flask_socketio
+libscrc
