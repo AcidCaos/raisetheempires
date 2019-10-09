@@ -235,35 +235,13 @@ def releases():
 def change_log():
     return render_template("changelog.txt")
 
-@app.route("/layouts/yc_r.css")
-def fb_ccs_1():
-    return send_from_directory("templates/layouts", "yc_r.css")
-
-
-@app.route("/layouts/yz_r.css")
-def fb_ccs_2():
-    return send_from_directory("templates/layouts", "yz_r.css")
-
-
-@app.route("/layouts/yC2_r.css")
-def fb_ccs_3():
-    return send_from_directory("templates/layouts", "yC2_r.css")
-
-
-@app.route("/layouts/icon.png")
-def icon_image():
-    return send_from_directory("templates/layouts", "icon.png")
-
-
-@app.route("/layouts/logo.png")
-def logo_image():
-    return send_from_directory("templates/layouts", "logo.png")
-
+@app.route("/layouts/<path:path>")
+def template_layouts(path):
+    return send_from_directory("templates/layouts", path)
 
 @app.route('/nullassets/<path:path>')
 def send_sol_assets(path):
     return send_from_directory('assets/sol_assets_octdict/assets', path)
-
 
 @app.route('/assets/<path:path>')
 def send_sol_assets_alternate(path):
