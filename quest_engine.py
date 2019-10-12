@@ -419,11 +419,10 @@ def do_rewards(label, raw_rewards, meta):
     if items:
         item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
         for k,v in items.items():
-            item_inventory[k] = int(v)
+            item_inventory[k] = item_inventory.get(k, 0) + v
         print(label, "item rewards:", ", ".join([ k + ": " + str(v) for k,v in items.items()]))
     handle_quest_progress(meta, progress_resource_added_count(inc, ""))
 
-        # TODO store them & consumption ///s6 is code of flag
 
 def roll_random():
     world = session['user_object']["userInfo"]["world"]

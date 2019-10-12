@@ -1216,6 +1216,8 @@ def tutorial_response(step, sequence, endpoint):
 
 
 def perform_world_response(step, supplied_id, position, item_name, reference_item, from_inventory, elapsed, req2):
+    print("this is step",step, supplied_id, position)
+
     id = supplied_id
     if step == "place":
         session['user_object']["userInfo"]["world"]["globalObjectId"] += 1  # for place only!
@@ -1297,6 +1299,16 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
         market = lookup_object(id)
         perform_world_response["data"] = ["success"]  #  TODO fail if bought
         refund_market_order(market)
+
+    if step == "sell":
+        for i in range(len(session['user_object']["userInfo"]["world"]["objects"])):
+            if session['user_object']["userInfo"]["world"]["objects"][i]['position'] == position:
+                del session['user_object']["userInfo"]["world"]["objects"][i]
+                break
+        #TODO cost for selling
+        # list1 = session['user_object']["userInfo"]["world"]["objects"]
+        # session['user_object']["userInfo"]["world"]["objects"] = list(filter(lambda i: i['position'] != position), list1)
+
 
     print("perform_world_response", repr(perform_world_response))
     return perform_world_response
@@ -1538,7 +1550,7 @@ def add_fleet_response(param):
     return add_fleet_response
 
 def buy_item_response(param):
-    print(repr(param))
+    print(param)
 
     item = lookup_item_by_code(param["code"])
     player = session['user_object']["userInfo"]["player"]
@@ -1558,32 +1570,26 @@ def buy_item_response(param):
     else:
     # param["useCash"]
         item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
-        if repr(param["code"])[1:-1] in item_inventory:
-            item_inventory["{}".format(repr(param["code"])[1:-1])] += 1
-        else:
-            item_inventory["{}".format(repr(param["code"])[1:-1])] = 1
+        item_inventory[param["code"]] = item_inventory.get(param["code"], 0) + 1
 
     player['cash'] -= int(float(item["cost"]["-cash"]) * param["amount"])
 
     buy_item_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
     return buy_item_response
+    #TODO buy powerup in combact
 
 def  buy_items_response(param):
     print(repr(param))
-
     buy_items_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
     return buy_items_response
 
 
 def use_item_response(param):
-    print(repr(param))
-
+    print(param)
     item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
-    if item_inventory.get(repr(param), 0) > 0:
-        item_inventory[repr(param)] -= 1
-    # TODO from inventory player['energy']
+    item_inventory[param] -= 1
     use_item_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
 
@@ -1608,14 +1614,14 @@ def purchase_energy_refill_response(param):
     return purchase_energy_refill_response
 
 def buy_quest_task_response(param):
-    print(repr(param))
+    print(param,type(param))
 
    # reqq.params[2][0].get('referenceItem')
 
-    player = session['user_object']["userInfo"]["player"]
-    world = session['user_object']["userInfo"]["world"]
+    # player = session['user_object']["userInfo"]["player"]
+    # world = session['user_object']["userInfo"]["world"]
 
-
+    #TODO
 
     buy_quest_task_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
