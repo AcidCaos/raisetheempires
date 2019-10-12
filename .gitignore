@@ -3,3 +3,4 @@
 /build
 *.spec
 *.rar
+/log.txt

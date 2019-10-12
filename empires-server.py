@@ -1,16 +1,21 @@
+import os
 import getopt
 import sys
+
+import texteditor
+
+os.environ["PBR_VERSION"] = '5.4.3'
+
 from tendo import singleton
-
-from save_engine import create_backup
-from save_migration import migrate
-
 opts, args = getopt.getopt(sys.argv[1:],"",["debug"])
 debug = ("--debug", '') in opts
 
 if not debug:
     me = singleton.SingleInstance()
 
+
+from save_engine import save_database_uri, log_path
+from save_migration import migrate
 from builtins import print
 from time import sleep
 
@@ -21,11 +26,10 @@ import pyamf
 
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
     get_active_island_by_map, set_active_island_by_map
-from game_settings import game_settings, get_zid, allies, initial_island
+from game_settings import get_zid, initial_island
 import threading, webbrowser
 import pyamf.amf0
 import json
-import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_compress import Compress
 from quest_engine import *
@@ -56,7 +60,7 @@ start = datetime.now()
 app = Flask(__name__)
 
 app.config['SESSION_TYPE'] = 'sqlalchemy'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///save.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = save_database_uri()
 app.config['SESSION_SQLALCHEMY'] = db
 
 
@@ -1544,8 +1548,9 @@ def buy_item_response(param):
     # standard_resources = ["coins", "oil", "wood", "aluminum", "copper", "gold", "iron", "uranium"]
 
     # resources[standard_resources[int(market["item"])]] += market["units"]
-
-    if item["-resourceType"] != "energy":
+    if item["-type"] == 'mercenary':
+        pass
+    elif item["-resourceType"] != "energy":
         resources[item["-resourceType"]] += param["amount"]
 
         print("Buy: received", item["-resourceType"] + ":", str(param["amount"]) +
@@ -1653,6 +1658,11 @@ def delete_save(message):
     # print('deleted save: ' + message)
     print("Save will be deleted after redirect " + message)
 
+
+@app.errorhandler(500)
+def page_not_found(error):
+    text = texteditor.open(filename=os.path.join(log_path(), "log.txt"))
+    return 'It went wrong'
 
 
 if __name__ == '__main__':

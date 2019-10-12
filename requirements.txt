@@ -6,3 +6,4 @@ flask_sqlalchemy
 flask_compress
 flask_socketio
 libscrc
+daiquiri

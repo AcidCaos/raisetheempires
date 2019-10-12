@@ -5,19 +5,20 @@ import os
 import libscrc
 from flask import session
 from datetime import datetime
+from save_engine import my_games_path
 
-with open("gamesettings-converted.json", 'r') as f:
+with open(os.path.join(my_games_path() ,"gamesettings-converted.json"), 'r') as f:
     game_settings = json.load(f)
     print("Gamesettings loaded: ",  len(game_settings['settings']), " setting sections loaded")
 
-with open("allies/initial-island.json", 'r') as f:
+with open(os.path.join(my_games_path() ,"allies/initial-island.json"), 'r') as f:
     initial_island = json.load(f)
     print("Initial island template", len(initial_island["objects"]), "objects loaded", len(initial_island["roads"]),
           "roads loaded")
     # game_objects = [o for o in game_objects_2 if int(o["position"].split(",")[0]) > 62 and int(o["position"].split(",")[1]) > 58]
 
 allies = {str(e["info"]["uid"] if e["info"] else e["friend"]["uid"]): e for e in
-          [json.load(open(os.path.join(root, file_name), 'r')) for root, _, file_names in os.walk("allies") for
+          [json.load(open(os.path.join(root, file_name), 'r')) for root, _, file_names in os.walk(os.path.join(my_games_path() ,"allies")) for
            file_name in
            file_names if 'island.json' in file_name and file_name != "initial-island.json"]}
 print("Ally islands", len(allies.keys()), "allies loaded",
