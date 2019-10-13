@@ -1,6 +1,6 @@
-/dist*
+/dist*/
 /.idea
-/build
-*.spec
+/build/
+/*.spec
 *.rar
 /log.txt

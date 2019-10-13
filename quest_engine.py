@@ -168,7 +168,7 @@ def progress_battle_damage_count(action, damage, ally_unit, baddy_unit):
 
 
 def progress_battle_damage(damage, maximum_total, extra,  progress):
-    extra["total"] = min(damage, int(maximum_total))
+    extra["yield"] = min(damage, int(maximum_total))
     return damage != progress
 
 

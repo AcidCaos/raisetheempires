@@ -1,4 +1,21 @@
 alpha v0.03a
+    battle damage quest fix, release build, readme Nat 13/10/2019 22:42
+    liberty bond battle reward thebatmanwa 13/10/2019 22:29
+    Revert "Flag_bug_solved" thebatmanwa 13/10/2019 15:59
+    expansions, battle fix Nat 13/10/2019 14:58
+    Flag_bug_solved thebatmanwa 12/10/2019 19:16
+    selling assets added thebatmanwa 12/10/2019 19:16
+    installer integration, logging, mercenary fix Nat 12/10/2019 11:57
+    transaction count fix: circle only spins when something is loading, source install requirements Nat 09/10/2019 23:03
+    Added loading screen. Fixed no-debug version zoom/scrolling AcidCaos 09/10/2019 17:01
+    Fixed templates/layouts redirection AcidCaos 09/10/2019 16:00
+    Removed unused CSS code from stylesheets AcidCaos 09/10/2019 00:08
+    Flag_bug_solved thebatmanwa 08/10/2019 20:15
+    enabled buying of resources&energy with empire points thebatmanwa 07/10/2019 00:42
+    autobackup on level, deprogress to previous battle island, save engine Nat 06/10/2019 23:21
+    showing dynamic game version AcidCaos 06/10/2019 22:39
+    fix home.html div-float problems with debug tables AcidCaos 06/10/2019 21:44
+    deprogress battle, autobackup, centralized version Nat 06/10/2019 15:56
     fix AI can crit after level 10, battle logging, logging module Nat 01/10/2019 18:55
     market part 1, market quest progression, fixed neighbor bar on new game Nat 21/09/2019 17:20
     ordering some limited edition items to prevent a stuck hut quest Nat 19/09/2019 23:42
