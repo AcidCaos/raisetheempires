@@ -124,6 +124,8 @@ def battle_complete_response(params):
             handle_quest_progress(meta, all_lambda(progress_action("islandWin"),
                                                    progress_parameter_equals("_island", str(current_island))))
             do_rewards("Campaign", map_item['island'][current_island].get("reward"), meta)
+            do_rewards("Liberty Bond",{"_type": "item","_item": "xk01","_count": "1"}, meta)
+
             next_island_id = map_item['island'][current_island].get('-unlocks')
             if next_island_id is not None:
                 print("Activating next island", map_name, next_island_id)
@@ -545,4 +547,3 @@ def doBattleRewards(hit_type, max_strength, damage, friendly_max_strength):
         player['energy'] += energy
         resources['energy'] += energy # needed?
         print("Combat rewards", hit_type ,  "energy:", energy, "(" + str(player['energy']) + ")")
-
