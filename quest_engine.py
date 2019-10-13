@@ -433,11 +433,15 @@ def roll_random():
 
 def roll_random_float():
     number = roll_random() / (2 ** 32 - 1)
-    return math.floor(number * 10 ** 3) / 10 ** 3
+    number_ = math.floor(number * 10 ** 3) / 10 ** 3
+    print("random float", number_)
+    return number_
 
 
 def roll_random_between(a, b):
-    return roll_random_float() * (b - a) + a
+    f = roll_random_float() * (b - a) + a
+    print("random between", a ,"and", b, "=", f)
+    return f
 
 
 def get_seed_w():

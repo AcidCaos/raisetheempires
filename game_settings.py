@@ -121,6 +121,24 @@ def replenish_energy():
         print("Energy replenished:", energy_replenished)
 
 
+def unlock_expansion(index):
+    expansions = session['user_object']["userInfo"]["player"]["expansions"]["data"]
+
+    i = index >> 5
+    #expansions = expansions + [0 for t in range(i + 1 - len(expansions))]
+    e = index - (i << 5)
+    expansions[i] = expansions[i] | 1 << e
+
+
+def relock_expansion(index):
+    expansions = session['user_object']["userInfo"]["player"]["expansions"]["data"]
+
+    i = index >> 5
+    #expansions = expansions + [0 for t in range(i + 1 - len(expansions))]
+    e = index - (i << 5)
+    expansions[i] = expansions[i] & ~(1 << e)
+
+
 def simple_list(raw_list):
     return (raw_list if isinstance(raw_list, list) else [raw_list]) if raw_list != '' else []
 

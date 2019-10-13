@@ -26,7 +26,7 @@ import pyamf
 
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
     get_active_island_by_map, set_active_island_by_map
-from game_settings import get_zid, initial_island
+from game_settings import get_zid, initial_island, unlock_expansion, relock_expansion
 import threading, webbrowser
 import pyamf.amf0
 import json
@@ -209,7 +209,8 @@ def record_stats():
 @app.route("/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf")
 def flashFile():
     # return send_from_directory("assets", "ZGame.109338.swf")
-    return send_from_directory("assets", "ZGame.109338_tracer2.swf")
+    return send_from_directory("assets", "ZGame.109338_tracer2.swf")  # regular one
+    #return send_from_directory("assets", "ZGame.109338_tracer2a.swf")  # with extra debug logging
 
 
 @app.route("/gameSettings.xml")
@@ -415,7 +416,7 @@ def post_gateway():
         elif reqq.functionName == 'PVPService.buyCrewRepelPosition':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.buyExpansion':
-            resps.append(dummy_response())
+            resps.append(buy_expansion_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyFullHeal':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.buyItem':
@@ -764,11 +765,13 @@ def init_user():
                 "newInstallExperiments": None,
                 "staticWorkers": 20,
                 "staticWorkersCap": 100,
+                # "expansions": {
+                #     "data": [4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
+                #              4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
+                #              4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
+                #              4294967295, 4294967295]},
                 "expansions": {
-                    "data": [4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
-                             4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
-                             4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
-                             4294967295, 4294967295]},
+                    "data": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},
                 "questTrees": {},
                 "questTreeUnlocks": {},
                 "questTreeData": {},
@@ -1032,6 +1035,12 @@ def user_response():
     # session['user_object']["experiments"]["empire_store_sorting_rev_enhanced"] = 0
     # session['user_object']["experiments"]["empires_shop_improvements"] = 0
     session['user_object']["experiments"]["empire_combataicancritical"] = 2
+    unlock_expansion(156)
+    unlock_expansion(157)
+    unlock_expansion(181)
+    unlock_expansion(182)
+    unlock_expansion(206)
+    unlock_expansion(207)
     # battle_status = 0
     # island = 2
     # replay_island = 0
@@ -1561,7 +1570,9 @@ def buy_item_response(param):
 
     # resources[standard_resources[int(market["item"])]] += market["units"]
     if item["-type"] == 'mercenary':
-        pass
+        print("Buying mercenary")
+    elif item.get("-subtype") == "expansion":
+        print("Buying expansion")
     elif item["-resourceType"] != "energy":
         resources[item["-resourceType"]] += param["amount"]
 
@@ -1627,6 +1638,17 @@ def buy_quest_task_response(param):
                       "data": []}
     return buy_quest_task_response
 
+
+def buy_expansion_response(param):
+    print(repr(param))
+    unlock_expansion(param['index'])
+    meta = {"newPVE": 0}
+    handle_quest_progress(meta, progress_action("expansionsPurchased"))
+    buy_expansion_response = {"errorType": 0, "userId": 1, "metadata": meta,
+                      "data": []}
+    return buy_expansion_response
+
+
 def dummy_response():
     dummy_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
@@ -1666,7 +1688,7 @@ def delete_save(message):
 
 
 @app.errorhandler(500)
-def page_not_found(error):
+def server_error_page(error):
     text = texteditor.open(filename=os.path.join(log_path(), "log.txt"))
     return 'It went wrong'
 

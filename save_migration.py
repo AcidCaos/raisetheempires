@@ -1,5 +1,6 @@
 from flask import session
 
+from game_settings import unlock_expansion
 from quest_engine import handle_quest_progress
 
 
@@ -11,6 +12,14 @@ def migrate(meta, version, target_version):
                 print("Reset quest completion")
 
         handle_quest_progress(meta, lambda task, progress, i, extra, *args: zero_yield(extra))
+
+        session['user_object']["userInfo"]["player"]["expansions"]["data"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        unlock_expansion(156)
+        unlock_expansion(157)
+        unlock_expansion(181)
+        unlock_expansion(182)
+        unlock_expansion(206)
+        unlock_expansion(207)
 
         version = "0.03a"
         session['save_version'] = version
