@@ -12,8 +12,8 @@ make sure your path includes only 64-bit python, adapt the following line as nee
 PATH=C:\Python\Python37\Scripts\;C:\Python\Python37\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\Git\cmd
 cd c:\empires
 pip install -r requirements.txt
-pyinstaller build-tools\empires-server.spec --distpath ..\dist_mini003_x64
-
+copy build-tools\empires-server.spec .
+pyinstaller empires-server.spec --distpath ..\dist_mini003_x64 --clean
 
 ## 32 bit build:
 open another cmd
@@ -21,10 +21,12 @@ make sure your path includes only 32-bit python, adapt the following line as nee
 PATH=C:\Python\Python37-32\Scripts\;C:\Python\Python37-32\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\Git\cmd
 cd c:\empires
 pip install -r requirements.txt
-pyinstaller build-tools\empires-server.spec --distpath ..\dist_mini003_x86
+copy build-tools\empires-server.spec .
+pyinstaller empires-server.spec --distpath ..\dist_mini003_x86 --clean
 
 ## Inno Setup installer
 open the build-tools/empires_inno_setup.iss file and play it
+test it!
 
 
 

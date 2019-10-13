@@ -2,10 +2,11 @@ import os
 import getopt
 import sys
 
-import texteditor
-
 os.environ["PBR_VERSION"] = '5.4.3'
+if not os.environ.get('EDITOR'):
+    os.environ["EDITOR"] = 'notepad'  # system specific!
 
+import editor
 from tendo import singleton
 opts, args = getopt.getopt(sys.argv[1:],"",["debug"])
 debug = ("--debug", '') in opts
@@ -40,7 +41,7 @@ import copy
 # import logging.config
 
 version = "0.03a"
-release_date = 'Saturday, 05 Oct 2019'
+release_date = 'Monday, 14 Oct 2019'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -1689,7 +1690,7 @@ def delete_save(message):
 
 @app.errorhandler(500)
 def server_error_page(error):
-    text = texteditor.open(filename=os.path.join(log_path(), "log.txt"))
+    text = editor.edit(filename=os.path.join(log_path(), "log.txt"))
     return 'It went wrong'
 
 

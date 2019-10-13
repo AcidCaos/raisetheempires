@@ -95,6 +95,10 @@ Filename: "{app}\RaiseTheEmpires.ini"; Section: "InstallSettings"; Flags: uninsd
 Filename: "{app}\RaiseTheEmpires.ini"; Section: "InstallSettings"; Check: Is64BitInstallMode; Key: "Arch"; String: "x64"
 Filename: "{app}\RaiseTheEmpires.ini"; Section: "InstallSettings"; Check: not Is64BitInstallMode; Key: "Arch"; String: "x86"
 
+[UninstallDelete]
+Type: files; Name: "{app}\RaiseTheEmpires.ini"
+Type: dirifempty; Name: "{app}"
+
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 

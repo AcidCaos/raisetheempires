@@ -1,4 +1,5 @@
 alpha v0.03a
+    0.03a release, dependencies fix Nat 14/10/2019 01:36
     battle damage quest fix, release build, readme Nat 13/10/2019 22:42
     liberty bond battle reward thebatmanwa 13/10/2019 22:29
     Revert "Flag_bug_solved" thebatmanwa 13/10/2019 15:59

@@ -5,10 +5,9 @@ import os
 import sys
 from datetime import datetime
 import daiquiri
+import editor
 from flask import session
 import logging
-import texteditor
-
 
 def lookup_object(id):
     [game_object] = [e for e in  session['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
@@ -56,7 +55,7 @@ def exception_handler(exc_type, exc_value, exc_traceback):
         return
 
     logger.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
-    text = texteditor.open(filename=os.path.join(log_path(), "log.txt"))
+    text = editor.edit(filename=os.path.join(log_path(), "log.txt"))
 
 # logger = logging.getLogger(__name__)
 # handler = logging.StreamHandler(stream=sys.stdout)
