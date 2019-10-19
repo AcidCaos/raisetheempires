@@ -17,6 +17,9 @@
   },
   "friend": null,
   "neighbor": true,
+  "expansions":{"data": null},
+  "worldName": "Steele's Empire",
+  "titanName": "Steele",
   "objects": [
     {
       "id": 1000,

@@ -771,8 +771,7 @@ def init_user():
                 #              4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
                 #              4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295, 4294967295,
                 #              4294967295, 4294967295]},
-                "expansions": {
-                    "data": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},
+                "expansions": {"data": [0,0,0,0,805306368,6291456,49152,0,0,0,0]},
                 "questTrees": {},
                 "questTreeUnlocks": {},
                 "questTreeData": {},
@@ -1524,6 +1523,13 @@ def load_world_response(params):
             ally["world"]["objects"] = allies[str(params[0])]["objects"]
         if allies[str(params[0])]["roads"]:
             ally["world"]["roadData"] = allies[str(params[0])]["roads"]
+        ##Added
+        if allies[str(params[0])]["expansions"]:
+            ally["player"]["expansions"] = allies[str(params[0])]["expansions"]
+        if allies[str(params[0])]["worldName"]:
+            ally["worldName"] = allies[str(params[0])]["worldName"]
+        if allies[str(params[0])]["titanName"]:
+            ally["titanName"] = allies[str(params[0])]["titanName"]
         # ally["gf"] = False
         # ally["yimf"] = ""
         # ally["novisit"] = False
@@ -1539,7 +1545,6 @@ def load_world_response(params):
     load_world_response = {"errorType": 0, "userId": 1, "metadata": meta,
                            "data": ally}
     return load_world_response
-
 
 def tend_ally_response():
     meta = {"newPVE": 0}

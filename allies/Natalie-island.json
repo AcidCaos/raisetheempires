@@ -26,6 +26,9 @@
     "pic_square": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png"
   },
   "neighbor": true,
+  "worldName": "Natalie's Empire",
+  "titanName": "Natalie",
+  "expansions":{"data":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},
   "recommendedFriends": true,
   "zyngaFriends": false,
   "empireFriends": true,
