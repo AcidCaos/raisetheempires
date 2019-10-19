@@ -6,11 +6,7 @@
 	<meta charset="utf-8"/>
     <link rel="stylesheet" href="layouts/yc_r.css"/>
 </head>
-
 <body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US">
-
-	<!-- TOP BANNER -->
-
 	<div class="-cx-PRIVATE-fbLayout__root">
 	  	<div id="pagelet_bluebar" data-referrer="pagelet_bluebar">
 	  		<div id="blueBarHolder">
@@ -25,114 +21,101 @@
 	  							</a>
 	  						</div>
 	  					</div>
-	  				<div class="signupBanner">
-	  					<div class="signup_bar_container">
-	  						<div class="signup_box clearfix">
-			  				</div>
-			  			</div>
+		  				<div class="signupBanner">
+		  					<div class="signup_bar_container">
+		  						<div class="signup_box clearfix">
+				  				</div>
+				  			</div>
+				  		</div>
 			  		</div>
-			  	</div>
-	  		</div>
+	  			</div>
+			</div>
 		</div>
-	</div>
-
-	<!-- PAGE BODY -->
-
-	<div id="globalContainer" class="uiContextualLayerParent">
-		<div id="content" class="fb_content clearfix">
-			<div>
-				<div id="mainContainer">
-					<div id="contentCol" class="clearfix hasRightCol">
-						<div id="rightCol" role="complementary">
-							<div class="fixedAux">
-								<div class="canvasRHCFooter" id="pagelet_canvas_footer_content" data-referrer="pagelet_canvas_footer_content" data-referrer="pagelet_canvas_footer_content">
-									<div class="mtl">
-										<div class="rhcFooterWrap" role="contentinfo">
-
-											<div class="rhcFooterCopyright fsm fwn fcg">
-												<span>Empires &amp; Allies</span>
-												 · 
-												<a href="#">App Privacy</a>
-												 · 
-												<a href="#">App Terms</a>
-												 · 
-												<a href="#">Report/Contact this App</a>
-											</div>
-
-											<div class="fsm fwn fcg">
-												<a rel="dialog" href="#" title="Use Facebook in another language." role="button">English (US)</a>
-												 · 
-												<a href="http://www.facebook.com/privacy/explanation" title="Learn about your privacy and Facebook.">Privacy</a>
-												 · 
-												<a href="http://www.facebook.com/policies?ref=pf" title="Review our terms and policies.">Terms</a>
-												 · 
-												<a href="http://www.facebook.com/help/cookies?ref_type=sitefooter" title="Cookies">Cookies</a>
-												 · 
-												<div class="-cx-PRIVATE-uiInlineBlock__root uiPopover" id="rhc_footer_selector">
-													<a class="rhcFooterSelectorButton -cx-PRIVATE-uiPopover__trigger" href="#" aria-haspopup="true" aria-expanded="false" rel="toggle" id="u_0_3" role="button">
-														More <i class="img sp_ctntui sx_321d1b"></i>
-													</a>
+		<div id="globalContainer" class="uiContextualLayerParent">
+			<div id="content" class="fb_content clearfix">
+				<div>
+					<div id="mainContainer">
+						<div id="contentCol" class="clearfix hasRightCol">
+							<div id="rightCol" role="complementary">
+								<div class="fixedAux">
+									<div class="canvasRHCFooter" id="pagelet_canvas_footer_content" data-referrer="pagelet_canvas_footer_content" data-referrer="pagelet_canvas_footer_content">
+										<div class="mtl">
+											<div class="rhcFooterWrap" role="contentinfo">
+												<div class="rhcFooterCopyright fsm fwn fcg">
+													<span>Empires &amp; Allies</span>
+													 · 
+													<a href="#">App Privacy</a>
+													 · 
+													<a href="#">App Terms</a>
+													 · 
+													<a href="#">Report/Contact this App</a>
+												</div>
+												<div class="fsm fwn fcg">
+													<a rel="dialog" href="#" title="Use Facebook in another language." role="button">English (US)</a>
+													 · 
+													<a href="http://www.facebook.com/privacy/explanation" title="Learn about your privacy and Facebook.">Privacy</a>
+													 · 
+													<a href="http://www.facebook.com/policies?ref=pf" title="Review our terms and policies.">Terms</a>
+													 · 
+													<a href="http://www.facebook.com/help/cookies?ref_type=sitefooter" title="Cookies">Cookies</a>
+													 · 
+													<div class="-cx-PRIVATE-uiInlineBlock__root uiPopover" id="rhc_footer_selector">
+														<a class="rhcFooterSelectorButton -cx-PRIVATE-uiPopover__trigger" href="#" aria-haspopup="true" aria-expanded="false" rel="toggle" id="u_0_3" role="button">
+															More <i class="img sp_ctntui sx_321d1b"></i>
+														</a>
+													</div>
 												</div>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-						</div>
-
-						<div id="contentArea" role="main" aria-describedby="pageTitle">
-							
-
-							<form action="/save-editor" method="post">
-							<div class="mvl ptm uiInterstitial canvas_error_page uiBoxWhite" title="" style="margin-left: 70px; margin-right: 50px">
-								<div class="uiHeader uiHeaderBottomBorder mhl mts uiHeaderPage interstitialHeader">
-									<div class="clearfix uiHeaderTop">
-										<div>
-											<h2 class="uiHeaderTitle" aria-hidden="true"> Raise The Empires Save Editor uid: {{uid}}</h2>
-										</div>
-									</div>
-								</div>
-
-
-									<div class="phl ptm uiInterstitialContent">
-								        <textarea rows="30" cols="135" name="savegame" >{{ savegame | default("ERROR: No savegame present!")}}</textarea><br>
-										<input type="text" size="135" name="message" placeholder="What did you change?"><br />
-								        <span style="color: crimson"><b>Warning:</b> This can corrupt your savegame!</span>
-										<span style="color: gray"><b>Psst:</b> Want to become a <a href="gazillionaire">gazillionaire</a> instead? Or want to <a href="deprogress">deprogress</a> your battle map?</span>
-									</div>
-									<div class="uiInterstitialBar uiBoxGray topborder">
-										<div class="clearfix">
-											<div class="rfloat">
-												<a class="inputaux uiButton" href="home.html" role="button" name="exit_button">
-													<span class="uiButtonText">Cancel</span>
-												</a>
-												<a class="uiButton uiButtonConfirm" href="home.html" role="button" name="try_again_button">
-													<span class="uiButtonText"></span>
-													<input type="submit" value="Save game">
-												</a>
-											</div>
-											<div class="pts">
+							<div id="contentArea" role="main" aria-describedby="pageTitle">
+								<form action="/save-editor" method="post">
+									<div class="mvl ptm uiInterstitial canvas_error_page uiBoxWhite" title="" style="margin-left: 70px; margin-right: 50px">
+										<div class="uiHeader uiHeaderBottomBorder mhl mts uiHeaderPage interstitialHeader">
+											<div class="clearfix uiHeaderTop">
+												<div>
+													<h2 class="uiHeaderTitle" aria-hidden="true"> Raise The Empires Save Editor uid: {{uid}}</h2>
+												</div>
 											</div>
 										</div>
+										<div class="phl ptm uiInterstitialContent">
+									        <div>
+									        	<div style="align:right">
+											        <textarea rows="30" cols="135" name="savegame" >{{ savegame | default("ERROR: No savegame present!")}}</textarea><br>
+													<input type="text" size="135" name="message" placeholder="What did you change?"><br />
+											        <span style="color: crimson"><b>Warning:</b> This can corrupt your savegame!</span>
+													<span style="color: gray"><b>Psst:</b> Want to become a <a href="gazillionaire">gazillionaire</a> instead? Or want to <a href="deprogress">deprogress</a> your battle map?</span>
+												</div>
+											</div>
+										</div>
+										<div class="uiInterstitialBar uiBoxGray topborder">
+											<div class="clearfix">
+												<div class="rfloat">
+													<a class="inputaux uiButton" href="home.html" role="button" name="exit_button">
+														<span class="uiButtonText">Cancel</span>
+													</a>
+													<a class="uiButton uiButtonConfirm" href="home.html" role="button" name="try_again_button">
+														<span class="uiButtonText"></span>
+														<input type="submit" value="Save game">
+													</a>
+												</div>
+												<div class="pts">
+												</div>
+											</div>
+										</div>
 									</div>
-
-							</div>
-
-							<div class="mvl ptm uiInterstitial canvas_error_page uiInterstitialLarge uiBoxWhite" id="backup-list" style=" padding: 9px">
-								<h2 class="uiHeaderTitle" aria-hidden="true"> Backups:</h2>
-								{% for backup in backups %}
-								{{ backup }} <a class="inputaux uiButton" href="#" role="button" name="exit_button">
-												<input type="submit" name="restore{{ backups.index(backup) }}" value="Restore this backup">
-
-											</a>
-											<br />
-								{% endfor %}
-							</div>
-							</form>
-
-							<div id="canvas_throbber">
-								<div class="mbl fsl fwb" id="canvas_throbber_text">Loading...</div>
-								<img class="mtl img" src="https://web.archive.org/web/20130619115711im_/https://fbstatic-a.akamaihd.net/rsrc.php/v2/y9/r/jKEcVPZFk-2.gif" alt="" width="32" height="32"/>
+									<div class="mvl ptm uiInterstitial canvas_error_page uiInterstitialLarge uiBoxWhite" id="backup-list" style=" padding: 9px">
+										<h2 class="uiHeaderTitle" aria-hidden="true"> Backups:</h2>
+										{% for backup in backups %}
+										{{ backup }} <a class="inputaux uiButton" href="#" role="button" name="exit_button">
+														<input type="submit" name="restore{{ backups.index(backup) }}" value="Restore this backup">
+													</a>
+													<br />
+										{% endfor %}
+									</div>
+								</form>
 							</div>
 						</div>
 					</div>
@@ -140,6 +123,5 @@
 			</div>
 		</div>
 	</div>
-</div>
-
-
+</body>
+</html>
