@@ -8,8 +8,12 @@
 		<img class="mtl img" src="layouts/loading.gif" alt="" width="32" height="32"/>
 	</center>
 </div>
-
-<script>
+<head>
+	<title id="pageTitle">Empires &amp; Allies on Facebook | Facebook</title>
+	<link rel="shortcut icon" href="layouts/icon.png"/>
+	<meta charset="utf-8"/>
+    <link rel="stylesheet" href="layouts/yc_r.css"/>
+	<script>
 		function getUserInfo() {
 		    console.log("getUserInfo called")
 		    return {'zid':1, 'uid':0, 'first_name': 'Natalie', 'name':'Natalie', "sex":'F'};
@@ -36,7 +40,7 @@
 			console.log("Perm " +perm +", "  +snuid+ ", " + name)
 			return
 		}
-	function showPermissions(d) {
+		function showPermissions(d) {
 			console.log("Show Perm " +d)
 			return
 		}
@@ -65,26 +69,18 @@
               				return;
                         }
 		}
-</script>
+	</script>
 
-<style>
-	body:focus-within {
-		overflow: hidden;
-		padding-right: 17px;
-	}
-</style>
+	<style>
+		body:focus-within {
+			overflow: hidden;
+			padding-right: 17px;
+		}
+	</style>
 
-<head>
-	<title id="pageTitle">Empires &amp; Allies on Facebook | Facebook</title>
-	<link rel="shortcut icon" href="layouts/icon.png"/>
-	<meta charset="utf-8"/>
-    <link rel="stylesheet" href="layouts/yc_r.css"/>
 </head>
 
 <body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US">
-
-	<!-- TOP BANNER -->
-
 	<div class="-cx-PRIVATE-fbLayout__root">
 	  	<div id="pagelet_bluebar" data-referrer="pagelet_bluebar">
 	  		<div id="blueBarHolder">
@@ -109,9 +105,6 @@
 	  		</div>
 		</div>
 	</div>
-
-	<!-- PAGE BODY -->
-
 	<div id="globalContainer" class="uiContextualLayerParent">
 		<div id="content" class="fb_content clearfix">
 			<div>
@@ -153,7 +146,6 @@
 								</div>
 							</div>
 						</div>
-
 						<div id="contentArea" role="main" aria-describedby="pageTitle">
 							<div class="uiInterstitial canvas_error_page " title="" style="margin-bottom: 20px">
 								
@@ -177,7 +169,6 @@
 									</div>
 								</div>
 							</div>
-
 							<center>
 								<div style="text-align: center; width:1010px;">
 								<div class="gameButtons" id="gameButtons" style=" margin-bottom:4px; margin-left: 5px; text-align: left;">
@@ -234,8 +225,6 @@
 										<td><div class="logbox" id="other_log">&nbsp;</div></td>
 									</tr>
 								</table>
-
-
 							</center>
 						</div>
 					</div>
@@ -244,4 +233,3 @@
 		</div>
 	</div>
 </div>
-
