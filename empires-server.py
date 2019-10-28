@@ -1,5 +1,5 @@
-import os
 import getopt
+import os
 import sys
 
 os.environ["PBR_VERSION"] = '5.4.3'
@@ -8,8 +8,30 @@ if not os.environ.get('EDITOR'):
 
 import editor
 from tendo import singleton
-opts, args = getopt.getopt(sys.argv[1:],"",["debug"])
-debug = ("--debug", '') in opts
+opts, args = getopt.getopt(sys.argv[1:],"",["debug", "host=", "port=", "http-host=", "http-path=", "no-popup"])
+
+debug = False
+host = '127.0.0.1'  # host to listen on 0.0.0.0 for all interfaces, 127.0.0.1 for only localhost
+http_host = '127.0.0.1' # host to open on the webbrowser, can't be 0.0.0.0
+http_path = '' # in order to open a specific page on startup
+port = 5005
+open_browser = True
+
+for o, a in opts:
+    if o == '--host':
+        host = a
+    elif o == '--port':
+        port = int(a)
+    elif o == '--http-host':
+        http_host = a
+    elif o == '--http-path':
+        http_path = a
+    elif o == '--debug':
+        debug = True
+    elif o == '--no-popup':
+        open_browser = False
+    else:
+        print("Warning: Unknown option " + o + ".")
 
 if not debug:
     me = singleton.SingleInstance()
@@ -27,7 +49,7 @@ import pyamf
 
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
     get_active_island_by_map, set_active_island_by_map
-from game_settings import get_zid, initial_island, unlock_expansion, relock_expansion
+from game_settings import get_zid, initial_island, unlock_expansion, random_image
 import threading, webbrowser
 import pyamf.amf0
 import json
@@ -79,19 +101,23 @@ def home():
                                               if "friend" in ally and ally["friend"] and ally["neighbor"]],
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
                            app_friends=json.dumps([ally["appFriendId"] for ally in allies.values()
-                                                   if "appFriendId" in ally and ally["appFriendId"] is not None]))
+                                                   if "appFriendId" in ally and ally["appFriendId"] is not None]),
+                           picture=random_image()
+                           )
 
 
 @app.route("/nodebug.html")
 def no_debug():
-    print("index")
+    print("no debug page")
     return render_template("nodebug.html", time=datetime.now().timestamp(), zid=str(get_zid()),
                            version=version,
                            allies=json.dumps([ally["friend"] for ally in allies.values()
                                               if "friend" in ally and ally["friend"] and ally["neighbor"]],
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
                            app_friends=json.dumps([ally["appFriendId"] for ally in allies.values()
-                                                   if "appFriendId" in ally and ally["appFriendId"] is not None]))
+                                                   if "appFriendId" in ally and ally["appFriendId"] is not None]),
+                           picture=random_image()
+                           )
 
 
 @app.route("/wipe_session", methods=['GET', 'POST'])
@@ -1700,8 +1726,8 @@ def server_error_page(error):
 
 
 if __name__ == '__main__':
-    if 'WERKZEUG_RUN_MAIN' not in os.environ:
-        threading.Timer(1.25, lambda: webbrowser.open("http://127.0.0.1:5005/")).start()
+    if 'WERKZEUG_RUN_MAIN' not in os.environ and open_browser:
+        threading.Timer(1.25, lambda: webbrowser.open("http://" + http_host + ":" + str(port) + "/" + http_path)).start()
     # init_db(app, db)
 
     compress.init_app(app)
@@ -1711,7 +1737,8 @@ if __name__ == '__main__':
     # session.app.session_interface.db.create_all()
     # app.session_interface.db.create_all()
     # db.create_all()
-    socketio.run(app, host='127.0.0.1', port=5005, debug=debug)
+
+    socketio.run(app, host=host, port=port, debug=debug)
     # app.run(host='127.0.0.1', port=5005, debug=True)
     # logging.getLogger('socketio').setLevel(logging.ERROR)
     # logging.getLogger('engineio').setLevel(logging.ERROR)

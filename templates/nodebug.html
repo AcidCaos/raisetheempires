@@ -15,17 +15,18 @@
     <link rel="stylesheet" href="layouts/yc_r.css"/>
 	<script>
 		function getUserInfo() {
-		    console.log("getUserInfo called")
-		    return {'zid':1, 'uid':0, 'first_name': 'Natalie', 'name':'Natalie', "sex":'F'};
-		}
-		function getFriendData() {
-		    console.log("getFriendData called")
-			return [{'zid':123, 'uid':123, 'first_name': 'Natalie', 'name':'Portman', "sex":'F'}];
-		}
-		function getAppFriendIds() {
-			console.log("getAppFriendIds called")
-			return []; // :-(
-		}
+	    console.log("getUserInfo called")
+	    return {'zid': {{ zid | default(-1000) }}, 'uid': {{ zid | default(-1000) }}, 'first_name': 'Natalie', 'name':'Natalie', "sex":'F', 'pic_square': '{{ picture }}'};
+	}
+	function getFriendData() {
+	    console.log("getFriendData called")
+		return {{ allies | safe | default([]) }};
+		// return  [{'zid':123, 'uid':123, 'first_name': 'Natalie', 'name':'Portman', "sex":'F'} ,{'zid':-2, 'uid':-2, 'first_name': 'Sergeant', 'name':'Cross', "sex":'M'},{'zid':-1, 'uid':-1, 'first_name': 'Steele', 'name':'Steele', "sex":'M'}];
+	}
+	function getAppFriendIds() {
+		console.log("getAppFriendIds called")
+		return {{ app_friends | safe | default([]) }};
+	}
 
 		function onGameLoaded(seen, popp, canvas) {
 			console.log("Game is loaded " +seen +", " + popp + ", " + canvas)

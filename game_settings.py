@@ -1,6 +1,7 @@
 import copy
 import json
 import os
+import random
 
 import libscrc
 from flask import session
@@ -137,6 +138,32 @@ def relock_expansion(index):
     #expansions = expansions + [0 for t in range(i + 1 - len(expansions))]
     e = index - (i << 5)
     expansions[i] = expansions[i] & ~(1 << e)
+
+def random_image():
+    return random.choice(list(set([u for u in fetch_urls() if u.endswith('.png')])))
+
+def fetch_urls():
+    return fetch_url_dict(game_settings)
+
+def fetch_url_dict(d):
+    urls =  [v for k, v in d.items() if k == '-url']
+    for k, v in d.items():
+        if isinstance(v, dict):
+            urls.extend(fetch_url_dict(v))
+        elif isinstance(v, list):
+            urls.extend(fetch_url_list(v))
+    return urls
+
+
+def fetch_url_list(l):
+    urls = []
+    for v in l:
+        if isinstance(v, dict):
+            urls.extend(fetch_url_dict(v))
+        elif isinstance(v, list):
+            urls.extend(fetch_url_list(v))
+    return urls
+
 
 
 def simple_list(raw_list):
