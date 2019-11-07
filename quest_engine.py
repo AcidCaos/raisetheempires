@@ -426,8 +426,10 @@ def do_rewards(label, raw_rewards, meta):
 
 def roll_random():
     world = session['user_object']["userInfo"]["world"]
+    prev_seed = str(world["randSeedW"]) + ', ' +  str(world["randSeedZ"])
     world["randSeedZ"] = 36969 * (world["randSeedZ"] & 65535)  + (world["randSeedZ"] >> 16 & 65535) & 4294967295;
     world["randSeedW"] = 18000 * (world["randSeedW"] & 65535)  + (world["randSeedW"] >> 16 & 65535) & 4294967295;
+    print("Seed", prev_seed , "=>", str(world["randSeedW"]) + ', ' +  str(world["randSeedZ"]))
     return (world["randSeedZ"] << 16) +  world["randSeedW"] & 4294967295
 
 

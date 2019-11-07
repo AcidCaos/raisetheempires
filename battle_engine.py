@@ -19,82 +19,88 @@ def battle_complete_response(params):
         player_turn = True
     else:
         player_turn = False
-        enemy_unit_id, _, player_unit_id = ai_best_attack(friendlies, friendly_strengths, baddies, baddie_strengths)
+        enemy_unit_id, _, player_unit_id = ai_best_attack(friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables)
 
-    # print("repr baddies", baddies)
-    baddie_max_strength = get_unit_max_strength(baddies[enemy_unit_id], False, params)
-    baddie_weak = get_unit_weak(baddies[enemy_unit_id])
-    baddie_unit_type = get_unit_type(baddies[enemy_unit_id])
+    if enemy_unit_id is not None and player_unit_id is not None:
+        # print("repr baddies", baddies)
+        baddie_max_strength = get_unit_max_strength(baddies[enemy_unit_id], False, params)
+        baddie_weak = get_unit_weak(baddies[enemy_unit_id])
+        baddie_unit_type = get_unit_type(baddies[enemy_unit_id])
 
-    friendly_max_strength = get_unit_max_strength(friendlies[player_unit_id], True)
-    friendly_weak = get_unit_weak(friendlies[player_unit_id])
-    friendly_unit_type = get_unit_type(friendlies[player_unit_id])
+        friendly_max_strength = get_unit_max_strength(friendlies[player_unit_id], True)
+        friendly_weak = get_unit_weak(friendlies[player_unit_id])
+        friendly_unit_type = get_unit_type(friendlies[player_unit_id])
 
-    friendly_strength = friendly_strengths[player_unit_id]
-    baddie_strength = baddie_strengths[enemy_unit_id]
+        friendly_strength = friendly_strengths[player_unit_id]
+        baddie_strength = baddie_strengths[enemy_unit_id]
 
-    init_seed = ["init seed", get_seed_w(), get_seed_z()]
-    roll = unit_roll(friendly_weak if player_turn else baddie_weak, baddie_weak if player_turn else friendly_weak)
+        init_seed = ["init seed", get_seed_w(), get_seed_z()]
+        roll = unit_roll(friendly_weak if player_turn else baddie_weak, baddie_weak if player_turn else friendly_weak)
 
-    crit, direct = get_hit_value(friendly_unit_type if player_turn else baddie_unit_type, baddie_unit_type if player_turn else friendly_unit_type)
-    if player_turn:
-        crit, direct = handle_accurancy_upgrades(crit, direct, friendlies, player_unit_id)
+        crit, direct = get_hit_value(friendly_unit_type if player_turn else baddie_unit_type, baddie_unit_type if player_turn else friendly_unit_type)
+        if player_turn:
+            crit, direct = handle_accurancy_upgrades(crit, direct, friendlies, player_unit_id)
 
-    hit = roll >= direct
+        hit = roll >= direct
 
-    base_damage = 25 # TODO tier difference & increments
+        base_damage = 25 # TODO tier difference & increments
 
-    if player_turn:
-        damage = base_damage * (3 * friendly_max_strength + baddie_strength) / (3 * baddie_strength + friendly_max_strength)
-        damage = damage / 100 * baddie_max_strength
+        if player_turn:
+            damage = base_damage * (3 * friendly_max_strength + baddie_strength) / (3 * baddie_strength + friendly_max_strength)
+            damage = damage / 100 * baddie_max_strength
+        else:
+            damage = base_damage * (3 * baddie_max_strength + friendly_strength) / (3 * friendly_strength + baddie_max_strength)
+            damage = damage / 100 * friendly_max_strength
+
+        consumable_extra_damage = 0
+        damage += max(consumable_extra_damage, 0)
+
+        if player_turn:
+            damage = handle_damage_upgrades(damage, friendlies, player_unit_id)
+
+        damage = math.floor(damage * 10 ** 3) / 10 ** 3
+
+        glance = 0.10
+        critter = 1.5
+
+        hit_type = "directhit"
+
+        if not hit:
+            damage *= glance
+            hit_type = "glancinghit"
+        elif roll != 2 and roll >= crit:
+            damage *= critter
+            hit_type = "criticalhit"
+
+        damage = math.ceil(damage)
+
+        if player_turn:
+            baddie_strengths[enemy_unit_id] -= damage
+            if baddie_strengths[enemy_unit_id] == 1:
+                damage +=1
+                baddie_strengths[enemy_unit_id] -= 1
+                print("Enemy inced to prevent 1 strength")
+            if baddie_strengths[enemy_unit_id] <= 0:
+                baddie_strengths[enemy_unit_id] = 0 #dead
+                print("Enemy unit", enemy_unit_id, "down")
+                hit_type = "kill" if hit_type != "criticalhit" else "criticalkill"
+                handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, friendlies[player_unit_id], baddies[enemy_unit_id]))
+                # session["battle"] = None
+            print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
+            doBattleRewards(hit_type, baddie_max_strength, damage, friendly_max_strength)
+            handle_quest_progress(meta, progress_battle_damage_count("battleDamage", damage, friendlies[player_unit_id], baddies[enemy_unit_id]))
+        else:
+            friendly_strengths[player_unit_id] -= damage
+            if friendly_strengths[player_unit_id] <= 0:
+                friendly_strengths[player_unit_id] = 0  # dead
+                print("Player unit", player_unit_id, "down")
+                # session["battle"] = None
+            print("Taken", damage, "damage, player hp:", friendly_strengths[player_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
     else:
-        damage = base_damage * (3 * baddie_max_strength + friendly_strength) / (3 * friendly_strength + baddie_max_strength)
-        damage = damage / 100 * friendly_max_strength
-
-    consumable_extra_damage = 0
-    damage += max(consumable_extra_damage, 0)
-
-    if player_turn:
-        damage = handle_damage_upgrades(damage, friendlies, player_unit_id)
-
-    damage = math.floor(damage * 10 ** 3) / 10 ** 3
-
-    glance = 0.10
-    critter = 1.5
-
-    hit_type = "directhit"
-
-    if not hit:
-        damage *= glance
-        hit_type = "glancinghit"
-    elif roll != 2 and roll >= crit:
-        damage *= critter
-        hit_type = "criticalhit"
-
-    damage = math.ceil(damage)
-
-    if player_turn:
-        baddie_strengths[enemy_unit_id] -= damage
-        if baddie_strengths[enemy_unit_id] == 1:
-            damage +=1
-            baddie_strengths[enemy_unit_id] -= 1
-            print("Enemy inced to prevent 1 strength")
-        if baddie_strengths[enemy_unit_id] <= 0:
-            baddie_strengths[enemy_unit_id] = 0 #dead
-            print("Enemy unit", enemy_unit_id, "down")
-            hit_type = "kill" if hit_type != "criticalhit" else "criticalkill"
-            handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, friendlies[player_unit_id], baddies[enemy_unit_id]))
-            # session["battle"] = None
-        print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
-        doBattleRewards(hit_type, baddie_max_strength, damage, friendly_max_strength)
-        handle_quest_progress(meta, progress_battle_damage_count("battleDamage", damage, friendlies[player_unit_id], baddies[enemy_unit_id]))
-    else:
-        friendly_strengths[player_unit_id] -= damage
-        if friendly_strengths[player_unit_id] <= 0:
-            friendly_strengths[player_unit_id] = 0  # dead
-            print("Player unit", player_unit_id, "down")
-            # session["battle"] = None
-        print("Taken", damage, "damage, player hp:", friendly_strengths[player_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
+        print("Stun skipped turn")
+        player_unit_id = next((i for strength, i in zip(friendly_strengths,range(len(friendly_strengths))) if strength > 0), None)
+        enemy_unit_id = next((i for strength, i in zip(baddie_strengths,range(len(baddie_strengths))) if strength > 0), None)
+        roll = 0
 
 
     result = {"attackerStunned": None, "psh": 0, "esh": 0, "ps": friendly_strengths[player_unit_id], "es": baddie_strengths[enemy_unit_id], "hv": None, "ur": roll,
@@ -256,7 +262,7 @@ def init_battle(params):
 
 
 def get_previous_fleet(name):
-    print("Using previous fleet as friendlies for ally comsumables")
+    print("Using previous fleet as friendlies for ally consumables")
     return name[:5] + str(int(name[5:name.index('_')]) - 1) + name[6:]
 
 
@@ -363,7 +369,7 @@ def assign_consumable_response(params):
 
     consumables = lookup_items_by_type_and_subtype("consumable", "consumable")
     if params["code"] == "A0A":   # Ally / merc
-        damaged = False # TODO check if any damaged for heals
+        damaged = any([strength < get_unit_max_strength(unit, True) for unit, strength in zip(friendlies, friendly_strengths)])
         level = 9
         valid_consumables = [c for c in consumables if "-secondary" not in c and \
                              int(c.get("requiredLevel", "0")) <= level and \
@@ -380,7 +386,7 @@ def assign_consumable_response(params):
 
         selected_random_consumable = round(selected_random_consumable_roll) # required roll fixed allyconsumable in tutorialstep
 
-        selected_consumable = valid_consumables[selected_random_consumable];
+        selected_consumable = valid_consumables[selected_random_consumable]
     else:
         selected_consumable = lookup_item_by_code(params["code"])
 
@@ -390,7 +396,7 @@ def assign_consumable_response(params):
     if selected_consumable["consumable"].get("-type") != "all":  #dead baddies?
         targeted_baddie = round(roll_random_between(0, round(len(baddies) - 1))) if len(baddies) > 1 else 0
 
-        apply_consumable_direct_impact(meta, selected_consumable, targeted_baddie, baddies, baddie_strengths)
+        apply_consumable_direct_impact(meta, selected_consumable, targeted_baddie, baddies, baddie_strengths, params, False)
             # session["battle"] = None
         # handle_win(baddie_strengths, meta, {})  #TODO next map?
         # handle_loss()
@@ -401,10 +407,15 @@ def assign_consumable_response(params):
 
         # TODO: more consumables
         # if consumable["consumable"].get("-type") == "all":
-        print("Consumable affects all")
+        print("Consumable", selected_consumable["-code"], selected_consumable["consumable"].get("-diweapon", ""), "affects all")
 
-        for i in range(len(baddies)):
-            apply_consumable_direct_impact(meta, selected_consumable, baddies[i], baddies, baddie_strengths)
+        if selected_consumable["consumable"].get("-target") == 'enemy':
+            for i in range(len(baddies)):
+                apply_consumable_direct_impact(meta, selected_consumable, i, baddies, baddie_strengths, params, False)
+        else:
+            print("target allies")
+            for i in range(len(friendlies)):
+                apply_consumable_direct_impact(meta, selected_consumable, i, friendlies, friendly_strengths, params, True)
 
         # for i in range(len(baddie_strengths)):
             # baddie_strengths[i] -= 15
@@ -422,20 +433,8 @@ def assign_consumable_response(params):
     return assign_consumable_response
 
 
-    #state_UseSecondaryAbility  item has secondaryAbility => consumable TAssignConsumable
-
-    # TODO ai rolls FindBestDefendingUnit  required roll
-    # FindBestDefendingUnitAgainstAttackers  optional roll
-    # all alive attackers select defender with best value and select attacker for that value if more attackers with same value (and not m_shouldFocusFire) then conditionally roll between len of those attackers
-    # when m_shouldFocusFire(and a defender was found) then it's found and returns
-    # FindBestDefendingUnitAgainstBestAttacker
-    # best valued alive defender: required roll
-    # FindBestDefendingUnit required roll combatAISwitchPercent 0.2
-    #consumables used?
-
-
-def apply_consumable_direct_impact(meta, selected_consumable, targeted_baddie, baddies, baddie_strengths):
-    baddie_current_strength = baddie_strengths[targeted_baddie]
+def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, units, units_strengths, params, ally):
+    unit_current_strength = units_strengths[targeted_unit]
     direct_impact = int(selected_consumable["consumable"].get("-di", 0))
     damage = direct_impact
     against = simple_list(selected_consumable["consumable"].get("against", ''))
@@ -444,36 +443,67 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_baddie, b
     # pirateBalloon01(npc), pirateFighter01, pirateBomber01, pirateFighter02, pirateBomber02, pirateFighter03,pirateBomber03, pirateFighter05, pirateBomber05,
     # pirateUBoat03, pirateCaptainKrunsch and many more
     for a in against:
-        if a['-type'] in (get_unit_type(baddies[targeted_baddie]), get_unit_terrain(baddies[targeted_baddie])):
+        if a['-type'] in (get_unit_type(units[targeted_unit]), get_unit_terrain(units[targeted_unit])):
             damage *= float(a['-mod'])
-    baddie_strengths[targeted_baddie] -= damage
-    if baddie_strengths[targeted_baddie] <= 0:
-        baddie_strengths[targeted_baddie] = 0  # dead
-        print("Enemy unit", targeted_baddie, "down")
-        handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, {},
-                                                                 baddies[targeted_baddie]))
-        doBattleRewards("kill", baddie_current_strength, baddie_current_strength, 0)
-    print("Consumable used to baddie:", targeted_baddie, "di", direct_impact, "damage", damage)
+    if units_strengths[targeted_unit] > 0: #can't damage/heal dead units
+        units_strengths[targeted_unit] -= damage
+        if units_strengths[targeted_unit] <= 0:
+            units_strengths[targeted_unit] = 0  # dead
+            print("Enemy unit" if not ally else "Friendly unit", targeted_unit, "down")
+            handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, {},
+                                                                     units[targeted_unit]))
+            doBattleRewards("kill", unit_current_strength, unit_current_strength, 0)
+
+        if units_strengths[targeted_unit] > get_unit_max_strength(units[targeted_unit], ally, params):
+            print("Limiting heal to max strength")
+            units_strengths[targeted_unit] = get_unit_max_strength(units[targeted_unit], ally, params)
+        print("Consumable", selected_consumable["-code"], selected_consumable["consumable"].get("-diweapon", ""), "used to " + ("friendly" if ally else "baddie:"), targeted_unit, "di", direct_impact, "damage", damage)
+    else:
+        print("Consumable", selected_consumable["-code"], selected_consumable["consumable"].get("-diweapon", ""), "not used to  dead " + ("friendly" if ally else "baddie:"), targeted_unit, "di", direct_impact, "damage", damage)
 
 
-def ai_best_attack(player_units, player_units_strengths, baddies, baddies_strengths):
+def is_stunned(target, active_consumables):
+    for consumable, consumable_target, tries in active_consumables:
+        if (consumable_target == target or consumable_target == (target[0], None)) and consumable["consumable"].get("-disable") == "stun":
+            return True
+    return False
+
+
+# state_UseSecondaryAbility  item has secondaryAbility => consumable TAssignConsumable
+
+# TODO ai rolls FindBestDefendingUnit  required roll
+# FindBestDefendingUnitAgainstAttackers  optional roll
+# all alive attackers select defender with best value and select attacker for that value if more attackers with same value (and not m_shouldFocusFire) then conditionally roll between len of those attackers
+# when m_shouldFocusFire(and a defender was found) then it's found and returns
+# FindBestDefendingUnitAgainstBestAttacker
+# best valued alive defender: required roll
+# FindBestDefendingUnit required roll combatAISwitchPercent 0.2
+# consumables used?
+def ai_best_attack(player_units, player_units_strengths, baddies, baddies_strengths, active_consumables):
     first_random = roll_random_float()
 
     players_tuple = zip(player_units, player_units_strengths, range(len(player_units)))
-    best_units = [ai_best_unit(baddies, baddies_strengths,  player_unit, first_random) + (i,) for player_unit, strength, i in players_tuple if strength > 0]
+    best_units = [ai_best_unit(baddies, baddies_strengths, player_unit, first_random, active_consumables, "enemy") + (i,) for player_unit, strength, i in players_tuple if strength > 0]
     max_grade = max([grade for baddie_index, grade, player_index in best_units])
-    best_pairings = [(baddie_index, grade, player_index) for baddie_index, grade, player_index in best_units if grade == max_grade]
-    best_pairing = best_pairings[round(roll_random_between(0, len(best_pairings) - 1)) if len(best_pairings) > 1 else 0]  #optional roll
-    best_pairing = (best_pairings[0][0],) + best_pairing[1:]  # bugged pairings
-    print("best AI pairing method 1 (baddie, grade, friendly)", repr(best_pairing))
+    best_pairings = [(baddie_index, grade, player_index) for baddie_index, grade, player_index in best_units if grade == max_grade and grade >= 0]
+    if best_pairings:
+        best_pairing = best_pairings[round(roll_random_between(0, len(best_pairings) - 1)) if len(best_pairings) > 1 else 0]  #optional roll
+        best_pairing = (best_pairings[0][0],) + best_pairing[1:]  # bugged pairings
+        print("best AI pairing method 1 (baddie, grade, friendly)", repr(best_pairing))
+    else:
+        best_pairing = None, 0, None
 
     baddies_tuple = zip(baddies, baddies_strengths, range(len(baddies)))
-    best_units_2 = [ai_best_unit(player_units, player_units_strengths,  baddie, first_random) + (i,) for baddie, strength, i in baddies_tuple if strength > 0]
+    best_units_2 = [ai_best_unit(player_units, player_units_strengths,  baddie, first_random, active_consumables, "ally") + (i,) for baddie, strength, i in baddies_tuple if strength > 0]
     max_grade_2 = max([grade for player_index, grade, baddie_index  in best_units_2])
-    best_player = [player_index for player_index, grade, baddie_index in best_units_2 if grade == max_grade_2][0]
-    second_random = roll_random_float()
-    best_pairing_2 = ai_best_unit(baddies, baddies_strengths, player_units[best_player], second_random) + (best_player,)
-    print("best AI pairing method 2 (baddie, grade, friendly)", repr(best_pairing_2))
+    best_players = [player_index for player_index, grade, baddie_index in best_units_2 if grade == max_grade_2]
+    if best_players:
+        best_player = best_players[0]
+        second_random = roll_random_float()
+        best_pairing_2 = ai_best_unit(baddies, baddies_strengths, player_units[best_player], second_random, active_consumables, "enemy") + (best_player,)
+        print("best AI pairing method 2 (baddie, grade, friendly)", repr(best_pairing_2))
+    else:
+        best_pairing_2 = None, 0, None
 
     #the poorer the better? if all units are poor against the best defender then select that one?
     ratio = best_pairing_2[1]/ max_grade if max_grade > 0 else 0
@@ -489,13 +519,17 @@ def ai_best_attack(player_units, player_units_strengths, baddies, baddies_streng
     return used_pairing
 
 
-def ai_best_unit(first_units, first_units_strengths, second_unit, random):
+def ai_best_unit(first_units, first_units_strengths, second_unit, random, active_consumables, target_group):
     first_units_tuple = list(zip(first_units, first_units_strengths, range(len(first_units))))
-    best_grade = max([get_hit_chance(first_unit, second_unit) for first_unit, strength, i in first_units_tuple if strength > 0])
-    best_units = [i for first_unit, strength, i in first_units_tuple if strength > 0 and get_hit_chance(first_unit, second_unit) == best_grade]
+    best_grade = max([get_hit_chance(first_unit, second_unit) for first_unit, strength, i in first_units_tuple if strength > 0 and not is_stunned((target_group, i), active_consumables)] + [-1])
+    best_units = [i for first_unit, strength, i in first_units_tuple if strength > 0 and not is_stunned((target_group, i), active_consumables) and get_hit_chance(first_unit, second_unit) == best_grade]
     # print("AI best unit" ,repr((first_units, first_units_strengths, second_unit, random)),best_grade, repr(best_units))
-    random_roll = round(random * (len(best_units) - 1))
-    return best_units[random_roll], best_grade
+    if best_units:
+        random_roll = round(random * (len(best_units) - 1))
+        return best_units[random_roll], best_grade
+    else:
+        return None, -1
+
 
 def get_unit_type(unit):
     return unit["unit"].get("-type", ",").split(',')[0]
@@ -508,7 +542,7 @@ def get_unit_terrain(unit):
 def get_unit_max_strength(unit, ally, params=None):
     strength = int(unit["unit"].get("-strength", "0"))
     _, island, map_item = get_current_island(params)
-    if island != None and "strength" in map_item["island"][island]:
+    if not ally and island != None and "strength" in map_item["island"][island]:
         strengths = simple_list(map_item["island"][island]["strength"])
         strength = apply_map_mod_strength(unit, strength, strengths)
         # print("Mod strenghts",repr(strengths))
@@ -596,7 +630,7 @@ def doBattleRewards(hit_type, max_strength, damage, friendly_max_strength):
     # TODO: energyRewardModVariant
     # TODO combat losses
 
-    rare_type = friendly_max_strength % 5;
+    rare_type = friendly_max_strength % 5
 
     if hit_type == "glancinghit":
         coin_amount = 0

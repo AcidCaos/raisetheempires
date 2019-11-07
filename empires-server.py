@@ -70,7 +70,7 @@ COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', '
 COMPRESS_LEVEL = 6
 COMPRESS_MIN_SIZE = 500
 
-# STATE todo statemachine class
+# starting seeds
 rand_seed_w = 5445  # very random
 rand_seed_z = 844
 
@@ -138,7 +138,7 @@ def more_money():
         response = make_response(redirect('/home.html'))
         return response
     else:
-        return ('Nope', 403)
+        return ("Nope! You don't have a game session yet", 403)
 
 
 @app.route("/deprogress", methods=['GET', 'POST'])
@@ -162,7 +162,81 @@ def deprogress_battle_map():
         response = make_response(redirect('/home.html'))
         return response
     else:
-        return ('Nope', 403)
+        return ("Nope! You don't have a game session yet", 403)
+
+
+@app.route("/seed/w/<int:w>/z/<int:z>", methods=['GET', 'POST'])
+def change_seed(w, z):
+    if 'user_object' in session:
+        create_backup("seed")
+        world = session['user_object']["userInfo"]["world"]
+        prev_seed = str(world["randSeedW"]) + ', ' + str(world["randSeedZ"])
+        world["randSeedW"] = w
+        world["randSeedZ"] = z
+        print("Seed change", prev_seed, "=>", str(world["randSeedW"]) + ', ' + str(world["randSeedZ"]))
+
+        session['saved'] = str(session.get('saved', "")) +  "seed"
+        response = make_response(redirect('/home.html'))
+        return response
+    else:
+        return ("Nope! You don't have a game session yet", 403)
+
+
+@app.route("/patch/<path:path>/empty-dict", methods=['GET', 'POST'])
+def patch_user_empty_dict(path):
+    return patch_user(path, {})
+
+
+@app.route("/patch/<path:path>/empty-list", methods=['GET', 'POST'])
+def patch_user_empty_list(path):
+    return patch_user(path, [])
+
+
+@app.route("/patch/<path:path>/none", methods=['GET', 'POST'])
+def patch_user_dict(path):
+    return patch_user(path, None)
+
+
+@app.route("/patch/<path:path>/int/<int:value>", methods=['GET', 'POST'])
+@app.route("/patch/<path:path>/string/<value>", methods=['GET', 'POST'])
+def patch_user(path, value):
+    if 'user_object' in session:
+        if path.split('/')[0] not in ("saved", "original_save_version"):
+            create_backup("patch")
+            dictionary = session
+            for p in path.split('/')[:-1]:
+                dictionary = dictionary[p]
+
+            dictionary[path.split('/')[-1]] = value
+
+            session['saved'] = str(session.get('saved', "")) + "patch"
+            response = make_response(redirect('/home.html'))
+            return response
+        else:
+            return ("Nope! Disallowed patch root", 403)
+    else:
+        return ("Nope! You don't have a game session yet", 403)
+
+
+@app.route("/patch/<path:path>/list/index/<int:i>/int/<int:value>", methods=['GET', 'POST'])
+@app.route("/patch/<path:path>/list/index/<int:i>/string/<value>", methods=['GET', 'POST'])
+def patch_user_list(path, i, value):
+    if 'user_object' in session:
+        if path.split('/')[0] not in ("saved", "original_save_version"):
+            create_backup("patch")
+            dictionary = session
+            for p in path.split('/'):
+                dictionary = dictionary[p]
+
+            dictionary[i] = value
+
+            session['saved'] = str(session.get('saved', "")) + "patch"
+            response = make_response(redirect('/home.html'))
+            return response
+        else:
+            return ("Nope! Disallowed patch root", 403)
+    else:
+        return ("Nope! You don't have a game session yet", 403)
 
 
 @app.route("/save-editor", methods=['GET'])
