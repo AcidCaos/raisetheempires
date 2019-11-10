@@ -52,8 +52,15 @@ def battle_complete_response(params):
             damage = base_damage * (3 * baddie_max_strength + friendly_strength) / (3 * friendly_strength + baddie_max_strength)
             damage = damage / 100 * friendly_max_strength
 
-        consumable_extra_damage = 0
-        damage += max(consumable_extra_damage, 0)
+        ally_target = ("ally", player_unit_id)
+        enemy_target = ("enemy", enemy_unit_id)
+        consumable_extra_damage = \
+            get_consumable_damage(ally_target if player_turn else enemy_target, active_consumables) - \
+            get_consumable_shield(enemy_target if player_turn else ally_target, active_consumables)
+        damage += max(consumable_extra_damage, -damage) # can't get negative damage by shield
+
+        if consumable_extra_damage:
+            print("Consumable extra damage", max(consumable_extra_damage, -damage))
 
         if player_turn:
             damage = handle_damage_upgrades(damage, friendlies, player_unit_id)
@@ -392,10 +399,10 @@ def assign_consumable_response(params):
 
     # TODO: AI secondary abily Z-units
 
-    # is target  type? not all
-    if selected_consumable["consumable"].get("-type") != "all":  #dead baddies?
-        targeted_baddie = round(roll_random_between(0, round(len(baddies) - 1))) if len(baddies) > 1 else 0
+    if selected_consumable["consumable"].get("-type") != "all":
+        live_baddies_index = [i for s, i in zip(baddie_strengths, range(len(baddie_strengths))) if s > 0]
 
+        targeted_baddie = live_baddies_index[round(roll_random_between(0, round(len(live_baddies_index) - 1)))] if len(live_baddies_index) > 1 else live_baddies_index[0]
         apply_consumable_direct_impact(meta, selected_consumable, targeted_baddie, baddies, baddie_strengths, params, False)
             # session["battle"] = None
         # handle_win(baddie_strengths, meta, {})  #TODO next map?
@@ -412,10 +419,16 @@ def assign_consumable_response(params):
         if selected_consumable["consumable"].get("-target") == 'enemy':
             for i in range(len(baddies)):
                 apply_consumable_direct_impact(meta, selected_consumable, i, baddies, baddie_strengths, params, False)
+            if len(baddies) > 1:  #only alive ones?
+                roll_random_float() #required roll
+            target = ('enemy', None)
         else:
             print("target allies")
             for i in range(len(friendlies)):
                 apply_consumable_direct_impact(meta, selected_consumable, i, friendlies, friendly_strengths, params, True)
+            if len(friendlies) > 1:
+                roll_random_float()
+            target = ('ally', None)
 
         # for i in range(len(baddie_strengths)):
             # baddie_strengths[i] -= 15
@@ -423,10 +436,12 @@ def assign_consumable_response(params):
             # if baddie_strengths[i] <= 0:
             #     baddie_strengths[i] = 0
             #     print("Baddie", i, "down by consumable")
-        target = ('enemy', None)
+
 
     if int(selected_consumable["consumable"].get("-duration", "0")) > 0:
         active_consumables.append((selected_consumable, target, int(selected_consumable["consumable"].get("-duration", "0"))))
+
+    handle_win(baddie_strengths, meta, params)
 
     assign_consumable_response = {"errorType": 0, "userId": 1, "metadata": meta,
                           "data": []}
@@ -459,7 +474,7 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
             units_strengths[targeted_unit] = get_unit_max_strength(units[targeted_unit], ally, params)
         print("Consumable", selected_consumable["-code"], selected_consumable["consumable"].get("-diweapon", ""), "used to " + ("friendly" if ally else "baddie:"), targeted_unit, "di", direct_impact, "damage", damage)
     else:
-        print("Consumable", selected_consumable["-code"], selected_consumable["consumable"].get("-diweapon", ""), "not used to  dead " + ("friendly" if ally else "baddie:"), targeted_unit, "di", direct_impact, "damage", damage)
+        print("Consumable", selected_consumable["-code"], selected_consumable["consumable"].get("-diweapon", ""), "not used to dead " + ("friendly" if ally else "baddie:"), targeted_unit, "di", direct_impact, "damage", damage)
 
 
 def is_stunned(target, active_consumables):
@@ -467,6 +482,22 @@ def is_stunned(target, active_consumables):
         if (consumable_target == target or consumable_target == (target[0], None)) and consumable["consumable"].get("-disable") == "stun":
             return True
     return False
+
+
+def get_consumable_damage(target, active_consumables):
+    return get_consumable_int(target, active_consumables, "-damage")
+
+
+def get_consumable_shield(target, active_consumables):
+    return get_consumable_int(target, active_consumables, "-shield")
+
+
+def get_consumable_int(target, active_consumables, field):
+    damage = 0
+    for consumable, consumable_target, tries in active_consumables:
+        if (consumable_target == target or consumable_target == (target[0], None)):
+            damage += int(consumable["consumable"].get(field, "0"))
+    return damage
 
 
 # state_UseSecondaryAbility  item has secondaryAbility => consumable TAssignConsumable
