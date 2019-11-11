@@ -22,6 +22,11 @@ def battle_complete_response(params):
         enemy_unit_id, _, player_unit_id = ai_best_attack(friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables)
 
     if enemy_unit_id is not None and player_unit_id is not None:
+        ally_target = ("ally", player_unit_id)
+        enemy_target = ("enemy", enemy_unit_id)
+        first_target = ally_target if player_turn else enemy_target
+        second_target = enemy_target if player_turn else ally_target
+
         # print("repr baddies", baddies)
         baddie_max_strength = get_unit_max_strength(baddies[enemy_unit_id], False, params)
         baddie_weak = get_unit_weak(baddies[enemy_unit_id])
@@ -41,6 +46,10 @@ def battle_complete_response(params):
         if player_turn:
             crit, direct = handle_accurancy_upgrades(crit, direct, friendlies, player_unit_id)
 
+        accuracy = (get_consumable_accuracy(first_target, active_consumables) - get_consumable_evasion(second_target, active_consumables)) * 0.01
+        crit -= accuracy
+        direct -= accuracy
+
         hit = roll >= direct
 
         base_damage = 25 # TODO tier difference & increments
@@ -52,11 +61,10 @@ def battle_complete_response(params):
             damage = base_damage * (3 * baddie_max_strength + friendly_strength) / (3 * friendly_strength + baddie_max_strength)
             damage = damage / 100 * friendly_max_strength
 
-        ally_target = ("ally", player_unit_id)
-        enemy_target = ("enemy", enemy_unit_id)
+
         consumable_extra_damage = \
-            get_consumable_damage(ally_target if player_turn else enemy_target, active_consumables) - \
-            get_consumable_shield(enemy_target if player_turn else ally_target, active_consumables)
+            get_consumable_damage(first_target, active_consumables) - \
+            get_consumable_shield(second_target, active_consumables)
         damage += max(consumable_extra_damage, -damage) # can't get negative damage by shield
 
         if consumable_extra_damage:
@@ -238,11 +246,20 @@ def handle_strength_upgrades(strength, unit):
 
 def init_battle(params):
     if 'target' not in params:
-        baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][params['fleet'] if params['fleet'] else params['name']])
-                   for baddy, count in sub_fleet.items()
-                   for i in range(int(count))]
-        friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                      session['fleets'][get_previous_fleet(params['fleet'] if params['fleet'] else params['name'])]]
+        if isinstance(simple_list(session['fleets'][params['fleet'] if params['fleet'] else params['name']])[0], str):
+            print("Ally direct target")
+            friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                          session['fleets'][params['fleet'] if params['fleet'] else params['name']]]
+            baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in
+                       simple_list(session['fleets'][get_next_fleet(params['fleet'] if params['fleet'] else params['name'])])
+                       for baddy, count in sub_fleet.items()
+                       for i in range(int(count))]
+        else :
+            baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][params['fleet'] if params['fleet'] else params['name']])
+                       for baddy, count in sub_fleet.items()
+                       for i in range(int(count))]
+            friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                          session['fleets'][get_previous_fleet(params['fleet'] if params['fleet'] else params['name'])]]
     elif params['target'].startswith('fleet'):
         baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][params['target']])
                    for baddy, count in sub_fleet.items()
@@ -270,7 +287,12 @@ def init_battle(params):
 
 def get_previous_fleet(name):
     print("Using previous fleet as friendlies for ally consumables")
-    return name[:5] + str(int(name[5:name.index('_')]) - 1) + name[6:]
+    return name[:5] + str(int(name[5:name.index('_')]) - 1) + name[name.index('_'):]
+
+
+def get_next_fleet(name):
+    print("Using next fleet as baddies for ally targeted consumables")
+    return name[:5] + str(int(name[5:name.index('_')]) + 1) + name[name.index('_'):]
 
 
 def unit_roll(attacker_weak, defender_weak):
@@ -373,11 +395,22 @@ def next_campaign_response(params):
 def assign_consumable_response(params):
     friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables = init_battle(params)
     meta = {"newPVE": 0}
+    targeted = False
 
     consumables = lookup_items_by_type_and_subtype("consumable", "consumable")
     if params["code"] == "A0A":   # Ally / merc
         damaged = any([strength < get_unit_max_strength(unit, True) for unit, strength in zip(friendlies, friendly_strengths)])
-        level = 9
+        if params.get('name') == "-1":
+            level = session["user_object"]["userInfo"]["player"]["level"] + 5  #steele = player level + 5
+        else:
+            level = 6
+            if params.get('name', '0')[0].isalpha():
+                merc = lookup_item_by_code(params["name"])
+                level = int(merc["level"])
+            else:
+                for neighbor in session['user_object']["neighbors"]:
+                    if neighbor["uid"] == int(params.get('name', '0')):
+                        level = neighbor["level"]
         valid_consumables = [c for c in consumables if "-secondary" not in c and \
                              int(c.get("requiredLevel", "0")) <= level and \
                              (damaged or c["consumable"].get("-target") == 'enemy' or c["consumable"].get("-target") == 'enemy' or int(c["consumable"].get("-di","0")) >= 0) and \
@@ -396,20 +429,34 @@ def assign_consumable_response(params):
         selected_consumable = valid_consumables[selected_random_consumable]
     else:
         selected_consumable = lookup_item_by_code(params["code"])
+        targeted = True
 
     # TODO: AI secondary abily Z-units
 
     if selected_consumable["consumable"].get("-type") != "all":
-        live_baddies_index = [i for s, i in zip(baddie_strengths, range(len(baddie_strengths))) if s > 0]
+        if selected_consumable["consumable"].get("-target") == 'enemy':
+            live_baddies_index = [i for s, i in zip(baddie_strengths, range(len(baddie_strengths))) if s > 0]
+            if targeted:
+                targeted_baddie = int(params["id"])
+            else:
+                targeted_baddie = live_baddies_index[round(roll_random_between(0, round(len(live_baddies_index) - 1)))] if len(live_baddies_index) > 1 else live_baddies_index[0]
+            apply_consumable_direct_impact(meta, selected_consumable, targeted_baddie, baddies, baddie_strengths, params, False)
+                # session["battle"] = None
+            # handle_win(baddie_strengths, meta, {})  #TODO next map?
+            # handle_loss()
 
-        targeted_baddie = live_baddies_index[round(roll_random_between(0, round(len(live_baddies_index) - 1)))] if len(live_baddies_index) > 1 else live_baddies_index[0]
-        apply_consumable_direct_impact(meta, selected_consumable, targeted_baddie, baddies, baddie_strengths, params, False)
-            # session["battle"] = None
-        # handle_win(baddie_strengths, meta, {})  #TODO next map?
-        # handle_loss()
-
-        target = ('enemy', targeted_baddie)
-
+            target = ('enemy', targeted_baddie)
+        else:
+            live_friendly_index = [i for s, i in zip(friendly_strengths, range(len(friendly_strengths))) if s > 0]
+            if targeted:
+                targeted_friendly = int(params["id"])
+            else:
+                targeted_friendly = live_friendly_index[
+                    round(roll_random_between(0, round(len(live_friendly_index) - 1)))] if len(
+                    live_friendly_index) > 1 else live_friendly_index[0]
+            apply_consumable_direct_impact(meta, selected_consumable, targeted_friendly, friendlies, friendly_strengths,
+                                           params, True)
+            target = ('ally', targeted_friendly)
     else:
 
         # TODO: more consumables
@@ -419,14 +466,14 @@ def assign_consumable_response(params):
         if selected_consumable["consumable"].get("-target") == 'enemy':
             for i in range(len(baddies)):
                 apply_consumable_direct_impact(meta, selected_consumable, i, baddies, baddie_strengths, params, False)
-            if len(baddies) > 1:  #only alive ones?
+            if not targeted and len(baddies) > 1:  #only alive ones?
                 roll_random_float() #required roll
             target = ('enemy', None)
         else:
             print("target allies")
             for i in range(len(friendlies)):
                 apply_consumable_direct_impact(meta, selected_consumable, i, friendlies, friendly_strengths, params, True)
-            if len(friendlies) > 1:
+            if not targeted and len(friendlies) > 1:
                 roll_random_float()
             target = ('ally', None)
 
@@ -492,10 +539,18 @@ def get_consumable_shield(target, active_consumables):
     return get_consumable_int(target, active_consumables, "-shield")
 
 
+def get_consumable_accuracy(target, active_consumables):
+    return get_consumable_int(target, active_consumables, "-attack")
+
+
+def get_consumable_evasion(target, active_consumables):
+    return get_consumable_int(target, active_consumables, "-defend")
+
+
 def get_consumable_int(target, active_consumables, field):
     damage = 0
     for consumable, consumable_target, tries in active_consumables:
-        if (consumable_target == target or consumable_target == (target[0], None)):
+        if consumable_target == target or consumable_target == (target[0], None):
             damage += int(consumable["consumable"].get(field, "0"))
     return damage
 

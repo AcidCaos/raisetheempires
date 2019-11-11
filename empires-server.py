@@ -1184,6 +1184,11 @@ def user_response():
     handle_quest_progress(meta, progress_inventory_count())
     handle_quest_progress(meta, progress_neighbor_count())
     handle_quest_progress(meta, progress_upgrades_count())
+
+    for neighbor in user["neighbors"]:
+        if neighbor["uid"] in [-1, 123]:
+            neighbor["level"] =  user["userInfo"]["player"]["level"] + 5
+
     if session.get('save_version') != version:
         print("Trying migration")
         migrate(meta, session.get('save_version'), version)
@@ -1679,7 +1684,7 @@ def buy_item_response(param):
         print("Buying mercenary")
     elif item.get("-subtype") == "expansion":
         print("Buying expansion")
-    elif item["-resourceType"] != "energy":
+    elif "-resourceType" in item and item["-resourceType"] != "energy":
         resources[item["-resourceType"]] += param["amount"]
 
         print("Buy: received", item["-resourceType"] + ":", str(param["amount"]) +
