@@ -122,11 +122,11 @@ def battle_complete_response(params):
      "playerUnit": player_unit_id, "enemyUnit": enemy_unit_id, "seeds": {"w": get_seed_w(), "z": get_seed_z()},
      "energy": None}
 
-    process_consumable_end_turn(active_consumables, baddie_strengths, player_turn)
+    process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, player_turn)
     handle_win(baddie_strengths, meta, params)
     handle_loss(friendly_strengths)
 
-    report_battle_log(friendly_strengths, baddie_strengths, player_turn, player_unit_id, enemy_unit_id)
+    report_battle_log(friendly_strengths, baddie_strengths, player_turn, player_unit_id, enemy_unit_id, active_consumables)
     battle_complete_response = {"errorType": 0, "userId": 1, "metadata": meta, "data": result}
     return battle_complete_response
 
@@ -137,38 +137,44 @@ def battle_complete_response(params):
 #              "-defend": "99", BuffEvasive
 # "-dot": "5" , PoisonGas
 
-def process_consumable_end_turn(active_consumables, baddie_strengths, player_turn):
-    if not player_turn:
-        for consumable_tuple in active_consumables:
-            (consumable, target, tries) = consumable_tuple
+def process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, player_turn):
+    for consumable_tuple in active_consumables:
+        (consumable, target, tries) = consumable_tuple
 
+        if not player_turn: # enemy dot after enemy turn
             if target == ("enemy", None):
                 # apply to all baddies
                 for selected_baddie in range(len(baddie_strengths)):
-                    apply_dot_damage(consumable, selected_baddie, baddie_strengths)
+                    apply_dot_damage(consumable, selected_baddie, baddie_strengths, "Baddie")
             elif target[0] == "enemy":
                 # apply to target[1]
-                apply_dot_damage(consumable, target[1], baddie_strengths)
+                apply_dot_damage(consumable, target[1], baddie_strengths, "Baddie")
+        else: # player dot after player turn
             if target == ("ally", None):
-                pass #apply to all allies
+                for selected_friendly in range(len(friendly_strengths)):
+                    apply_dot_damage(consumable, selected_friendly, friendly_strengths, "Friendly")
             else:  #if  target[0] == "ally":
-                pass #apply to target[1]  ally
+                apply_dot_damage(consumable, target[1], friendly_strengths, "Friendly")
 
-        active_consumables[:] = [(consumable, target, tries - 1) for consumable, target, tries
-                                 in active_consumables if tries > 1]
+    active_consumables[:] = [(consumable, target, tries - (1 if is_consumable_for_turn(target, player_turn) else 0)) for consumable, target, tries
+                             in active_consumables if tries > (1 if is_consumable_for_turn(target, player_turn) else 0)]
 
 
-def apply_dot_damage(consumable, selected_baddie, baddie_strengths):
+def is_consumable_for_turn(target, player_turn):
+    return (target[0] == "ally" and player_turn) or (target[0] in ["enemy", "AI"] and not player_turn)
+
+
+def apply_dot_damage(consumable, selected_unit, strengths, target_description):
     dot_damage = int(consumable["consumable"].get("-dot", "0"))
     if dot_damage:
         print("Applying", dot_damage, "damage over time")
 
-        if baddie_strengths[selected_baddie] > 0:
-            baddie_strengths[selected_baddie] -= dot_damage
-            print("Baddie", selected_baddie, "strength", baddie_strengths[selected_baddie])
-            if baddie_strengths[selected_baddie] <= 0:
-                baddie_strengths[selected_baddie] = 0
-                print("Baddie", selected_baddie, "down by consumable")
+        if strengths[selected_unit] > 0:
+            strengths[selected_unit] -= dot_damage
+            print(target_description, selected_unit, "strength", strengths[selected_unit])
+            if strengths[selected_unit] <= 0:
+                strengths[selected_unit] = 0
+                print(target_description, selected_unit, "down by consumable")
 
 
 def handle_loss(friendly_strengths):
@@ -246,7 +252,17 @@ def handle_strength_upgrades(strength, unit):
 
 def init_battle(params):
     if 'target' not in params:
-        if isinstance(simple_list(session['fleets'][params['fleet'] if params['fleet'] else params['name']])[0], str):
+        if params.get("name") == "AI":
+            print("AI fleet")
+            future_enemy_fleet = get_new_enemy_fleet_name()
+            friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                          session['fleets'][get_previous_fleet(get_previous_fleet(get_previous_fleet(future_enemy_fleet)))]]
+            baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in
+                       simple_list(
+                           session['fleets'][get_previous_fleet(get_previous_fleet(future_enemy_fleet))])
+                       for baddy, count in sub_fleet.items()
+                       for i in range(int(count))]
+        elif isinstance(simple_list(session['fleets'][params['fleet'] if params['fleet'] else params['name']])[0], str):
             print("Ally direct target")
             friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
                           session['fleets'][params['fleet'] if params['fleet'] else params['name']]]
@@ -315,9 +331,9 @@ def get_hit_value(type, defender_type):
 def get_combat_chain_grade(type, defender_type):
     # print("chain grade", type, defender_type)
     [chain] = [e for e in game_settings['settings']['combatChain']['chain'] if e['-type'] == type]
-    if defender_type in chain.get('-great').split(','):
+    if defender_type in chain.get('-great', '').split(','):
         grade = 'great'
-    elif defender_type in chain.get('-poor').split(','):
+    elif defender_type in chain.get('-poor', '').split(','):
         grade = 'poor'
     else:
         grade = 'good'
@@ -377,16 +393,22 @@ def next_campaign_response(params):
 
     enemy_fleet = map_item["island"][island]['fleet']
     #TODO what if defeated?
-    i=1
-    fleet_name = "fleet1_" + str(get_zid())
-    while fleet_name in session["fleets"]:
-        i += 2
-        fleet_name = "fleet" + str(i) + "_" + str(get_zid())
+    fleet_name = get_new_enemy_fleet_name()
 
     session["fleets"][fleet_name] = enemy_fleet
     print("Enemy fleet:", enemy_fleet)
 
     return next_campaign_response
+
+
+def get_new_enemy_fleet_name():
+    i = 1
+    fleet_name = "fleet1_" + str(get_zid())
+    while fleet_name in session["fleets"]:
+        i += 2
+        fleet_name = "fleet" + str(i) + "_" + str(get_zid())
+    return fleet_name
+
 
 # new TAssignConsumable("AI",null,0,0,null) 2nd ability
 #getRandomConsumableForMercenary=merc getRandomConsumableForPlayer=ally steele?
@@ -396,6 +418,8 @@ def assign_consumable_response(params):
     friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables = init_battle(params)
     meta = {"newPVE": 0}
     targeted = False
+    enemy_turn = False
+    casting_ai = False
 
     consumables = lookup_items_by_type_and_subtype("consumable", "consumable")
     if params["code"] == "A0A":   # Ally / merc
@@ -427,72 +451,115 @@ def assign_consumable_response(params):
         selected_random_consumable = round(selected_random_consumable_roll) # required roll fixed allyconsumable in tutorialstep
 
         selected_consumable = valid_consumables[selected_random_consumable]
+    elif params.get("name") == "AI":
+        secondaries = [get_unit_secondary(b) for b, i in zip(baddies, range(len(baddies))) if get_unit_secondary(b) is not None and not is_stunned(("enemy", i), active_consumables)]
+        if len(secondaries) > 1:
+            print("WARN: more that one secondary", repr(secondaries))
+        if not secondaries:
+            print("ERROR: no secondary", repr(secondaries))
+            raise Exception("ERROR: no secondary", repr(secondaries))
+
+        selected_consumable = lookup_item_by_code(secondaries[0])
+        enemy_turn = True
+
+        cast_chance = roll_random_float()
+        cast_percent = float(selected_consumable["consumable"]["-castpercent"])
+
+        print(("Not c" if cast_chance >= cast_percent else "C") + "asting secondary power", cast_chance, ">=", cast_percent)
+
+        selected_consumable = None #second targeted call will be made
+
+        casting_ai = cast_chance < cast_percent
+
+        #selected_consumable = None
     else:
         selected_consumable = lookup_item_by_code(params["code"])
         targeted = True
+        enemy_turn = is_affected_by_consumable(("AI", None), {"consumable":{}}, active_consumables)
 
     # TODO: AI secondary abily Z-units
+    if selected_consumable is not None:
+        if selected_consumable["consumable"].get("-type") != "all":
+            if (selected_consumable["consumable"].get("-target") == 'enemy') ^ enemy_turn:
+                live_baddies_index = get_alive_unit_index(baddie_strengths)
+                if targeted:
+                    targeted_baddie = int(params["id"])
+                #TODO enemy support heals, accuracy,...
+                else:
+                    targeted_baddie = live_baddies_index[round(roll_random_between(0, round(len(live_baddies_index) - 1)))] if len(live_baddies_index) > 1 else live_baddies_index[0]
+                apply_consumable_direct_impact(meta, selected_consumable, targeted_baddie, baddies, baddie_strengths, params, False)
+                    # session["battle"] = None`
+                # handle_win(baddie_strengths, meta, {})  #TODO next map?
+                # handle_loss()
 
-    if selected_consumable["consumable"].get("-type") != "all":
-        if selected_consumable["consumable"].get("-target") == 'enemy':
-            live_baddies_index = [i for s, i in zip(baddie_strengths, range(len(baddie_strengths))) if s > 0]
-            if targeted:
-                targeted_baddie = int(params["id"])
+                target = ('enemy', targeted_baddie)
             else:
-                targeted_baddie = live_baddies_index[round(roll_random_between(0, round(len(live_baddies_index) - 1)))] if len(live_baddies_index) > 1 else live_baddies_index[0]
-            apply_consumable_direct_impact(meta, selected_consumable, targeted_baddie, baddies, baddie_strengths, params, False)
-                # session["battle"] = None
-            # handle_win(baddie_strengths, meta, {})  #TODO next map?
-            # handle_loss()
-
-            target = ('enemy', targeted_baddie)
+                live_friendly_index = get_alive_unit_index(friendly_strengths)
+                if targeted:
+                    targeted_friendly = int(params["id"])
+                elif enemy_turn:
+                    targeted_friendly = next(
+                        i for s, i in zip(friendly_strengths, range(len(friendly_strengths))) if
+                        s > 0 and not is_affected_by_consumable(("ally", i), selected_consumable, active_consumables))
+                else:
+                    targeted_friendly = live_friendly_index[
+                        round(roll_random_between(0, round(len(live_friendly_index) - 1)))] if len(
+                        live_friendly_index) > 1 else live_friendly_index[0]
+                apply_consumable_direct_impact(meta, selected_consumable, targeted_friendly, friendlies, friendly_strengths,
+                                               params, True)
+                target = ('ally', targeted_friendly)
         else:
-            live_friendly_index = [i for s, i in zip(friendly_strengths, range(len(friendly_strengths))) if s > 0]
-            if targeted:
-                targeted_friendly = int(params["id"])
+
+            # TODO: more consumables
+            # if consumable["consumable"].get("-type") == "all":
+            print("Consumable", selected_consumable["-code"], selected_consumable["consumable"].get("-diweapon", ""), "affects all")
+
+            if (selected_consumable["consumable"].get("-target") == 'enemy') ^ enemy_turn:
+                for i in range(len(baddies)):
+                    apply_consumable_direct_impact(meta, selected_consumable, i, baddies, baddie_strengths, params, False)
+                if not targeted and not enemy_turn and len(get_alive_unit_index(baddie_strengths)) > 1:
+                    roll_random_float() #required roll
+                target = ('enemy', None)
             else:
-                targeted_friendly = live_friendly_index[
-                    round(roll_random_between(0, round(len(live_friendly_index) - 1)))] if len(
-                    live_friendly_index) > 1 else live_friendly_index[0]
-            apply_consumable_direct_impact(meta, selected_consumable, targeted_friendly, friendlies, friendly_strengths,
-                                           params, True)
-            target = ('ally', targeted_friendly)
-    else:
+                print("target allies")
+                for i in range(len(friendlies)):
+                    apply_consumable_direct_impact(meta, selected_consumable, i, friendlies, friendly_strengths, params, True)
+                if not targeted and not enemy_turn and len(get_alive_unit_index(friendly_strengths)) > 1:
+                    roll_random_float()
+                target = ('ally', None)
 
-        # TODO: more consumables
-        # if consumable["consumable"].get("-type") == "all":
-        print("Consumable", selected_consumable["-code"], selected_consumable["consumable"].get("-diweapon", ""), "affects all")
-
-        if selected_consumable["consumable"].get("-target") == 'enemy':
-            for i in range(len(baddies)):
-                apply_consumable_direct_impact(meta, selected_consumable, i, baddies, baddie_strengths, params, False)
-            if not targeted and len(baddies) > 1:  #only alive ones?
-                roll_random_float() #required roll
-            target = ('enemy', None)
-        else:
-            print("target allies")
-            for i in range(len(friendlies)):
-                apply_consumable_direct_impact(meta, selected_consumable, i, friendlies, friendly_strengths, params, True)
-            if not targeted and len(friendlies) > 1:
-                roll_random_float()
-            target = ('ally', None)
-
-        # for i in range(len(baddie_strengths)):
-            # baddie_strengths[i] -= 15
-            # print("Baddie", i, "strength", baddie_strengths[i])
-            # if baddie_strengths[i] <= 0:
-            #     baddie_strengths[i] = 0
-            #     print("Baddie", i, "down by consumable")
+            # for i in range(len(baddie_strengths)):
+                # baddie_strengths[i] -= 15
+                # print("Baddie", i, "strength", baddie_strengths[i])
+                # if baddie_strengths[i] <= 0:
+                #     baddie_strengths[i] = 0
+                #     print("Baddie", i, "down by consumable")
 
 
-    if int(selected_consumable["consumable"].get("-duration", "0")) > 0:
-        active_consumables.append((selected_consumable, target, int(selected_consumable["consumable"].get("-duration", "0"))))
+        if int(selected_consumable["consumable"].get("-duration", "0")) > 0:
+            active_consumables.append((selected_consumable, target, int(selected_consumable["consumable"].get("-duration", "0"))))
 
-    handle_win(baddie_strengths, meta, params)
+        if targeted and enemy_turn:
+            print("Consumable use ends enemy turn")
+            process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, False)
+        elif not enemy_turn:
+            process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, True)
+
+        handle_win(baddie_strengths, meta, params)
+        handle_loss(friendly_strengths)
+
+        report_battle_log(friendly_strengths, baddie_strengths, not enemy_turn, None, None,
+                          active_consumables)
+    if casting_ai:
+        active_consumables.append(({"consumable": {}}, ("AI", None), -1))
 
     assign_consumable_response = {"errorType": 0, "userId": 1, "metadata": meta,
                           "data": []}
     return assign_consumable_response
+
+
+def get_alive_unit_index(strengths):
+    return [i for s, i in zip(strengths, range(len(strengths))) if s > 0]
 
 
 def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, units, units_strengths, params, ally):
@@ -512,9 +579,10 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
         if units_strengths[targeted_unit] <= 0:
             units_strengths[targeted_unit] = 0  # dead
             print("Enemy unit" if not ally else "Friendly unit", targeted_unit, "down")
-            handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, {},
-                                                                     units[targeted_unit]))
-            doBattleRewards("kill", unit_current_strength, unit_current_strength, 0)
+            if ally:
+                handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, {},
+                                                                         units[targeted_unit]))
+                doBattleRewards("kill", unit_current_strength, unit_current_strength, 0)
 
         if units_strengths[targeted_unit] > get_unit_max_strength(units[targeted_unit], ally, params):
             print("Limiting heal to max strength")
@@ -530,6 +598,11 @@ def is_stunned(target, active_consumables):
             return True
     return False
 
+def is_affected_by_consumable(target, used_consumable, active_consumables):
+    for consumable, consumable_target, tries in active_consumables:
+        if (consumable_target == target or consumable_target == (target[0], None)) and consumable == used_consumable:
+            return True
+    return False
 
 def get_consumable_damage(target, active_consumables):
     return get_consumable_int(target, active_consumables, "-damage")
@@ -623,6 +696,10 @@ def get_unit_type(unit):
 
 def get_unit_terrain(unit):
     return unit["unit"].get("-type", ",").split(',')[1]
+
+
+def get_unit_secondary(unit):
+    return unit["unit"].get("-secondary")
 
 
 def get_unit_max_strength(unit, ally, params=None):

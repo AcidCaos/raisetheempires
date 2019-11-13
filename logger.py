@@ -33,13 +33,27 @@ def report_other_log(service, response, req, endpoint):
     socketio.emit('other_log', [service, response, req2, req.sequence, endpoint])
 
 
-def report_battle_log(friendly_strengths, baddie_strengths, player_turn, player_unit_id, enemy_unit_id):
+def report_battle_log(friendly_strengths, baddie_strengths, player_turn, player_unit_id, enemy_unit_id, active_consumables):
     friendly_strengths_ = [str(s) for s in friendly_strengths]
     baddie_strengths_ = [str(s) for s in baddie_strengths]
-    mark_array_element(friendly_strengths_, player_unit_id)
-    mark_array_element(baddie_strengths_, enemy_unit_id)
+    if player_unit_id:
+        mark_array_element(friendly_strengths_, player_unit_id)
+    if enemy_unit_id:
+        mark_array_element(baddie_strengths_, enemy_unit_id)
+    for consumable, consumable_target, tries in active_consumables:
+        if consumable_target[1] is None:
+            for i in range(len(baddie_strengths_ if consumable_target[0] == "enemy" else friendly_strengths_)):
+                mark_consumable_array_element(baddie_strengths_ if consumable_target[0] == "enemy" else friendly_strengths_, i, tries)
+        else:
+            mark_consumable_array_element(baddie_strengths_ if consumable_target[0] == "enemy" else friendly_strengths_, consumable_target[1], tries)
+
     socketio.emit('battle_log', ', '.join(friendly_strengths_) + (' => ' if player_turn else ' <= ') + ', '.join(baddie_strengths_))
 
 
 def mark_array_element(strengths, unit_id):
     strengths[unit_id] = "[" + strengths[unit_id] + "]"
+
+
+def mark_consumable_array_element(strengths, unit_id, tries):
+    superscript = str.maketrans("-0123456789", "⁻⁰¹²³⁴⁵⁶⁷⁸⁹")
+    strengths[unit_id] = strengths[unit_id] + "💣" + str(tries).translate(superscript)
