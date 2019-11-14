@@ -1,3 +1,21 @@
+alpha v0.04a
+    0.04a release Nat 14/11/2019 23:26
+    collateral damage amplified by type, incing 1 health enemies Nat 14/11/2019 23:18
+    energy max level Nat 14/11/2019 22:35
+    Consumables: barrage collateral damage Nat 14/11/2019 22:16
+    modifying roads Nat 14/11/2019 19:17
+    Consumables: Z-support units secondary fire Nat 14/11/2019 00:49
+    Consumables: accuracy, target jammer, evasion & nukes, direct consumables, direct heal[+] button, steele is your level+5 Nat 11/11/2019 18:48
+    Consumables: ammo & hunker down power-up, targeting alive baddies, win by consumable Nat 11/11/2019 00:30
+    Consumables: heal & stun power-up, enemy skips turn when fully stunned, patch & seed testing links Nat 08/11/2019 00:48
+    Visual C++ and Adobe Flash Redistributables AcidCaos 08/11/2019 19:17
+    Consumables: random power-up by allies/mercs, or player power-up, support for direct impact and damage over time power-ups Nat 01/11/2019 16:03
+    Added command line options to have the server listen on certain ip addresses, ports, ...(e.g. setting it public). Random player image. Nat 28/10/2019 21:33
+    Initial map: filled upper island, left part. AcidCaos 20/10/2019 18:31
+    Initial map: filled upper island, left part. AcidCaos 20/10/2019 18:31
+    add map extensions AcidCaos 19/10/2019 18:15
+    web front AcidCaos 19/10/2019 15:11
+    add game-page menu and game trailer AcidCaos 17/10/2019 15:54
 alpha v0.03a
     0.03a release, dependencies fix Nat 14/10/2019 01:36
     battle damage quest fix, release build, readme Nat 13/10/2019 22:42

@@ -2,6 +2,7 @@ from flask import session
 
 from game_settings import unlock_expansion
 from quest_engine import handle_quest_progress
+from save_engine import create_backup
 
 
 def migrate(meta, version, target_version):
@@ -22,6 +23,10 @@ def migrate(meta, version, target_version):
         unlock_expansion(207)
 
         version = "0.03a"
+        session['save_version'] = version
+    if version == "0.03a" and version != target_version:
+        create_backup("Update to 0.04a")
+        version = "0.04a"
         session['save_version'] = version
 
 
