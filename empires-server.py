@@ -310,8 +310,8 @@ def record_stats():
 @app.route("/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf")
 def flashFile():
     # return send_from_directory("assets", "ZGame.109338.swf")
-    # return send_from_directory("assets", "ZGame.109338_tracer2.swf")  # regular one
-    return send_from_directory("assets", "ZGame.109338_tracer2a.swf")  # with extra debug logging
+    return send_from_directory("assets", "ZGame.109338_tracer2.swf")  # regular one
+    #return send_from_directory("assets", "ZGame.109338_tracer2a.swf")  # with extra debug logging
 
 
 @app.route("/gameSettings.xml")

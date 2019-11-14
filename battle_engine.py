@@ -153,7 +153,7 @@ def process_consumable_end_turn(active_consumables, baddie_strengths, friendly_s
             if target == ("ally", None):
                 for selected_friendly in range(len(friendly_strengths)):
                     apply_dot_damage(consumable, selected_friendly, friendly_strengths, "Friendly")
-            else:  #if  target[0] == "ally":
+            elif target[0] == "ally":  #if  target[0] == "ally":
                 apply_dot_damage(consumable, target[1], friendly_strengths, "Friendly")
 
     active_consumables[:] = [(consumable, target, tries - (1 if is_consumable_for_turn(target, player_turn) else 0)) for consumable, target, tries
@@ -590,6 +590,33 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
         print("Consumable", selected_consumable["-code"], selected_consumable["consumable"].get("-diweapon", ""), "used to " + ("friendly" if ally else "baddie:"), targeted_unit, "di", direct_impact, "damage", damage)
     else:
         print("Consumable", selected_consumable["-code"], selected_consumable["consumable"].get("-diweapon", ""), "not used to dead " + ("friendly" if ally else "baddie:"), targeted_unit, "di", direct_impact, "damage", damage)
+
+    if "-chipFactor" in selected_consumable["consumable"]:
+        for i in range(len(units)):
+            if units_strengths[i] > 0:
+                collateral_unit_current_strength =  units_strengths[i]
+                units_strengths[i] -= get_adjacent_factor(targeted_unit, i, len(units)) * int(selected_consumable["consumable"]["-chipFactor"]) * int(selected_consumable["consumable"].get("-di", 0)) / 100
+                print("Enemy unit" if not ally else "Friendly unit suffered", collateral_unit_current_strength - units_strengths[i], "collateral damage")
+                if units_strengths[i] <= 0:
+                    units_strengths[i] = 0  # dead
+                    print("Enemy unit" if not ally else "Friendly unit", i, "down by collateral damage")
+                    if ally:
+                        handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, {},
+                                                                                 units[i]))
+                        doBattleRewards("kill", collateral_unit_current_strength, collateral_unit_current_strength, 0)
+
+
+def get_adjacent_factor(unit_1, unit_2, count):
+    if unit_1 == unit_2 or count == 1:
+        return 0
+    elif count == 2:
+        return 4
+    elif count == 3:
+        return [[0,4,3],[4,0,3],[3,4,0]][unit_1][unit_2]
+    elif count == 4:
+        return [[0,4,0,0],[4,0,3,0],[0,4,0,3],[0,0,4,0]][unit_1][unit_2]
+    elif count == 5:
+        return [[0,4,3,0,0],[4,0,3,2,0],[4,3,0,2,1],[0,4,3,0,2][0,0,4,3,0]][unit_1][unit_2]
 
 
 def is_stunned(target, active_consumables):
