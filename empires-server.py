@@ -415,7 +415,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.setWorldName':
             resps.append(world_name_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.updateRoads':
-            resps.append(update_roads_response())
+            resps.append(update_roads_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.streamPublish':
             resps.append(stream_publish_response())
         elif reqq.functionName == 'WorldService.stopMayhemEvent':
@@ -699,9 +699,9 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.reviveUnits':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.moveRoad':
-            resps.append(dummy_response())
+            resps.append(update_roads_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.sellRoad':
-            resps.append(dummy_response())
+            resps.append(update_roads_response(reqq.params[0]))
         elif reqq.functionName == 'PVPService.seenPrisonCampNotification':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.seenStrikeTeamComment':
@@ -1571,7 +1571,8 @@ def world_name_response(name):
     return world_name_response
 
 
-def update_roads_response():
+def update_roads_response(roads):
+    session["user_object"]["userInfo"]["world"]["roadData"] = roads
     update_roads_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                              "data": []}
     return update_roads_response
