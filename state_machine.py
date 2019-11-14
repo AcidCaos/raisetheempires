@@ -169,7 +169,7 @@ def do_state_rewards(state, reference_item, meta):
     levels = [level for level in game_settings['settings']['levels']['level'] if
               int(level["-num"]) > player['level'] and int(level["-requiredXP"]) <= player['xp']]
     for level in levels:
-        [energy_cap] = [e['-cap'] for e in game_settings['settings']['energycaps']['energycap'] if e['-level'] == level["-num"]]
+        energy_cap = ([e['-cap'] for e in game_settings['settings']['energycaps']['energycap'] if e['-level'] == level["-num"]] + [46])[0]
         print("Level increased to", level["-num"], "New energy:", energy_cap)
         player['level'] = int(level["-num"])
         player['energy'] = int(energy_cap)
