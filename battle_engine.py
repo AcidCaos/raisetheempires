@@ -576,6 +576,9 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
             damage *= float(a['-mod'])
     if units_strengths[targeted_unit] > 0: #can't damage/heal dead units
         units_strengths[targeted_unit] -= damage
+        if not ally and 1 >= units_strengths[targeted_unit] > 0:
+            units_strengths[targeted_unit] = 0
+            print("Enemy inced to prevent 1 strength")
         if units_strengths[targeted_unit] <= 0:
             units_strengths[targeted_unit] = 0  # dead
             print("Enemy unit" if not ally else "Friendly unit", targeted_unit, "down")
@@ -594,8 +597,17 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
     if "-chipFactor" in selected_consumable["consumable"]:
         for i in range(len(units)):
             if units_strengths[i] > 0:
-                collateral_unit_current_strength =  units_strengths[i]
-                units_strengths[i] -= get_adjacent_factor(targeted_unit, i, len(units)) * int(selected_consumable["consumable"]["-chipFactor"]) * int(selected_consumable["consumable"].get("-di", 0)) / 100
+                collateral_unit_current_strength = units_strengths[i]
+                colateral_damage = math.ceil(get_adjacent_factor(targeted_unit, i, len(units)) *
+                                             int(selected_consumable["consumable"]["-chipFactor"]) *
+                                             int(selected_consumable["consumable"].get("-di", 0)) / 100)
+                for a in against:
+                    if a['-type'] in (get_unit_type(units[i]), get_unit_terrain(units[i])):
+                        colateral_damage *= float(a['-mod'])
+                units_strengths[i] -= colateral_damage
+                if not ally and 1 >= units_strengths[i] > 0:
+                    units_strengths[i] = 0
+                    print("Enemy inced to prevent 1 strength")
                 print("Enemy unit" if not ally else "Friendly unit suffered", collateral_unit_current_strength - units_strengths[i], "collateral damage")
                 if units_strengths[i] <= 0:
                     units_strengths[i] = 0  # dead
@@ -820,7 +832,7 @@ def doBattleRewards(hit_type, max_strength, damage, friendly_max_strength):
     # TODO: energyRewardModVariant
     # TODO combat losses
 
-    rare_type = friendly_max_strength % 5
+    rare_type = int(friendly_max_strength % 5)
 
     if hit_type == "glancinghit":
         coin_amount = 0
