@@ -175,7 +175,7 @@ def progress_battle_damage(damage, maximum_total, extra,  progress):
 def progress_resource_added_count(rewards, prefix):
     return lambda task, progress, i, extra, *args: \
         task["_action"] == "resourceAdded" and rewards.get(prefix + task["_type"]) \
-        and progress_yield_amount(rewards[prefix + task["_type"]].split('|')[0], task["_total"], extra, progress)
+        and progress_yield_amount(str(rewards[prefix + task["_type"]]).split('|')[0], task["_total"], extra, progress)
 
 
 def progress_market_added_count(amount):

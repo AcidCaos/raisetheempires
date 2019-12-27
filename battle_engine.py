@@ -861,6 +861,7 @@ def doBattleRewards(hit_type, max_strength, damage, friendly_max_strength):
         resource_order = world['resourceOrder']
         resources[resource_order[rare_type]] += rare_amount
         print("Combat rewards", hit_type ,  "rare" + str(rare_type) + ":", rare_amount, "(" + str(resources[resource_order[rare_type]]) + ")")
+        #Todo quest added
 
     print("Combat rewards", hit_type ,  "xp:", xp, "(" + str(player['xp']) + ")")
 
