@@ -2,6 +2,8 @@ import getopt
 import os
 import sys
 
+from itsdangerous import want_bytes
+
 os.environ["PBR_VERSION"] = '5.4.3'
 if not os.environ.get('EDITOR'):
     os.environ["EDITOR"] = 'notepad'  # system specific!
@@ -43,7 +45,7 @@ from builtins import print
 from time import sleep
 
 from flask import Flask, render_template, send_from_directory, request, Response, make_response, redirect
-from flask_session import Session
+from flask_session import Session, SqlAlchemySessionInterface
 from pyamf import remoting
 import pyamf
 
@@ -59,6 +61,10 @@ from quest_engine import *
 from state_machine import *
 from logger import socketio, report_tutorial_step, report_world_log, report_other_log
 import copy
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 # import logging.config
 
@@ -80,11 +86,12 @@ db = SQLAlchemy()
 
 start = datetime.now()
 
-app = Flask(__name__)
+app: Flask = Flask(__name__)
 
 app.config['SESSION_TYPE'] = 'sqlalchemy'
 app.config['SQLALCHEMY_DATABASE_URI'] = save_database_uri()
 app.config['SESSION_SQLALCHEMY'] = db
+app.config['SESSION_COOKIE_HTTPONLY'] = False
 
 
 @app.route("/")
@@ -102,7 +109,8 @@ def home():
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
                            app_friends=json.dumps([ally["appFriendId"] for ally in allies.values()
                                                    if "appFriendId" in ally and ally["appFriendId"] is not None]),
-                           picture=random_image()
+                           picture=random_image(),
+                           sessions_info=get_sessions_info()
                            )
 
 
@@ -116,7 +124,8 @@ def no_debug():
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
                            app_friends=json.dumps([ally["appFriendId"] for ally in allies.values()
                                                    if "appFriendId" in ally and ally["appFriendId"] is not None]),
-                           picture=random_image()
+                           picture=random_image(),
+                           sessions_info=get_sessions_info()
                            )
 
 
@@ -126,6 +135,48 @@ def wipe_session():
     response = make_response(redirect('/home.html'))
     # response.set_cookie('session', '', expires=0)
     return response
+
+
+# @app.route("/switch-session/session-id/<session_id>", methods=['GET', 'POST'])
+# def switch_session(session_id):
+#     response = make_response(redirect('/home.html'))
+#     #session.sid = session_id.split(":")[1]
+#     #response.set_cookie('sessions3', session_id.split(":")[1], max_age=60*60*24*365*2)
+#     return response
+
+
+@app.route("/list_session", methods=['GET', 'POST'])
+def list_session():
+    response = get_sessions_info()
+
+    dump = json.dumps(response,
+                      default=lambda o: '<not serializable>', sort_keys=False, indent=2)
+    return dump
+
+
+def get_sessions_info():
+    records = get_all_sessions()
+    if records:
+        response = [{
+            "session_id": record.session_id,
+            # "expiry" : record.expiry,
+            "uid": save['user_object']["userInfo"]["player"]["uid"],
+            "world_name": save['user_object']["userInfo"]["worldName"],
+            "level": save['user_object']["userInfo"]["player"]["level"],
+            "xp": save['user_object']["userInfo"]["player"]["xp"],
+        } for record in records for save in [pickle.loads(want_bytes(record.data))] if 'user_object' in save]
+    else:
+        response = []
+    return response
+
+
+def get_all_sessions():
+    sess_int: SqlAlchemySessionInterface = app.session_interface
+    sess_model = sess_int.sql_session_model
+    # record = sess_model.query.filter_by(
+    #         id=17).first()
+    records = sess_model.query.all()
+    return records
 
 
 @app.route("/gazillionaire", methods=['GET', 'POST'])

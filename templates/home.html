@@ -127,6 +127,13 @@
         $('#world_log').scrollTop(0)
     });
 
+  	function cookieCrumble(sessionId) {
+        console.log("session " + sessionId);
+        console.log(sessionId.replace(":", "=")+"; max-age="+(60*60*24*365*2));
+        document.cookie=sessionId.replace(":", "=")+"; max-age="+(60*60*24*365*2);
+        location.reload();
+    }
+
 </script>
 <style>
 		.logbox {
@@ -228,8 +235,20 @@
 	  								<i class="fb_logo img sp_e2gpgs sx_584554">
 	  									<u>Facebook logo</u>
 	  								</i>
-	  							</a>
-	  						</div>
+								</a>
+								<ul class="userMenu rfloat">
+									<li>
+										<b>{% for session_info in sessions_info %}{% if session_info["uid"] == zid | int %}
+												{{session_info["world_name"]}} Level {{session_info["level"]}} xp {{session_info["xp"]}}
+											{% endif %}{% endfor %}</b>
+										<ul class="dropdownUser">
+											 {% for session_info in sessions_info %}{% if session_info["uid"] != zid | int %}
+											<li><a href="#" onclick="cookieCrumble(&quot;{{session_info['session_id']}}&quot;); return false">{{session_info["world_name"]}} Level {{session_info["level"]}} xp {{session_info["xp"]}}</a></li>
+											 {% endif %}{% endfor %}
+										</ul>
+									</li>
+								</ul>
+							</div>
 	  					</div>
 	  				<div class="signupBanner">
 	  					<div class="signup_bar_container">
