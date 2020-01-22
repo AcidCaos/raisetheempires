@@ -11,7 +11,7 @@
 
 <head>
 	<title id="pageTitle">Empires &amp; Allies on Facebook | Facebook</title>
-	<link rel="shortcut icon" href="layouts/icon.png"/>
+	<link rel="icon" type="image/png" href="layouts/icon.png"/>
 	<meta charset="utf-8"/>
     <link rel="stylesheet" href="layouts/yc_r.css"/>
 <script>
@@ -137,11 +137,14 @@
 </script>
 <style>
 		.logbox {
+			/*max-width: 450px;*/
+			/*min-width: 325px;*/
 			width: 450px;
 			height: 200px;
 			vertical-align: top;
 			overflow-y: scroll;
 			z-index: 5;
+			display: inline-block;
 		}
 
 		.tooltiplink {
@@ -327,9 +330,8 @@
 												<span class="uiButtonText">Edit save game</span>
 											</a>
 
-
-											<a class="inputaux uiButton" href="https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2" role="button" name="exit_button" target="_blank">
-												<span class="uiButtonText">E&amp;A Wiki</span>
+											<!-- <a class="inputaux uiButton" href="https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2" role="button" name="exit_button" target="_blank">
+												<span class="uiButtonText">E&amp;A Wiki</span> -->
 											</a>
 										</div>
 										<div class="pts">
@@ -337,10 +339,69 @@
 									</div>
 								</div>
 							</div>
+
+							<style>
+								.zBar {
+									text-align: left; 
+									border: solid 1px; 
+									border-color: #DCDCDC; 
+									width:1000px; 
+									height:105px; 
+									border-radius:15px; 
+									margin-bottom: 15px; 
+									padding: 0px 10px 0px 10px; 
+									background-color:#F8F8FB; 
+									background-image: url('layouts/remake.png');
+									background-repeat: no-repeat; 
+									background-size: contain;
+								}
+
+								.zBarButtons {
+									display: inline-block;
+									border: solid 1px;
+									border-color: #DCDCDC;
+									width:50px; 
+									height:50px; 
+									border-radius:5px;
+									background-repeat: no-repeat; 
+									background-size: contain;
+									cursor: pointer;
+								}
+
+								.zBarButtons:hover {
+									border-color: #FAFAFA;
+								}
+
+							</style>
+							<center><div class="zBar" id="zBar">
+								<div style="display: inline-block; float: left; width: 315px; height:105px;"><!-- Used for background--></div>
+								<div style="float: left; height:97px; padding: 4px;">
+									<!-- zbar column 1 content here-->
+									
+									<a title="Empires & Allies Wiki" href="https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2" target="_blank"><div class="zBarButtons" id="zBarButtons" style="background-image: url('layouts/fandom.png');"></div></a>
+
+									<a title="Discord group" href="https://discord.gg/xrNE6Hg" target="_blank"><div class="zBarButtons" id="zBarButtons" style="background-image: url('layouts/discord.png');"></div></a>
+
+									<a title="Github repository" href="https://github.com/AcidCaos/empires-and-allies" target="_blank"><div class="zBarButtons" id="zBarButtons" style="background-image: url('layouts/github.png');"></div></a>
+
+								</div>
+
+								<div style="float: right; height:97px; padding: 4px;">
+									<!-- zbar column 3 content here-->
+									<img src="layouts/RewardVilleLogo.png" style="vertical-align: bottom; display: inline; margin-top: 53px;">
+									
+								</div>
+								<div style="float: right; height:97px; padding: 4px; display: flex;">
+									<!-- zbar column 2 content here-->
+									<img src="layouts/Zcoins.png" style="align-self:flex-end">							
+								</div>
+
+							</div></center>
+
 							<center><div style="text-align: center; width:1010px;">
-								<div class="gameButtons" id="gameButtons" style=" margin-bottom:4px; margin-left: 5px; text-align: left;">
+								<div class="gameButtons" id="gameButtons" style=" margin-bottom:4px; margin-left: 5px; text-align: left; /*border: solid 1px*/; height:20px; padding-top: 4px;">
 									<style>
-										#gameButtons a{
+										#gameButtons a.unsel {
 											color: #000;
 											background-color:#FFFAF0;
 											font: 12px Arial;
@@ -354,22 +415,46 @@
 											border-radius: 15px;
 											margin-left: 3px;
 										}
-										#gameButtons a.selec{
-											
+
+										#gameButtons a.selec {
+											color: #000;
 											background-color:#FFA500;
+											font: 12px Arial;
+											border: solid 1.2px;
+											text-decoration: none;
+											display:inline;
+											padding: 4px;
+											padding-left: 8px;
+											padding-right: 8px;
+											border-color: #DEB887;
+											border-radius: 15px;
+											margin-left: 3px;
 											box-shadow: inset 0px 3px 4px -1px #ffffff;
-											
 										}
-										
+
+										#gameButtons a.unsel:hover {
+											background-color:#FFFEFB;
+											border: solid 1.2px;
+											border-color: #DEB887;
+										}
+
+										#gameButtons a.selec:hover {
+											background-color:#FFB711;
+											box-shadow: inset 0px 3px 3px -1px #ffDA11;
+										}
+
 									</style>
-									<a href="#">Free Gifts</a>
+									<a href="#" class="unsel">Free Gifts</a>
 									<a href="#" class="selec">Play</a>
-									<a href="#">My Meighbors</a>
-									<a href="#">Invite Friends</a>
-									<a href="#">Help</a>
-									<a href="/gazillionaire">Get Empire Points</a>
-									<a href="#">Earn Empire Points</a>
-									<a href="#">GameCards</a>
+									<a href="#" class="unsel">My Neighbors</a>
+									<a href="#" class="unsel">Invite Friends</a>
+									<a title="Check the Empires & Allies Wiki" href="https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2" class="unsel">Help</a>
+									<a title="Adds 10k Empire Points" href="/gazillionaire" class="unsel">Get Empire Points</a>
+									<a href="#" class="unsel">Earn Empire Points</a>
+									<a href="#" class="unsel">GameCards</a>
+
+									<a href="#" style="display:inline; float:right; padding-top: 0px;"><img src="layouts/globe.png" style="height:25px"></a>
+
 								</div>
 								
 								<div style="margin:10px">
@@ -388,14 +473,24 @@
 
 							</div></center>
 						</div>
-						<table>
-							<tr>
-								<td><div class="logbox" id="tutorial_step">&nbsp;</div></td>
-								<td><div class="logbox" id="world_log">&nbsp;</div></td>
-								<td><div class="logbox" id="other_log">&nbsp;</div></td>
-							</tr>
-						</table>
 
+						<div style="margin: 30px"></div>
+						<div class="uiInterstitialBar uiBoxGray topborder">
+							<div class="clearfix">
+								<center><table style="border: 1px solid #3b5998; border-radius: 5px;">
+									<tr>
+										<td><div class="logbox" id="tutorial_step">&nbsp;</div></td>
+										<td><div class="logbox" id="world_log">&nbsp;</div></td>
+										<td><div class="logbox" id="other_log">&nbsp;</div></td>
+									</tr>
+								</table></center>
+								<center>
+									<p style="color: #666699;"> <br>
+									The Raise the Empires team. Empires &amp; Allies {{ version | default("")}}
+									</p>
+								</center>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
