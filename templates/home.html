@@ -241,12 +241,12 @@
 								</a>
 								<ul class="userMenu rfloat">
 									<li>
-										<b>{% for session_info in sessions_info %}{% if session_info["uid"] == zid | int %}
-												{{session_info["world_name"]}} Level {{session_info["level"]}} xp {{session_info["xp"]}}
+										<b>{% for dropdown_item in dropdown_items %}{% if dropdown_item["uid"] == zid | int %}
+												{{dropdown_item["world_name"]}} Level {{dropdown_item["level"]}} xp {{dropdown_item["xp"]}}
 											{% endif %}{% endfor %}</b>
 										<ul class="dropdownUser">
-											 {% for session_info in sessions_info %}{% if session_info["uid"] != zid | int %}
-											<li><a href="#" onclick="cookieCrumble(&quot;{{session_info['session_id']}}&quot;); return false">{{session_info["world_name"]}} Level {{session_info["level"]}} xp {{session_info["xp"]}}</a></li>
+											 {% for dropdown_item in dropdown_items %}{% if dropdown_item["uid"] != zid | int %}
+											<li><a href="#" onclick="cookieCrumble(&quot;{{dropdown_item['session_id']}}&quot;); return false">{{dropdown_item["world_name"]}} Level {{dropdown_item["level"]}} xp {{dropdown_item["xp"]}}</a></li>
 											 {% endif %}{% endfor %}
 										</ul>
 									</li>

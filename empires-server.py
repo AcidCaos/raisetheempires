@@ -102,30 +102,42 @@ def index():
 @app.route("/home.html")
 def home():
     print("home")
+    saves = get_saves()
     return render_template("home.html", time=datetime.now().timestamp(), zid=str(get_zid()),
                            version=version,
-                           allies=json.dumps([ally["friend"] for ally in allies.values()
-                                              if "friend" in ally and ally["friend"] and ally["neighbor"]],
+                           allies=json.dumps(get_allies_friend(saves),
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
-                           app_friends=json.dumps([ally["appFriendId"] for ally in allies.values()
-                                                   if "appFriendId" in ally and ally["appFriendId"] is not None]),
+                           app_friends=json.dumps(get_allies_id(saves)),
                            picture=random_image(),
-                           sessions_info=get_sessions_info()
+                           dropdown_items=get_sessions_dropdown_info(saves)
                            )
+
+
+def get_allies_friend(saves):
+    return [ally["friend"] for ally in allies.values()
+            if "friend" in ally and ally["friend"] and ally["neighbor"]] + get_sessions_friends(saves)
+
+
+def get_allies_id(saves):
+    return [ally["appFriendId"] for ally in allies.values()
+            if "appFriendId" in ally and ally["appFriendId"] is not None] + get_sessions_id(saves)
+
+
+def get_allies_info():
+    return [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neighbor")]+ get_sessions_info(get_saves())
 
 
 @app.route("/nodebug.html")
 def no_debug():
     print("no debug page")
+    saves = get_saves()
     return render_template("nodebug.html", time=datetime.now().timestamp(), zid=str(get_zid()),
                            version=version,
-                           allies=json.dumps([ally["friend"] for ally in allies.values()
-                                              if "friend" in ally and ally["friend"] and ally["neighbor"]],
+                           allies=json.dumps(get_allies_friend(saves),
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
-                           app_friends=json.dumps([ally["appFriendId"] for ally in allies.values()
-                                                   if "appFriendId" in ally and ally["appFriendId"] is not None]),
+                           app_friends=json.dumps(get_allies_id(saves)),
                            picture=random_image(),
-                           sessions_info=get_sessions_info()
+                           dropdown_items=get_sessions_dropdown_info(saves)
                            )
 
 
@@ -147,27 +159,85 @@ def wipe_session():
 
 @app.route("/list_session", methods=['GET', 'POST'])
 def list_session():
-    response = get_sessions_info()
+    response = get_sessions_dropdown_info(get_all_sessions())
 
     dump = json.dumps(response,
                       default=lambda o: '<not serializable>', sort_keys=False, indent=2)
     return dump
 
 
-def get_sessions_info():
-    records = get_all_sessions()
-    if records:
+def get_sessions_dropdown_info(saves):
+    if saves:
         response = [{
-            "session_id": record.session_id,
+            "session_id": save['session_id'],
             # "expiry" : record.expiry,
             "uid": save['user_object']["userInfo"]["player"]["uid"],
             "world_name": save['user_object']["userInfo"]["worldName"],
             "level": save['user_object']["userInfo"]["player"]["level"],
             "xp": save['user_object']["userInfo"]["player"]["xp"],
-        } for record in records for save in [pickle.loads(want_bytes(record.data))] if 'user_object' in save]
+        } for save in saves]
     else:
         response = []
     return response
+
+
+def get_sessions_friends(saves):
+    one_image = random_image() # one random for performance reasons
+    if saves:
+        response = [{
+                "zid":  save['user_object']["userInfo"]["player"]["uid"],
+                "uid":  save['user_object']["userInfo"]["player"]["uid"],
+                "first_name": save['user_object']["userInfo"]["worldName"],
+                "name": save['user_object']["userInfo"]["worldName"],
+                "sex": "F",
+                "portrait": one_image,
+                "pic": one_image,
+                "pic_square": one_image
+        } for save in saves if save['user_object']["userInfo"]["player"]["level"] >= -6]
+    else:
+        response = []
+    return response
+
+
+def get_sessions_info(saves):
+    one_image = random_image() # one random for performance reasons, turn list to load once on start
+    if saves:
+        response = [{
+            "uid": save['user_object']["userInfo"]["player"]["uid"],
+            "resource": save['user_object']["userInfo"]["player"]["playerResourceType"],
+            "coins": save['user_object']["userInfo"]["world"]['resources']["coins"],
+            "xp": save['user_object']["userInfo"]["player"]["xp"],
+            "level": save['user_object']["userInfo"]["player"]["level"],
+            "socialXpGood": save['user_object']["userInfo"]["player"]["socialXpGood"],
+            "socialLevelGood": save['user_object']["userInfo"]["player"]["socialLevelGood"],
+            "socialXpBad": save['user_object']["userInfo"]["player"]["socialXpBad"],
+            "socialLevelBad": save['user_object']["userInfo"]["player"]["socialLevelBad"],
+            "profilePic": one_image,
+            "dominanceRank": 1,
+            "tending": {
+                "actions": 3
+            }
+        } for save in saves if save['user_object']["userInfo"]["player"]["level"] >= -6]
+    else:
+        response = []
+    return response
+
+
+def get_sessions_id(saves):
+    if saves:
+        response = [save['user_object']["userInfo"]["player"]["uid"] for save in saves if save['user_object']["userInfo"]["player"]["level"] >= -6]
+    else:
+        response = []
+    return response
+
+
+def get_saves():
+    return [enrich_save(save, record) for record in get_all_sessions() for save in [pickle.loads(want_bytes(record.data))] if 'user_object' in save]
+
+
+def enrich_save(save, record):
+    save["session_id"] = record.session_id
+    return save
 
 
 def get_all_sessions():
@@ -1053,7 +1123,7 @@ def init_user():
                       }
 
         },
-        "neighbors": [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neighbor")],
+        "neighbors": get_allies_info(),
         "unlockedResource": {"aluminum": 3, "copper": 4, "gold": 5, "iron": 6},
         "showBookmark": True,
         "firstDay": True,
@@ -1148,7 +1218,7 @@ def user_response():
 
         qc = session['quests']
 
-        user["neighbors"] = [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neighbor")]
+        user["neighbors"] = get_allies_info()
 
         meta = {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]}
     else:
@@ -1676,17 +1746,26 @@ def load_world_response(params):
     else:
         ally = copy.deepcopy(init_user()["userInfo"])
         ally["player"]["uid"] = int(params[0])
-        if allies[str(params[0])]["objects"]:
-            ally["world"]["objects"] = allies[str(params[0])]["objects"]
-        if allies[str(params[0])]["roads"]:
-            ally["world"]["roadData"] = allies[str(params[0])]["roads"]
-        ##Added
-        if allies[str(params[0])]["expansions"]:
-            ally["player"]["expansions"] = allies[str(params[0])]["expansions"]
-        if allies[str(params[0])]["worldName"]:
-            ally["worldName"] = allies[str(params[0])]["worldName"]
-        if allies[str(params[0])]["titanName"]:
-            ally["titanName"] = allies[str(params[0])]["titanName"]
+        if str(params[0]) in allies:
+            if allies[str(params[0])]["objects"]:
+                ally["world"]["objects"] = allies[str(params[0])]["objects"]
+            if allies[str(params[0])]["roads"]:
+                ally["world"]["roadData"] = allies[str(params[0])]["roads"]
+            ##Added
+            if allies[str(params[0])]["expansions"]:
+                ally["expansions"] = allies[str(params[0])]["expansions"]
+            if allies[str(params[0])]["worldName"]:
+                ally["worldName"] = allies[str(params[0])]["worldName"]
+            if allies[str(params[0])]["titanName"]:
+                ally["titanName"] = allies[str(params[0])]["titanName"]
+        else:
+            [save] = [save for save in get_saves() if str(save['user_object']["userInfo"]["player"]["uid"]) == str(params[0])]
+            ally["world"]["objects"] = save['user_object']["userInfo"]["world"]["objects"]
+            ally["world"]["roadData"] = save['user_object']["userInfo"]["world"]["roadData"]
+            ally["expansions"] = save['user_object']["userInfo"]["player"]["expansions"]
+            ally["worldName"] = save['user_object']["userInfo"]["worldName"]
+            ally["titanName"] = save['user_object']["userInfo"]["titanName"]
+
         # ally["gf"] = False
         # ally["yimf"] = ""
         # ally["novisit"] = False
