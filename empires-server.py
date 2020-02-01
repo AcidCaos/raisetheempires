@@ -249,6 +249,16 @@ def get_all_sessions():
     return records
 
 
+def store_session(save):
+    sess_int: SqlAlchemySessionInterface = app.session_interface
+    sess_model = sess_int.sql_session_model
+    record = sess_model.query.filter_by(
+            session_id=save["session_id"]).first()
+
+    record.data = pickle.dumps(dict(save))
+    sess_int.db.session.commit()
+
+
 @app.route("/gazillionaire", methods=['GET', 'POST'])
 def more_money():
     if 'user_object' in session:
@@ -550,7 +560,7 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.loadWorld':
             resps.append(load_world_response(reqq.params))
         elif reqq.functionName == 'VisitorService.help':
-            resps.append(tend_ally_response())
+            resps.append(tend_ally_response(reqq.params))
         elif reqq.functionName == 'WorldService.beginNextCampaign':
             resps.append(next_campaign_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.addFleet':
@@ -1179,7 +1189,7 @@ def init_user():
         "FREE_GIFT_PARTS_BUILDING_DATA": "",
         "snid": 0,
         "snuid": 0,
-        "visitorHelpRequests": None,
+        "visitorHelpRequests": {},
         "LE_DISCOUNT_SALE": 0,
         "LOW_EP_POPUP": None,
         "COMBAT_NO_ENERGY": 0,
@@ -1782,9 +1792,22 @@ def load_world_response(params):
                            "data": ally}
     return load_world_response
 
-def tend_ally_response():
+def tend_ally_response(params):
     meta = {"newPVE": 0}
     handle_quest_progress(meta, progress_action("tending"))
+
+    for save in get_saves():
+        if save['user_object']["userInfo"]["player"]["uid"] == int(params[0]):
+            if not save['user_object']["visitorHelpRequests"]:
+                save['user_object']["visitorHelpRequests"] = {}
+            if str(get_zid()) in save['user_object']["visitorHelpRequests"]:
+                save['user_object']["visitorHelpRequests"][str(get_zid())] += "," + str(params[1])
+            else:
+                save['user_object']["visitorHelpRequests"][str(get_zid())] = str(params[1])
+            store_session(save)
+
+    #TODO rewards!!
+
     tend_ally_response = {"errorType": 0, "userId": 1, "metadata": meta,
                           "data": []}
     return tend_ally_response

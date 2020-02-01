@@ -1,5 +1,6 @@
 alpha v0.05a
-    multiplayer: visiting server friends, unlocked tending Nat 01/02/2019 01:21
+    multiplayer: tending neighbors Nat 01/02/2020 23:26
+    multiplayer: visiting server friends, unlocked tending Nat 01/02/2020 01:21
     Added zBar. Style logbox. AcidCaos 22/01/2020 18:58
     multiplayer: access to other player sessions, session switcher to switch to other player profiles Nat 22/01/2020 00:31
     battle rewards completing coin quests fix Nat 27/12/2019 15:08
