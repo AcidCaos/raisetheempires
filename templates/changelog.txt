@@ -1,4 +1,5 @@
 alpha v0.05a
+    multiplayer: tending recipient accept/decline, new session & change ore menu, neighbor ore quests Nat 02/02/2020 23:58
     multiplayer: tending rewards Nat 02/02/2020 18:57
     multiplayer: tending neighbors Nat 01/02/2020 23:26
     multiplayer: visiting server friends, unlocked tending Nat 01/02/2020 01:21

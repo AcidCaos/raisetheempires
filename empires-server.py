@@ -896,9 +896,9 @@ def post_gateway():
         elif reqq.functionName == 'UserService.viralSurfacingSeen':
             resps.append(dummy_response())
         elif reqq.functionName == 'VisitorService.accept':
-            resps.append(dummy_response())
+            resps.append(accept_tend_ally_response(reqq.params))
         elif reqq.functionName == 'VisitorService.decline':
-            resps.append(dummy_response())
+            resps.append(decline_tend_ally_response(reqq.params))
         elif reqq.functionName == 'VisitorService.helpedInvalid':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.grantWatchToEarnReward':
@@ -1810,6 +1810,28 @@ def tend_ally_response(params):
     tend_ally_response = {"errorType": 0, "userId": 1, "metadata": meta,
                           "data": []}
     return tend_ally_response
+
+
+def accept_tend_ally_response(params):
+    meta = {"newPVE": 0}
+    for item in session['user_object']["visitorHelpRequests"][params[0]].split(","):
+        click_next_state(False, int(item), meta, None, None, playback_tend=True)
+
+    del session['user_object']["visitorHelpRequests"][params[0]]
+
+    accept_tend_ally_response = {"errorType": 0, "userId": 1, "metadata": meta,
+                          "data": []}
+    return accept_tend_ally_response
+
+
+def decline_tend_ally_response(params):
+    meta = {"newPVE": 0}
+
+    del session['user_object']["visitorHelpRequests"][params[0]]
+
+    decline_tend_ally_response = {"errorType": 0, "userId": 1, "metadata": meta,
+                          "data": []}
+    return decline_tend_ally_response
 
 
 def add_fleet_response(param):

@@ -40,7 +40,7 @@ def click_next_state(do_click, id, meta, step, reference_item, speed_up=False, t
                 state = lookup_state(state_machine, next_state_id, cur_object, True)
                 check_state(state_machine, state, cur_object, tending)
                 if not tending:
-                    do_state_rewards(state, cur_object.get('referenceItem'), meta)
+                    do_state_rewards(state, cur_object.get('referenceItem'), meta, playback_tend=playback_tend)
                 if 'lastUpdated' not in cur_object:
                     cur_object['lastUpdated'] = 0  #init?
                 cur_object['lastUpdated'] += duration * 1000
@@ -63,7 +63,7 @@ def click_next_state(do_click, id, meta, step, reference_item, speed_up=False, t
             check_state(state_machine, next_click_state, cur_object, tending)
             print("next_click_state:", repr(next_click_state))
             if not tending:
-                do_state_rewards(next_click_state, cur_object.get('referenceItem'), meta)
+                do_state_rewards(next_click_state, cur_object.get('referenceItem'), meta, playback_tend=playback_tend)
                 handle_world_state_change(meta, next_click_state, state_machine, game_item, step, state, reference_item,  cur_object.get('referenceItem'))
             else:
                 if tend_type == "mine":
@@ -86,7 +86,7 @@ def click_next_state(do_click, id, meta, step, reference_item, speed_up=False, t
                 check_state(state_machine, next_click_state, cur_object, tending)
                 print("auto_next_state:", repr(next_click_state))
                 if not tending:
-                    do_state_rewards(next_click_state, reference_item, meta)
+                    do_state_rewards(next_click_state, reference_item, meta, playback_tend=playback_tend)
                     handle_world_state_change(meta, next_click_state, state_machine, game_item, step, previous_state, reference_item, reference_item)
 
             cur_object['state'] = next_state_id
@@ -141,10 +141,13 @@ def parse_duration(duration):
         return float(duration)
 
 
-def do_state_rewards(state, reference_item, meta):
+def do_state_rewards(state, reference_item, meta, playback_tend=False):
     player = session['user_object']["userInfo"]["player"]
     player['xp'] += int(state.get('-xp', 0))
-    player['energy'] += int(state.get('-energy', 0))
+    energy = int(state.get('-energy', 0))
+    if playback_tend:
+        energy = max(energy, 0);
+    player['energy'] += energy
     player['cash'] += int(state.get('-cash', 0))
     player['socialXpGood'] += int(state.get('-socialXpGood', 0))
     player['socialXpBad'] += int(state.get('-socialXpBad', 0))
@@ -152,7 +155,7 @@ def do_state_rewards(state, reference_item, meta):
     world = session['user_object']["userInfo"]["world"]
     resources = world['resources']
     resources['coins'] += int(state.get('-coins', 0))
-    resources['energy'] += int(state.get('-energy', 0)) #which one?
+    resources['energy'] += energy  #which one?
     resources['oil'] += int(state.get('-oil', '0').split('|')[0])
     resources['wood'] += int(state.get('-wood', '0').split('|')[0])
 
@@ -210,7 +213,7 @@ def do_state_rewards(state, reference_item, meta):
          (label, increment, total)
          in
          [("xp:", state.get('-xp', '0'), player['xp']),
-          ("energy:", state.get('-energy', '0'), player['energy']),
+          ("energy:", str(energy), player['energy']),
           ("coins:", state.get('-coins', '0'), resources['coins']),
           ("oil:", state.get('-oil', '0'), resources['oil']),
           ("wood:", state.get('-wood', '0'), resources['wood']),

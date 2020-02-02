@@ -1555,7 +1555,7 @@ ul li a:hover
 {
     background: #617F8A;
 }
-li:hover ul
+li:hover > ul
 {
     display: block;
     position: absolute;
@@ -1576,3 +1576,22 @@ li:hover li a:hover
 {
     background: #95A9B1;
 }
+
+.third-level-menu
+{
+    position: absolute;
+    top: 0;
+    right: -150px;
+    width: 150px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: none;
+}
+
+.third-level-menu > li
+{
+    height: 30px;
+    background: #999999;
+}
+.third-level-menu > li:hover { background: #CCCCCC; }

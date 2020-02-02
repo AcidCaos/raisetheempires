@@ -134,6 +134,12 @@
         location.reload();
     }
 
+  	function eatCookie() {
+        document.cookie= "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+		console.log("session cookie eaten");
+        location.reload();
+    }
+
 </script>
 <style>
 		.logbox {
@@ -245,6 +251,15 @@
 												{{dropdown_item["world_name"]}} Level {{dropdown_item["level"]}} xp {{dropdown_item["xp"]}}
 											{% endif %}{% endfor %}</b>
 										<ul class="dropdownUser">
+											<li><a href="#" onclick="eatCookie(); return false">New</a><li>
+											<li><a href="#" onclick="return false">Change ore</a>
+												<ul class="third-level-menu">
+													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/3"><img src="layouts/Aluminum_60.png"></a></li>
+													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/4"><img src="layouts/Copper_60.png"></a></li>
+													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/5"><img src="layouts/Gold_60.png"></a></li>
+													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/6"><img src="layouts/Iron_60.png"></a></li>
+													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/7"><img src="layouts/Uranium_60.png"></a></li>
+												</ul></li>
 											 {% for dropdown_item in dropdown_items %}{% if dropdown_item["uid"] != zid | int %}
 											<li><a href="#" onclick="cookieCrumble(&quot;{{dropdown_item['session_id']}}&quot;); return false">{{dropdown_item["world_name"]}} Level {{dropdown_item["level"]}} xp {{dropdown_item["xp"]}}</a></li>
 											 {% endif %}{% endfor %}

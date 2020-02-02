@@ -173,9 +173,17 @@ def progress_battle_damage(damage, maximum_total, extra,  progress):
 
 
 def progress_resource_added_count(rewards, prefix):
+    standard_resources = ["coins", "oil", "wood", "aluminum", "copper", "gold", "iron", "uranium"]
+    ores = ["aluminum", "copper", "gold", "iron", "uranium"]
+    rares = {"rare": 0, "nrare0": 0, "nrare1": 1, "nrare2": 2, "nrare3": 3, "nrare4": 4}
+    resource_type = session['user_object']["userInfo"]["player"]["playerResourceType"]
+    sorted_ores = ores[resource_type - 3:] + ores[:resource_type - 3]
+    # resources[standard_resources[int(market["item"])]]
     return lambda task, progress, i, extra, *args: \
-        task["_action"] == "resourceAdded" and rewards.get(prefix + task["_type"]) \
-        and progress_yield_amount(str(rewards[prefix + task["_type"]]).split('|')[0], task["_total"], extra, progress)
+        task["_action"] == "resourceAdded" and ((rewards.get(prefix + task["_type"]) \
+        and progress_yield_amount(str(rewards[prefix + task["_type"]]).split('|')[0], task["_total"], extra, progress)) \
+        or (task["_type"] in rares and rewards.get(prefix + sorted_ores[rares[task["_type"]]]) \
+        and progress_yield_amount(str(rewards[prefix + sorted_ores[rares[task["_type"]]]]).split('|')[0], task["_total"], extra, progress)))
 
 
 def progress_market_added_count(amount):
