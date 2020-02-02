@@ -69,6 +69,11 @@ def lookup_yield():  #TODO buildstate
     return sum([yields[e['itemName']] for e in session['user_object']["userInfo"]["world"]["objects"] if e['itemName'] in yields.keys()])
 
 
+def lookup_visitor_reward(reward_name):
+    [reward] = [reward for reward in game_settings['settings']['visitorRewards']["reward"] if reward["-name"] == reward_name]
+    return reward
+
+
 # def lookup_built_yield(placed_objects):
 #     built_objects = [e for e in objects if
 #                      int(e.get('state', 0)) >= (int(state_machine['-builtState']) if state_machine else 0)]

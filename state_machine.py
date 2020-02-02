@@ -3,16 +3,17 @@ from quest_engine import handle_world_state_change, roll_reward_random_float, ha
 from datetime import datetime
 from flask import session
 from game_settings import game_settings, lookup_item_by_name, lookup_state_machine, lookup_reference_item, \
-    lookup_item_by_code
-from save_engine import lookup_object, create_backup
+    lookup_item_by_code, lookup_visitor_reward
+from save_engine import lookup_object, create_backup, lookup_object_save
 
 
 # TODO add new reference item from clicknext step, use old one for first autostep, new one for 2nd autonext,
 #  not needed: is handled by checkstates if new one is null then use old reference item in clicknext(harvesting step?)
 # TODO checkState?
-def click_next_state(do_click, id, meta, step, reference_item, speed_up):
-    cur_object = lookup_object(id)
+def click_next_state(do_click, id, meta, step, reference_item, speed_up=False, tending=False, save=None, playback_tend=False, tend_type=None):
+    cur_object = lookup_object(id) if not tending else lookup_object_save(save, id)
     print("cur_object used:", repr(cur_object))
+    tend = tending or playback_tend
 
     game_item = lookup_item_by_name(cur_object['itemName'])
     print("item used:", repr(game_item))
@@ -29,26 +30,29 @@ def click_next_state(do_click, id, meta, step, reference_item, speed_up):
 
         while '-autoNext' in state and state['-stateName'] != state['-autoNext']:   # '-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
             duration =  parse_duration(state.get('-duration', '0'))
-            if cur_object.get('lastUpdated', 0) / 1000 +  duration <= timestamp or speed_up:
+            if cur_object.get('lastUpdated', 0) / 1000 +  duration <= timestamp or speed_up or tend:
                 if cur_object.get('lastUpdated', 0) / 1000 + duration > timestamp:
                     speed_up = False  # consumes speed up
+                    tend = False
                     print("speed up used")
                 next_state_id = state['-autoNext']  # not all states have this!! end states? autostate after time?
                 previous_state = state
                 state = lookup_state(state_machine, next_state_id, cur_object, True)
-                check_state(state_machine, state, cur_object)
-                do_state_rewards(state, cur_object.get('referenceItem'), meta)
+                check_state(state_machine, state, cur_object, tending)
+                if not tending:
+                    do_state_rewards(state, cur_object.get('referenceItem'), meta)
                 if 'lastUpdated' not in cur_object:
                     cur_object['lastUpdated'] = 0  #init?
                 cur_object['lastUpdated'] += duration * 1000
                 cur_object['state'] = next_state_id
                 print("pre auto_next_state:", repr(state), 'time', cur_object['lastUpdated'], "duration", duration)
-                handle_world_state_change(meta, state, state_machine, game_item, step, previous_state, cur_object.get('referenceItem'), cur_object.get('referenceItem'))
+                if not tending:
+                    handle_world_state_change(meta, state, state_machine, game_item, step, previous_state, cur_object.get('referenceItem'), cur_object.get('referenceItem'))
             else:
                 print("state has autoNext, but not enough time was passed")
                 break
 
-        if do_click and '-clickNext' in state:
+        if (do_click or tend) and '-clickNext' in state:
             next_state_id = state['-clickNext']
             if reference_item != cur_object.get('referenceItem'):
                 state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'],
@@ -56,19 +60,34 @@ def click_next_state(do_click, id, meta, step, reference_item, speed_up):
                                                      (lookup_item_by_code(reference_item.split(":")[0]) if reference_item else {})
                                                      .get('referenceValues', {}).get('define'))
             next_click_state = lookup_state(state_machine, next_state_id, cur_object, True)
-            check_state(state_machine, next_click_state, cur_object)
+            check_state(state_machine, next_click_state, cur_object, tending)
             print("next_click_state:", repr(next_click_state))
-            do_state_rewards(next_click_state, cur_object.get('referenceItem'), meta)
-            handle_world_state_change(meta, next_click_state, state_machine, game_item, step, state, reference_item,  cur_object.get('referenceItem'))
+            if not tending:
+                do_state_rewards(next_click_state, cur_object.get('referenceItem'), meta)
+                handle_world_state_change(meta, next_click_state, state_machine, game_item, step, state, reference_item,  cur_object.get('referenceItem'))
+            else:
+                if tend_type == "mine":
+                    standard_resources = ["coins", "oil", "wood", "aluminum", "copper", "gold", "iron", "uranium"]
+                    tend_type += standard_resources[save['user_object']["userInfo"]["player"]["playerResourceType"]]
+                elif tend_type == "harvest":
+                    tend_type += "_" + game_item['stateMachineValues']['-referenceType'] if '-referenceType' in game_item['stateMachineValues'] else ""
+                    tend_type += "_" + game_item['stateMachineValues']['-referenceSubtype'] if '-referenceSubtype' in game_item['stateMachineValues'] else ""
+                elif tend_type == "clear":
+                    tend_type += game_item['-subtype']
+                #TODO Crew tax
+
+                reward = lookup_visitor_reward(tend_type)
+                do_state_rewards(reward, cur_object.get('referenceItem'), meta)
 
             while '-autoNext' in next_click_state and next_state_id != next_click_state['-autoNext'] and next_click_state.get('-duration', '0') in ['0', '0s']:   #'-clientDuration': '2.0s', '-duration': '0' respect duration for harvest?
                 next_state_id = next_click_state['-autoNext']
                 previous_state = next_click_state
                 next_click_state = lookup_state(state_machine, next_state_id, cur_object, True)
-                check_state(state_machine, next_click_state, cur_object)
+                check_state(state_machine, next_click_state, cur_object, tending)
                 print("auto_next_state:", repr(next_click_state))
-                do_state_rewards(next_click_state, reference_item, meta)
-                handle_world_state_change(meta, next_click_state, state_machine, game_item, step, previous_state, reference_item, reference_item)
+                if not tending:
+                    do_state_rewards(next_click_state, reference_item, meta)
+                    handle_world_state_change(meta, next_click_state, state_machine, game_item, step, previous_state, reference_item, reference_item)
 
             cur_object['state'] = next_state_id
             cur_object['lastUpdated'] = timestamp * 1000
@@ -78,7 +97,8 @@ def click_next_state(do_click, id, meta, step, reference_item, speed_up):
     else:
         print("object has no statemachine, click does nothing")
         cur_object['lastUpdated'] = timestamp * 1000
-        handle_world_state_change(meta, {}, None, game_item, step, {}, reference_item, reference_item)
+        if not tending:
+            handle_world_state_change(meta, {}, None, game_item, step, {}, reference_item, reference_item)
 
 
 def lookup_state(state_machine, i, cur_object, check_state):
@@ -90,16 +110,16 @@ def lookup_state(state_machine, i, cur_object, check_state):
 
 
 #use state from current statemachine as replacement state for that state (with values and 2 random numbers
-def check_state(state_machine, state, cur_object):
+def check_state(state_machine, state, cur_object, tending):
     if '-checkState' in state:
         check_state = lookup_state(state_machine, state["-checkState"], cur_object, False)
         if 'check_state' not in cur_object:
             cur_object['check_state'] = {}
         cur_object['check_state'][state["-checkState"]] = check_state
         print("Future check state overridden", state["-checkState"])
-        if "-xp" in check_state:
+        if "-xp" in check_state and not tending:
             roll_reward_random_float() # prison xp
-        if "-dooberType" in check_state:
+        if "-dooberType" in check_state and not tending:
             roll_reward_random_float() # for the platinum pipes
 
 
@@ -143,6 +163,11 @@ def do_state_rewards(state, reference_item, meta):
     resources[resource_order[2]] += int(state.get('-nrare2', '0').split('|')[0])
     resources[resource_order[3]] += int(state.get('-nrare3', '0').split('|')[0])
     resources[resource_order[4]] += int(state.get('-nrare4', '0').split('|')[0])
+    resources["aluminum"] += int(state.get('-aluminum', '0').split('|')[0])
+    resources["copper"] += int(state.get('-copper', '0').split('|')[0])
+    resources["gold"] += int(state.get('-gold', '0').split('|')[0])
+    resources["iron"] += int(state.get('-iron', '0').split('|')[0])
+    resources["uranium"] += int(state.get('-uranium', '0').split('|')[0])
 
     item_inventory = player["inventory"]["items"]
     if int(state.get('-buildable', '0')):
@@ -200,7 +225,12 @@ def do_state_rewards(state, reference_item, meta):
           (resource_order[1] + ":", state.get('-nrare1', '0'), resources[resource_order[1]]),
           (resource_order[2] + ":", state.get('-nrare2', '0'), resources[resource_order[2]]),
           (resource_order[3] + ":", state.get('-nrare3', '0'), resources[resource_order[3]]),
-          (resource_order[4] + ":", state.get('-nrare4', '0'), resources[resource_order[4]])
+          (resource_order[4] + ":", state.get('-nrare4', '0'), resources[resource_order[4]]),
+          ("aluminum" + ":", state.get('-aluminum', '0'), resources["aluminum"]),
+          ("copper" + ":", state.get('-copper', '0'), resources["copper"]),
+          ("gold" + ":", state.get('-gold', '0'), resources["gold"]),
+          ("iron" + ":", state.get('-iron', '0'), resources["iron"]),
+          ("uranium" + ":", state.get('-uranium', '0'), resources["uranium"])
           ] if int(increment.split('|')[0]) != 0])
     if log_rewards:
         print("State rewards:", log_rewards)

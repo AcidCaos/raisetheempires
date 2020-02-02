@@ -1491,7 +1491,7 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
     meta = {"newPVE": 0}
 
     if step in ["place", "setState"]:
-        click_next_state(True, id, meta, step, reference_item, False)  # place & setstate only
+        click_next_state(True, id, meta, step, reference_item)  # place & setstate only
 
     if step == "setState":
         lookup_object(id)["referenceItem"] = reference_item
@@ -1524,7 +1524,7 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
 
     if step == "speedUp":
         # lookup_object(id)['lastUpdated'] = lookup_object(id).get('lastUpdated', 0) - elapsed * 1000
-        click_next_state(False, id, meta, step, reference_item, True)
+        click_next_state(False, id, meta, step, reference_item, speed_up=True)
     # TODO: cost of speedup?
 
     if step == "add":
@@ -1805,8 +1805,7 @@ def tend_ally_response(params):
             else:
                 save['user_object']["visitorHelpRequests"][str(get_zid())] = str(params[1])
             store_session(save)
-
-    #TODO rewards!!
+            click_next_state(False, params[1], meta, None, None, tending=True, save=copy.deepcopy(save), tend_type=params[2])
 
     tend_ally_response = {"errorType": 0, "userId": 1, "metadata": meta,
                           "data": []}

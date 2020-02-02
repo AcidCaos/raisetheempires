@@ -10,7 +10,12 @@ from flask import session
 import logging
 
 def lookup_object(id):
-    [game_object] = [e for e in  session['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
+    [game_object] = [e for e in session['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
+    return game_object
+
+
+def lookup_object_save(save, id):
+    [game_object] = [e for e in save['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
     return game_object
 
 
