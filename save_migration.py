@@ -28,6 +28,10 @@ def migrate(meta, version, target_version):
         create_backup("Update to 0.04a")
         version = "0.04a"
         session['save_version'] = version
+    if version == "0.04a" and version != target_version:
+        create_backup("Update to 0.05a")
+        version = "0.05a"
+        session['save_version'] = version
 
 
 def zero_yield(extra):

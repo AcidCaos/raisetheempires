@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "RaiseTheEmpires"
-#define MyAppVersion "0.04a"
+#define MyAppVersion "0.05a"
 #define MyAppPublisher "RaiseTheEmpires"
 #define MyAppURL "https://github.com/AcidCaos/empires-and-allies"
 #define MyAppExeName "empires-server.exe"
@@ -64,9 +64,11 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 
 [Files]
 ;x64
-Source: "C:\dist_mini004_x64\empires-server.exe"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion 
+Source: "C:\empires\redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Check: Is64BitInstallMode; Flags: deleteafterinstall
+Source: "C:\dist_mini005_x64\empires-server.exe"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion
 ;x86
-Source: "C:\dist_mini004_x86\empires-server.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak ignoreversion 
+Source: "C:\empires\\redist\vc_redist.x86.exe"; DestDir: "{tmp}"; Check: not Is64BitInstallMode; Flags: deleteafterinstall
+Source: "C:\dist_mini005_x86\empires-server.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak ignoreversion
 ;common
 Source: "C:\empires\allies\*"; DestDir: "{userdocs}\My Games\{#MyAppName}\allies"; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
 Source: "C:\empires\assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -100,5 +102,42 @@ Type: files; Name: "{app}\RaiseTheEmpires.ini"
 Type: dirifempty; Name: "{app}"
 
 [Run]
+Filename: "{tmp}\vc_redist.x64.exe"; Check: Is64BitInstallMode and VCRedistNeedsInstall; StatusMsg: Installing Visual Studio Runtime x64 Libraries...
+Filename: "{tmp}\vc_redist.x86.exe"; Check: (not Is64BitInstallMode) and VCRedist86NeedsInstall; StatusMsg: Installing Visual Studio Runtime x86 Libraries...
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+[Code]
+type
+  INSTALLSTATE = Longint;
+
+  const
+  INSTALLSTATE_INVALIDARG = -2;  { An invalid parameter was passed to the function. }
+  INSTALLSTATE_UNKNOWN = -1;     { The product is neither advertised or installed. }
+  INSTALLSTATE_ADVERTISED = 1;   { The product is advertised but not installed. }
+  INSTALLSTATE_ABSENT = 2;       { The product is installed for a different user. }
+  INSTALLSTATE_DEFAULT = 5;      { The product is installed for the current user. }
+
+  { Visual C++ 2017 Redistributable 14.16.27024 }
+  VC_2017_REDIST_X84_ADD = '{7258184A-EC44-4B1A-A7D3-68D85A35BFD0}';
+  VC_2017_REDIST_X84_MIN = '{5EEFCEFB-E5F7-4C82-99A5-813F04AA4FBD}';
+
+  VC_2017_REDIST_X64_ADD = '{9D29FC96-9EEE-4253-943F-96B3BBFDD0B6}';
+  VC_2017_REDIST_X64_MIN = '{F1B0FB3A-E0EA-47A6-9383-3650655403B0}';
+
+function MsiQueryProductState(szProduct: string): INSTALLSTATE;
+  external 'MsiQueryProductState{#AW}@msi.dll stdcall';
+
+function VCVersionInstalled(const ProductID: string): Boolean;
+begin
+  Result := MsiQueryProductState(ProductID) = INSTALLSTATE_DEFAULT;
+end;
+
+function VCRedistNeedsInstall: Boolean;
+begin
+  Result := not VCVersionInstalled(VC_2017_REDIST_X64_MIN);
+end;
+
+function VCRedist86NeedsInstall: Boolean;
+begin
+  Result := not VCVersionInstalled(VC_2017_REDIST_X84_MIN);
+end;
