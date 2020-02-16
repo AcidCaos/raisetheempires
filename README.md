@@ -3,7 +3,7 @@
 > Empires and Allies(Facebook) officially closed June 17th, 2013
 
 The Old Empires & Allies preservation project by the Raise the Empires team.
-This project is dedicated to preserving this Flash game on Facebook so that it's not lost to time.
+This project is dedicated to preserving this Flash game so that it's not lost to time.
 
 [![version](https://img.shields.io/badge/version-0.05a-blue)](../../releases/tag/0.05a)
 [![size](https://img.shields.io/badge/size-219%20MB-brightgreen)](#)
@@ -21,12 +21,17 @@ This project is dedicated to preserving this Flash game on Facebook so that it's
 ## Reporting Bugs and Contacting
 :speech_balloon: Check our feedback [![Discord Channel](https://img.shields.io/discord/536575691563466772?label=Discord)](https://discord.gg/xrNE6Hg)
 
-## The team
 :email: raisetheempires@gmail.com
 
 ## External Links
 :beginner: [Empires & Allies Wiki (FANDOM)](https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2)
 
+## On archives and accessibility to digital heritage
+- [Exemption to PCCPSACT](https://www.federalregister.gov/documents/2018/10/26/2018-23241/exemption-to-prohibition-on-circumvention-of-copyright-protection-systems-for-access-control), exemptions to the provision of the Digital Millennium Copyright Act (“DMCA”). 
+- [EFGAMP](https://efgamp.eu/), the European Federation of Video Game Archives, Museums and Preservation projects.
+- [UNESCO PERSIST Programme](https://unescopersist.org/), helps ensure that digital information can continue to be accessed in the future.
+- [The Internet Archive](https://archive.org/), a digital library of Internet sites and other cultural artifacts in digital form.
+- [BlueMaxima's Flashpoint](https://bluemaxima.org/flashpoint/), the webgame preservation project.
 
 <br><br>
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue)](http://www.gnu.org/licenses/gpl-3.0)
