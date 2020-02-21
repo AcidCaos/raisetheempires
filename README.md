@@ -26,7 +26,7 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 ## Tools
 
-:iphone: [Empires & Allies Mobile version](https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native)
+:iphone: [Empires & Allies Termux/GNU/Linux Version](https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native)
 
 :world_map: [Empires & Allies Empire Map Editor](https://github.com/AcidCaos/ea-empire-editor)
 
