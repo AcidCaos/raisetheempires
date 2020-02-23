@@ -32,7 +32,11 @@ def migrate(meta, version, target_version):
         create_backup("Update to 0.05a")
         version = "0.05a"
         session['save_version'] = version
-
+    if version == "0.05a" and version != target_version: # upcoming 0.06
+        # create_backup("Update to 0.06a") # for release
+        # version = "0.06a"
+        #
+        session['user_object']["experiments"]["empire_decorations_master"] = 2
 
 def zero_yield(extra):
     extra["yield"] = 0

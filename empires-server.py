@@ -68,8 +68,8 @@ except ImportError:
 
 # import logging.config
 
-version = "0.05a"
-release_date = 'Monday, 3 Feb 2020'
+version = "0.05a.2020_02_23"
+release_date = 'Sunday, 23 Feb 2020'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -1155,7 +1155,7 @@ def init_user():
         "DEATHMATCH_DURATION": None,
         "clansInfo": None,
         "immunityTimeVariant": 0,
-        "experiments": {"empire_combataicancritical": 2},
+        "experiments": {"empire_combataicancritical": 2, "empire_decorations_master": 2},
         "completedQuests": [],
         "decorationsInfo": None,
         "treasureVaultHighlights": None,
@@ -1554,6 +1554,15 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
         # list1 = session['user_object']["userInfo"]["world"]["objects"]
         # session['user_object']["userInfo"]["world"]["objects"] = list(filter(lambda i: i['position'] != position), list1)
 
+
+    if step == "staffPosition":
+        decoration = lookup_object(id)
+        item = lookup_item_by_name(item_name)
+        #TODO bonus buildings staffing
+        print("staffing")
+
+    if step == "decoCrewBuyOnce":
+        pass
 
     print("perform_world_response", repr(perform_world_response))
     return perform_world_response

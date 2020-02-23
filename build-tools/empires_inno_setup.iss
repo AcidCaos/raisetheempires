@@ -107,6 +107,11 @@ Filename: "{tmp}\vc_redist.x86.exe"; Check: (not Is64BitInstallMode) and VCRedis
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
+#IFDEF UNICODE
+  #DEFINE AW "W"
+#ELSE
+  #DEFINE AW "A"
+#ENDIF
 type
   INSTALLSTATE = Longint;
 
