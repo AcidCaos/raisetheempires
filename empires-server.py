@@ -68,8 +68,8 @@ except ImportError:
 
 # import logging.config
 
-version = "0.05a.2020_02_23"
-release_date = 'Sunday, 23 Feb 2020'
+version = "0.05a.2020_04_05"
+release_date = 'Sunday, 5 Apr 2020'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -762,7 +762,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.purchaseAmmoRefill':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.purchaseContractUnlock':
-            resps.append(dummy_response())
+            resps.append(purchase_contact_unlock(reqq.params[0]))
         elif reqq.functionName == 'UserService.purchaseEnergyRefill':
             resps.append(purchase_energy_refill_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.purchaseManaRefill':
@@ -1878,14 +1878,15 @@ def buy_item_response(param):
         item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
         item_inventory[param["code"]] = item_inventory.get(param["code"], 0) + 1
 
-    player['cash'] -= int(float(item["cost"]["-cash"]) * param["amount"])
+    player['cash'] -= get_cash_cost(item, param["amount"])
 
     buy_item_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
     return buy_item_response
     #TODO buy powerup in combact
 
-def  buy_items_response(param):
+
+def buy_items_response(param):
     print(repr(param))
     buy_items_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
@@ -1919,6 +1920,7 @@ def purchase_energy_refill_response(param):
                       "data": []}
     return purchase_energy_refill_response
 
+
 def buy_quest_task_response(param):
     print(param,type(param))
 
@@ -1942,6 +1944,53 @@ def buy_expansion_response(param):
     buy_expansion_response = {"errorType": 0, "userId": 1, "metadata": meta,
                       "data": []}
     return buy_expansion_response
+
+
+
+def purchase_contact_unlock(param):
+    print(repr(param))
+    item = lookup_item_by_code(param["itemCode"])
+
+    #TODO specops contractMultiple
+    unlock_cost = int(game_settings['settings']['gamesettings']['-contractUnlockMultiple']) * get_cash_cost(item, 1)
+
+    player = session['user_object']["userInfo"]["player"]
+    player['cash'] -= unlock_cost
+    item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
+    item_inventory[param["itemCode"]] = item_inventory.get(param["itemCode"], 0) + 1
+    player['unlockedContracts'].append(param["itemCode"])
+
+    meta = {"newPVE": 0}
+    purchase_contact_unlock = {"errorType": 0, "userId": 1, "metadata": meta,
+                              "data": []}
+    return purchase_contact_unlock
+
+
+def get_cash_cost(item, amount):
+    #TODO unit price expirements cost
+    #TODO priceTestSettings
+    #TODO EXPERIMENT_LE_DISCOUNT_SALE
+    cash_cost = int(item["cost"]["-cash"])
+
+    required_level = int(item.get("requiredLevel", "0"))
+    player_level = session["user_object"]["userInfo"]["player"]["level"]
+
+    le_discount = 0
+    if "requiredDate" in item:
+        if required_level >= 25:
+            if player_level >= 51:
+                le_discount = .25
+            elif player_level >= 35:
+                le_discount = .15
+        elif required_level >= 15:
+            if player_level >= 51:
+                le_discount = .30
+            elif player_level >= 35:
+                le_discount = .20
+            elif player_level >= 20:
+                le_discount = .10
+
+    return math.ceil(cash_cost * amount * (1 - le_discount))
 
 
 def dummy_response():

@@ -1,3 +1,11 @@
+upcoming
+    unlock units (& free unit), LE discounts Nat 05/04/2020 00:47
+    Enabling bonus decorations Nat 23/02/2020 20:51
+    Update README.md questandachievementProjects* 21/02/2020 01:43
+    Public README (II) AcidCaos 20/02/2020 19:27
+    On digital heritage info. AcidCaos 17/02/2020 00:34
+    Added GPL v3 LICENSE (Readme info.) AcidCaos 16/02/2020 23:48
+    Public project. README AcidCaos 15/02/2020 18:44
 alpha v0.05a
     0.05a release Nat 03/02/2020 02:11
     multiplayer: tending recipient accept/decline, new session & change ore menu, neighbor ore quests Nat 02/02/2020 23:58
