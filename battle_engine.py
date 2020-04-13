@@ -282,6 +282,12 @@ def init_battle(params):
                    for i in range(int(count))]
         friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
                       session['fleets'][params['fleet']]]
+    elif params['target'] == "FleetName":
+        baddies = [lookup_item_by_code(baddy.split(',')[0]) for sub_fleet in
+                   simple_list(session['fleets'][get_next_fleet(params['fleet'])])
+                   for baddy in sub_fleet["units"]]
+        friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                      session['fleets'][params['fleet']]]
     else:
         quest = lookup_quest(params['target'])
         tasks = get_tasks(quest)
@@ -399,6 +405,18 @@ def next_campaign_response(params):
     print("Enemy fleet:", enemy_fleet)
 
     return next_campaign_response
+
+
+
+def register_random_fleet(fleet):
+    if 'fleets' not in session:
+        session["fleets"] = {}
+
+    enemy_fleet = fleet
+    fleet_name = get_new_enemy_fleet_name()
+
+    session["fleets"][fleet_name] = enemy_fleet
+    print("Random Enemy fleet:", enemy_fleet)
 
 
 def get_new_enemy_fleet_name():

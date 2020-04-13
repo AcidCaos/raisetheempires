@@ -50,7 +50,7 @@ from pyamf import remoting
 import pyamf
 
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
-    get_active_island_by_map, set_active_island_by_map
+    get_active_island_by_map, set_active_island_by_map, register_random_fleet
 from game_settings import get_zid, initial_island, unlock_expansion, random_image
 import threading, webbrowser
 import pyamf.amf0
@@ -68,8 +68,8 @@ except ImportError:
 
 # import logging.config
 
-version = "0.05a.2020_04_05"
-release_date = 'Sunday, 5 Apr 2020'
+version = "0.05a.2020_04_14"
+release_date = 'Tuesday, 14 Apr 2020'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -532,11 +532,11 @@ def post_gateway():
         elif reqq.functionName == 'UserService.setSeenFlag':
             resps.append(seen_flag_response(reqq.params[0]))
         elif reqq.functionName == 'PVPService.createRandomFleetChallenge':
-            resps.append(random_fleet_challenge_response())
+            resps.append(random_fleet_challenge_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.spawnFleet':
             resps.append(spawn_fleet(reqq.params[0]))
         elif reqq.functionName == 'PVPService.loadChallenge':
-            resps.append(load_challenge_response())
+            resps.append(load_challenge_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.resolveBattle':
             resps.append(battle_complete_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.genericString':
@@ -1615,7 +1615,7 @@ def seen_flag_response(flag):
     return seen_flag_response
 
 
-def random_fleet_challenge_response():
+def random_fleet_challenge_response(host_uid):
     unit_user = "U01,,,,"
     unit = "BD3,,,,"
 
@@ -1638,7 +1638,10 @@ def random_fleet_challenge_response():
         "ransomRandom": None,
         "ransomResource": None,
         "ransomAmount": None,
-        "units": [unit_user],  # only one unit for tutorial [unit, unit, unit],
+        "units": [
+            unit_user,
+
+                  ],  # only one unit for tutorial [unit, unit, unit],
         "store": [0],  # [0, 0, 0],
         "fleets": None,
         "upgrades": None,
@@ -1647,7 +1650,7 @@ def random_fleet_challenge_response():
 
     fleet = {
         "type": "army",
-        "uid": "pve",
+        "uid": host_uid,
         "name": "FleetName",
         "status": 0,
         "target": "",
@@ -1671,6 +1674,8 @@ def random_fleet_challenge_response():
         "hp": None
     }
 
+    register_random_fleet(fleet)
+
     random_fleet_challenge_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                                        "data": {
                                            "state": 0,
@@ -1681,9 +1686,13 @@ def random_fleet_challenge_response():
     return random_fleet_challenge_response
 
 
-def load_challenge_response():
+def load_challenge_response(param):
     load_challenge_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                                "data": {"eFID": "pve", "state": 1}}  # CHALLENGE_STATE_IN_PROGRESS
+
+    session["fleets"][param['challengeeFleet']['name']] = param['challengeeFleet']['units']
+    print("Challenge Player fleet:", param['challengeeFleet']['units'])
+
     return load_challenge_response
 
 
