@@ -1,6 +1,6 @@
 from quest_settings import quest_settings
 from game_settings import game_settings, lookup_item_by_code, lookup_state_machine, replenish_energy, lookup_yield, \
-    allies
+    allies,lookup_items_by_type_and_subtype
 from save_engine import lookup_objects_by_item_name, create_backup
 from flask import session
 from functools import reduce
@@ -89,7 +89,8 @@ def world_state_change(*state_args):
              progress_build(*state_args)(*args),
              progress_harvest(*state_args)(*args),
              progress_state(*state_args)(*args),
-             progress_inventory_count()(*args)
+             progress_inventory_count()(*args),
+             progress_harvest_consumable(*state_args)(*args)
              ])
 
 
@@ -271,6 +272,11 @@ def progress_nested_parameter_implies_contains(key, key2, value):
     return lambda task, *args: task.get(key, {}).get(key2) == None or any(i in task.get(key, {}).get(key2, "_NO_MATCH_").split(",") for i in value.split(","))
 
 
+def progress_parameter_implies_contains(key, value):
+    return lambda task, *args: task.get(key) == None or any(
+        i in task.get(key, "_NO_MATCH_").split(",") for i in value.split(","))
+
+
 # deprogress functions?
 def handle_quest_progress(meta, progress_function):
     replenish_energy()
@@ -339,6 +345,8 @@ def new_quest_with_sequels(name, new_quests, meta):
             print("Sequel quest precompleted", name)
             do_quest_rewards(q, meta)
             activate_sequels(new_sequel_quest, new_quests, meta)
+
+
 
 
 
@@ -437,7 +445,6 @@ def roll_random():
     prev_seed = str(world["randSeedW"]) + ', ' +  str(world["randSeedZ"])
     world["randSeedZ"] = 36969 * (world["randSeedZ"] & 65535)  + (world["randSeedZ"] >> 16 & 65535) & 4294967295;
     world["randSeedW"] = 18000 * (world["randSeedW"] & 65535)  + (world["randSeedW"] >> 16 & 65535) & 4294967295;
-    print("Seed", prev_seed , "=>", str(world["randSeedW"]) + ', ' +  str(world["randSeedZ"]))
     return (world["randSeedZ"] << 16) +  world["randSeedW"] & 4294967295
 
 
@@ -467,6 +474,7 @@ def roll_reward_random():
     world = session['user_object']["userInfo"]["world"]
     world["rewardRandSeedZ"] = 36969 * (world["rewardRandSeedZ"] & 65535)  + (world["rewardRandSeedZ"] >> 16 & 65535) & 4294967295;
     world["rewardRandSeedW"] = 18000 * (world["rewardRandSeedW"] & 65535)  + (world["rewardRandSeedW"] >> 16 & 65535) & 4294967295;
+    print( (world["rewardRandSeedZ"] << 16) +  world["rewardRandSeedW"] & 4294967295)
     return (world["rewardRandSeedZ"] << 16) +  world["rewardRandSeedW"] & 4294967295
 
 
@@ -478,5 +486,11 @@ def roll_reward_random_float():
 def roll_reward_random_between(a, b):
     return roll_reward_random_float() * (b - a) + a
 
+def progress_harvest_consumable(state, state_machine, game_item, step, previous_state, reference_item, previous_reference_item, *state_args):
+    return lambda task, progress, i, *args: \
+        task["_action"] in  "inventoryAdded" and state.get("-harvestingState") == "1" and reference_item is not None and (
+                progress_parameter_implies("_type", lookup_item_by_code(reference_item.split(":")[0]).get("-type",""))(task, progress, i, *args) and \
+                progress_parameter_implies("_subtype", lookup_item_by_code(reference_item.split(":")[0]).get("-subtype",""))(task, progress, i, *args) and \
+                progress_parameter_implies_contains("_item", reference_item.split(":")[0])(task, progress, i, *args)) \
 
 
