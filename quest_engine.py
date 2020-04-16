@@ -1,11 +1,10 @@
 from quest_settings import quest_settings
 from game_settings import game_settings, lookup_item_by_code, lookup_state_machine, replenish_energy, lookup_yield, \
-    allies,lookup_items_by_type_and_subtype
+    allies,lookup_items_by_type_and_subtype,unlock_expansion
 from save_engine import lookup_objects_by_item_name, create_backup
 from flask import session
 from functools import reduce
 import math
-
 
 def merge_quest_progress(qc, output_list, label):
     if qc:
@@ -445,6 +444,7 @@ def roll_random():
     prev_seed = str(world["randSeedW"]) + ', ' +  str(world["randSeedZ"])
     world["randSeedZ"] = 36969 * (world["randSeedZ"] & 65535)  + (world["randSeedZ"] >> 16 & 65535) & 4294967295;
     world["randSeedW"] = 18000 * (world["randSeedW"] & 65535)  + (world["randSeedW"] >> 16 & 65535) & 4294967295;
+    print("Seed", prev_seed, "=>", str(world["randSeedW"]) + ', ' + str(world["randSeedZ"]))
     return (world["randSeedZ"] << 16) +  world["randSeedW"] & 4294967295
 
 
@@ -486,11 +486,20 @@ def roll_reward_random_float():
 def roll_reward_random_between(a, b):
     return roll_reward_random_float() * (b - a) + a
 
+
+
 def progress_harvest_consumable(state, state_machine, game_item, step, previous_state, reference_item, previous_reference_item, *state_args):
     return lambda task, progress, i, *args: \
-        task["_action"] in  "inventoryAdded" and state.get("-harvestingState") == "1" and reference_item is not None and (
+        task["_action"] in "inventoryAdded" and state.get("-harvestingState") == "1" and reference_item is not None and (
                 progress_parameter_implies("_type", lookup_item_by_code(reference_item.split(":")[0]).get("-type",""))(task, progress, i, *args) and \
                 progress_parameter_implies("_subtype", lookup_item_by_code(reference_item.split(":")[0]).get("-subtype",""))(task, progress, i, *args) and \
                 progress_parameter_implies_contains("_item", reference_item.split(":")[0])(task, progress, i, *args)) \
 
 
+
+def progress_buy_consumable(item):
+    return lambda task, progress, i, *args: \
+        task["_action"] == "inventoryAdded" and item is not None and \
+        progress_parameter_implies("_type", item.get("-type", ""))(task, progress, i, *args) and \
+        progress_parameter_implies("_subtype", item.get("-subtype", ""))(task, progress, i, *args) and \
+        progress_parameter_implies_contains("_item", item["-code"])(task, progress, i, *args)

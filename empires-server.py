@@ -1888,8 +1888,9 @@ def buy_item_response(param):
         item_inventory[param["code"]] = item_inventory.get(param["code"], 0) + 1
 
     player['cash'] -= get_cash_cost(item, param["amount"])
-
-    buy_item_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+    meta = {"newPVE": 0}
+    handle_quest_progress(meta, progress_buy_consumable(item))
+    buy_item_response = {"errorType": 0, "userId": 1, "metadata": meta,
                       "data": []}
     return buy_item_response
     #TODO buy powerup in combact
@@ -1953,7 +1954,6 @@ def buy_expansion_response(param):
     buy_expansion_response = {"errorType": 0, "userId": 1, "metadata": meta,
                       "data": []}
     return buy_expansion_response
-
 
 
 def purchase_contact_unlock(param):
