@@ -7,7 +7,7 @@ from game_settings import lookup_item_by_code, game_settings, get_zid, lookup_it
 from logger import report_battle_log
 from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_seed_z, roll_random_between, \
     handle_quest_progress, progress_action, roll_random_float, all_lambda, progress_parameter_equals, do_rewards, \
-    roll_reward_random_float, progress_battle_damage_count
+    roll_reward_random_float, progress_battle_damage_count,progress_useAOA_consumable,progress_useGeneral_consumable
 
 
 def battle_complete_response(params):
@@ -467,8 +467,8 @@ def assign_consumable_response(params):
         selected_random_consumable_roll = roll_random_between(0, len(valid_consumables) - 1)
 
         selected_random_consumable = round(selected_random_consumable_roll) # required roll fixed allyconsumable in tutorialstep
-
         selected_consumable = valid_consumables[selected_random_consumable]
+        handle_quest_progress(meta, progress_useAOA_consumable(selected_consumable))
     elif params.get("name") == "AI":
         secondaries = [get_unit_secondary(b) for b, i in zip(baddies, range(len(baddies))) if get_unit_secondary(b) is not None and not is_stunned(("enemy", i), active_consumables)]
         if len(secondaries) > 1:
@@ -484,7 +484,6 @@ def assign_consumable_response(params):
         cast_percent = float(selected_consumable["consumable"]["-castpercent"])
 
         print(("Not c" if cast_chance >= cast_percent else "C") + "asting secondary power", cast_chance, ">=", cast_percent)
-
         selected_consumable = None #second targeted call will be made
 
         casting_ai = cast_chance < cast_percent
@@ -493,7 +492,10 @@ def assign_consumable_response(params):
     else:
         selected_consumable = lookup_item_by_code(params["code"])
         targeted = True
+        handle_quest_progress(meta, progress_useGeneral_consumable(selected_consumable))
         enemy_turn = is_affected_by_consumable(("AI", None), {"consumable":{}}, active_consumables)
+
+
 
     # TODO: AI secondary abily Z-units
     if selected_consumable is not None:
@@ -637,6 +639,8 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
 
 
 def get_adjacent_factor(unit_1, unit_2, count):
+    print(type(unit_1))
+    print(type(unit_2))
     if unit_1 == unit_2 or count == 1:
         return 0
     elif count == 2:
@@ -646,7 +650,7 @@ def get_adjacent_factor(unit_1, unit_2, count):
     elif count == 4:
         return [[0,4,0,0],[4,0,3,0],[0,4,0,3],[0,0,4,0]][unit_1][unit_2]
     elif count == 5:
-        return [[0,4,3,0,0],[4,0,3,2,0],[4,3,0,2,1],[0,4,3,0,2][0,0,4,3,0]][unit_1][unit_2]
+        return [[0,4,3,0,0],[4,0,3,2,0],[4,3,0,2,1],[0,4,3,0,2],[0,0,4,3,0]][unit_1][unit_2]
 
 
 def is_stunned(target, active_consumables):

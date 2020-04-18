@@ -503,3 +503,19 @@ def progress_buy_consumable(item):
         progress_parameter_implies("_type", item.get("-type", ""))(task, progress, i, *args) and \
         progress_parameter_implies("_subtype", item.get("-subtype", ""))(task, progress, i, *args) and \
         progress_parameter_implies_contains("_item", item["-code"])(task, progress, i, *args)
+
+def progress_useAOA_consumable(item):
+    return lambda task, progress, i, *args: \
+        task["_action"] == "useConsumable" and task.get("_neighbor") == "true" and item is not None and \
+        progress_parameter_implies("_type", item.get("-type", ""))(task, progress, i, *args) and \
+        progress_parameter_implies("_subtype", item.get("-subtype", ""))(task, progress, i, *args) and \
+        progress_parameter_implies_contains("_item", item["-code"])(task, progress, i, *args)
+
+
+
+def progress_useGeneral_consumable(item):
+    return lambda task, progress, i, *args: \
+        task["_action"] == "useConsumable"  and item is not None and \
+        progress_parameter_implies("_type", item.get("-type", ""))(task, progress, i, *args) and \
+        progress_parameter_implies("_subtype", item.get("-subtype", ""))(task, progress, i, *args) and \
+        progress_parameter_implies_contains("_item", item["-code"])(task, progress, i, *args)
