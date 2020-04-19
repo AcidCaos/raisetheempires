@@ -492,8 +492,8 @@ def assign_consumable_response(params):
     else:
         selected_consumable = lookup_item_by_code(params["code"])
         targeted = True
-        handle_quest_progress(meta, progress_useGeneral_consumable(selected_consumable))
         enemy_turn = is_affected_by_consumable(("AI", None), {"consumable":{}}, active_consumables)
+        handle_quest_progress(meta, progress_useGeneral_consumable(selected_consumable,enemy_turn))
 
 
 

@@ -504,6 +504,7 @@ def progress_buy_consumable(item):
         progress_parameter_implies("_subtype", item.get("-subtype", ""))(task, progress, i, *args) and \
         progress_parameter_implies_contains("_item", item["-code"])(task, progress, i, *args)
 
+
 def progress_useAOA_consumable(item):
     return lambda task, progress, i, *args: \
         task["_action"] == "useConsumable" and task.get("_neighbor") == "true" and item is not None and \
@@ -513,9 +514,12 @@ def progress_useAOA_consumable(item):
 
 
 
-def progress_useGeneral_consumable(item):
+def progress_useGeneral_consumable(item,enemy_turn): #DONT USE THIS FUNCTION FOR SOMETHING ELSE
+    if enemy_turn == False:
+        item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
+        item_inventory[item["-code"]] -= 1
     return lambda task, progress, i, *args: \
-        task["_action"] == "useConsumable"  and item is not None and \
+        task["_action"] == "useConsumable"  and item is not None and enemy_turn == False and \
         progress_parameter_implies("_type", item.get("-type", ""))(task, progress, i, *args) and \
         progress_parameter_implies("_subtype", item.get("-subtype", ""))(task, progress, i, *args) and \
         progress_parameter_implies_contains("_item", item["-code"])(task, progress, i, *args)
