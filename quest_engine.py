@@ -209,8 +209,13 @@ def progress_build(state, state_machine, game_item, step, previous_state, refere
         task["_action"] == "build" and reference_item is not None and (
                 reference_item.split(":")[0] in task.get("_item", "").split(',') or
                 progress_parameter_equals("_resourceType",
-                                          lookup_item_by_code(reference_item.split(":")[0]).get("-resourceType", ""))(
-                    task, progress, i, *args)
+                                          lookup_item_by_code(reference_item.split(":")[0]).get("-resourceType", ""))
+                or all_lambda(progress_parameter_equals("_isUpgrade", "true"),
+                              lambda *args: lookup_item_by_code(previous_reference_item.split(":")[0]).get("-type","upgrade"),
+                              progress_nested_parameter_implies("unit", "_subtype", lookup_item_by_code(
+                                  previous_reference_item.split(":")[1]).get("-subtype", "") if len(
+                                  previous_reference_item.split(":")) > 1 else "")
+                              )(task, progress, i, *args)
         ) \
         and previous_reference_item == None
 
@@ -523,3 +528,4 @@ def progress_useGeneral_consumable(item,enemy_turn): #DONT USE THIS FUNCTION FOR
         progress_parameter_implies("_type", item.get("-type", ""))(task, progress, i, *args) and \
         progress_parameter_implies("_subtype", item.get("-subtype", ""))(task, progress, i, *args) and \
         progress_parameter_implies_contains("_item", item["-code"])(task, progress, i, *args)
+
