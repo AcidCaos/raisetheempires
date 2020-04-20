@@ -10,7 +10,7 @@ from save_engine import lookup_object, create_backup, lookup_object_save
 # TODO add new reference item from clicknext step, use old one for first autostep, new one for 2nd autonext,
 #  not needed: is handled by checkstates if new one is null then use old reference item in clicknext(harvesting step?)
 # TODO checkState?
-def click_next_state(do_click, id, meta, step, reference_item, speed_up=False, tending=False, save=None, playback_tend=False, tend_type=None):
+def click_next_state(do_click, id, meta, step, reference_item, speed_up=False, tending=False, save=None, playback_tend=False, tend_type=None, cancel=True):
     cur_object = lookup_object(id) if not tending else lookup_object_save(save, id)
     print("cur_object used:", repr(cur_object))
     tend = tending or playback_tend
@@ -52,8 +52,8 @@ def click_next_state(do_click, id, meta, step, reference_item, speed_up=False, t
                 print("state has autoNext, but not enough time was passed")
                 break
 
-        if (do_click or tend) and '-clickNext' in state:
-            next_state_id = state['-clickNext']
+        if (do_click or tend) and ('-clickNext' if not cancel else '-cancelNext') in state:
+            next_state_id = state['-clickNext'] if not cancel else state['-cancelNext']
             if reference_item != cur_object.get('referenceItem'):
                 state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'],
                                                      game_item['stateMachineValues'].get('define', []),
@@ -62,9 +62,11 @@ def click_next_state(do_click, id, meta, step, reference_item, speed_up=False, t
             next_click_state = lookup_state(state_machine, next_state_id, cur_object, True)
             check_state(state_machine, next_click_state, cur_object, tending)
             print("next_click_state:", repr(next_click_state))
-            if not tending:
+            if cancel:
+                print("canceled state")
+            elif not tending:
                 do_state_rewards(next_click_state, cur_object.get('referenceItem'), meta, playback_tend=playback_tend)
-                handle_world_state_change(meta, next_click_state, state_machine, game_item, step, state, reference_item,  cur_object.get('referenceItem'))
+                handle_world_state_change(meta, next_click_state, state_machine, game_item, step, state, reference_item, cur_object.get('referenceItem'))
             else:
                 if tend_type == "mine":
                     standard_resources = ["coins", "oil", "wood", "aluminum", "copper", "gold", "iron", "uranium"]

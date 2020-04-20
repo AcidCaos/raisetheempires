@@ -517,12 +517,15 @@ def post_gateway():
             # for reqq2 in resp_msg.bodies[0][1].body[1]:
             #     if reqq2.functionName == 'WorldService.performAction' and reqq2.params[1] and reqq2.params[1].id:
             #         lastId=reqq2.params[1].id
-            wr = perform_world_response(reqq.params[0], reqq.params[1].id, reqq.params[1].position,
-                                        reqq.params[1].itemName,
-                                        reqq.params[2][0].get('referenceItem') if len(reqq.params[2]) > 0 else None,
-                                        reqq.params[2][0].get('isGift') if len(reqq.params[2]) > 0 else None,
-                                        reqq.params[2][0].get('elapsed') if len(reqq.params[2]) > 0 else None,
-                                        reqq.params[2][0] if len(reqq.params[2]) > 0 else None)
+            wr = perform_world_response(step=reqq.params[0],
+                                        supplied_id=reqq.params[1].id,
+                                        position=reqq.params[1].position,
+                                        item_name=reqq.params[1].itemName,
+                                        reference_item=reqq.params[2][0].get('referenceItem') if len(reqq.params[2]) > 0 else None,
+                                        from_inventory=reqq.params[2][0].get('isGift') if len(reqq.params[2]) > 0 else None,
+                                        elapsed=reqq.params[2][0].get('elapsed') if len(reqq.params[2]) > 0 else None,
+                                        cancel=reqq.params[2][0].get('cancel') if len(reqq.params[2]) > 0 else None,
+                                        req2=reqq.params[2][0] if len(reqq.params[2]) > 0 else None)
             resps.append(wr)
             report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position,
                              wr["data"], reqq.params, reqq.sequence, resp_msg.bodies[0][0],
@@ -1460,7 +1463,7 @@ def tutorial_response(step, sequence, endpoint):
     return tutorial_response
 
 
-def perform_world_response(step, supplied_id, position, item_name, reference_item, from_inventory, elapsed, req2):
+def perform_world_response(step, supplied_id, position, item_name, reference_item, from_inventory, elapsed, cancel, req2):
     print("this is step",step, supplied_id, position)
 
     id = supplied_id
@@ -1491,7 +1494,7 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
     meta = {"newPVE": 0}
 
     if step in ["place", "setState"]:
-        click_next_state(True, id, meta, step, reference_item)  # place & setstate only
+        click_next_state(True, id, meta, step, reference_item, cancel=cancel)  # place & setstate only
 
     if step == "setState":
         lookup_object(id)["referenceItem"] = reference_item
@@ -1809,6 +1812,7 @@ def load_world_response(params):
     load_world_response = {"errorType": 0, "userId": 1, "metadata": meta,
                            "data": ally}
     return load_world_response
+
 
 def tend_ally_response(params):
     meta = {"newPVE": 0}
