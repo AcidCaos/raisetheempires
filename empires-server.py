@@ -68,8 +68,8 @@ except ImportError:
 
 # import logging.config
 
-version = "0.05a.2020_04_14"
-release_date = 'Tuesday, 14 Apr 2020'
+version = "0.05a.2020_04_21"
+release_date = 'Tuesday, 21 Apr 2020'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -1561,11 +1561,14 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
     if step == "staffPosition":
         decoration = lookup_object(id)
         item = lookup_item_by_name(item_name)
-        #TODO bonus buildings staffing
+        decoration["crewInfo"] = decoration.get("crewInfo", []) + [-1]
         print("staffing")
 
     if step == "decoCrewBuyOnce":
-        pass
+        decoration = lookup_object(id)
+        item = lookup_item_by_name(item_name)
+        decoration["crewInfo"] = [-1, -1 , -1]
+        print("staffing full")
 
     print("perform_world_response", repr(perform_world_response))
     return perform_world_response

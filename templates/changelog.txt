@@ -1,4 +1,15 @@
 upcoming
+    crewing buildings Nat 21/04/2020 23:39
+    ability to cancel units, research, produce, ... Nat 21/04/2020 01:05
+    fix quest kill counter Oshere1111 20/04/2020 23:46
+    test2 Oshere1111 20/04/2020 18:05
+    test Oshere1111 20/04/2020 18:01
+    fix build upgrade quests Nat* 20/04/2020 19:35
+    progress fix oshere1111* 19/04/2020 18:50
+    use general consumable oshere1111* 19/04/2020 17:38
+    consumable quest progress oshere1111* 18/04/2020 21:05
+    buy consumables oshere1111* 17/04/2020 01:34
+    progress harvest consumable. powerup counting oshere1111* 16/04/2020 02:10
     invade neighbors initial Nat 14/04/2020 01:59
     unlock units (& free unit), LE discounts Nat 05/04/2020 00:47
     Enabling bonus decorations Nat 23/02/2020 20:51
