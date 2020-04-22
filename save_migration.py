@@ -34,7 +34,7 @@ def migrate(meta, version, target_version):
         session['save_version'] = version
     if  version.startswith("0.05a") and version != target_version: # upcoming 0.06
         #create_backup("Update to 0.06a")#  for release
-        #version = "0.06a"
+        #ersion = "0.06a"
         #govt_fixer()
         session['user_object']["experiments"]["empire_decorations_master"] = 2
         #session['save_version'] = version
@@ -58,10 +58,14 @@ def govt_fixer():
                   "Treasury": 5,
                   "Maritime Academy": 6,
                   "National Archives": 7,
-                  "Federal Prison": 8,
+                  "Prison": 8,
                   "State Media": 10,
                   "Opera House": 11,
                   "Mint": 12,
+                  "Intelligence HQ" : 11,
+                  "Space Agency" : 12,
+                  "Satellite_Tracking_Center" : 12,
+                  "Engineering_Office" : 12
                   }
 
     for decoration in session['user_object']["userInfo"]["world"]["objects"]:
