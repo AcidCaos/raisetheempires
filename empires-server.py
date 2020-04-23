@@ -1885,7 +1885,7 @@ def buy_item_response(param):
     elif item.get("-subtype") == "expansion":
         print("Buying expansion")
     elif "-resourceType" in item and item["-resourceType"] != "energy":
-        resources[item["-resourceType"]] += param["amount"]
+        resources[item["-resourceType"]] += param["amount"] * int(item.get("resourceYield", "1"))
 
         print("Buy: received", item["-resourceType"] + ":", str(param["amount"]) +
                   "(" + str(resources[item["-resourceType"]]) + ")")

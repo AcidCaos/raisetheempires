@@ -1,5 +1,5 @@
 import math
-#yeetos with a little bit of cheetosnoooooo
+
 from flask import session
 
 from game_settings import lookup_item_by_code, game_settings, get_zid, lookup_items_by_type, \
