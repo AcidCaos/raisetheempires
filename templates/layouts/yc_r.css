@@ -995,32 +995,37 @@ img{
 	height:16px;
 	width:16px
 }
-.sx_95b530{
+.sx_95b530{ /*search*/
 	width:11px;
 	height:11px;
 	background-position:-4px -8px
 }
-.sx_8a284b{
+.sx_8a284b{ /*mini fb logo*/
 	background-position:-85px -118px
 }
 .sx_25b7a2{
 	background-position:-119px -118px
 }
-.sx_343b36{
+.sx_343b36{ /*chat logo*/
 	width:9px;
 	background-position:0 -153px
 }
-.sx_612416{
+.sx_612416{ /*drop-up arrow*/
 	width:9px;
 	height:5px;
 	background-position:-160px -135px
 }
-.sx_321d1b{
+.sx_612416_new{ /*big dropdown arrow*/
+	width:10px;
+	/*height:5px;*/
+	background-position:-150px -135px
+}
+.sx_321d1b{ /*small dropdown arrow*/
 	width:5px;
 	height:3px;
 	background-position:-191px -27px
 }
-.sx_2e3561{
+.sx_2e3561{ /*Fb logo*/
 	width:190px;
 	height:90px;
 	background-position:0 -27px
@@ -1515,7 +1520,6 @@ a.-cx-PRIVATE-uiPopover__trigger{
 
 .userMenu{
 	color:#fff;
-	margin-top:40px;
 }
 
 ul
@@ -1525,6 +1529,7 @@ ul
     margin: 0;
     padding: 0;
     list-style: none;
+    text-decoration: none;
 }
 
 ul li
@@ -1546,14 +1551,15 @@ ul li a
     color: #ffffff;
     border-top: 1px solid #ffffff;
     padding: 5px 15px 5px 15px;
-    background: #2C5463;
+    background: #3b5998;
     margin-left: 1px;
     white-space: nowrap;
 }
 
 ul li a:hover
 {
-    background: #617F8A;
+    background: #5572b1;
+    text-decoration:none;
 }
 li:hover > ul
 {
@@ -1569,12 +1575,12 @@ li:hover li
 
 li:hover a
 {
-    background: #617F8A;
+    background: #3b5998;
 }
 
 li:hover li a:hover
 {
-    background: #95A9B1;
+    background: #5572b1;
 }
 
 .third-level-menu

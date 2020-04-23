@@ -245,23 +245,48 @@
 	  									<u>Facebook logo</u>
 	  								</i>
 								</a>
-								<ul class="userMenu rfloat">
+								<ul class="rfloat" style="color:#fff;">
 									<li>
 										<b>{% for dropdown_item in dropdown_items %}{% if dropdown_item["uid"] == zid | int %}
-												{{dropdown_item["world_name"]}} Level {{dropdown_item["level"]}} xp {{dropdown_item["xp"]}}
-											{% endif %}{% endfor %}</b>
+											
+											<div style="position:relative; display: inline-block; vertical-align: top; text-align: left;">
+												<p style="margin-top:8px;">{{dropdown_item["world_name"]}} </p>
+											</div>
+											 
+											<div style="position:relative; text-align:center; display: inline-block;">
+												<img src="layouts/xp.png" style="width:30px;"> 
+												<div style="position:absolute; top:40%; left:50%; transform: translate(-50%, -50%); color:black;">
+													{{dropdown_item["level"]}}
+												</div>
+											</div> 
+											<i class="img sp_ctntui sx_612416_new"></i>
+											{% endif %}{% endfor %}
+										</b>
 										<ul class="dropdownUser">
-											<li><a href="#" onclick="eatCookie(); return false">New</a><li>
+											<li><a href="#" onclick="eatCookie(); return false">New player</a><li>
 											<li><a href="#" onclick="return false">Change ore</a>
 												<ul class="third-level-menu">
-													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/3"><img src="layouts/Aluminum_60.png"></a></li>
-													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/4"><img src="layouts/Copper_60.png"></a></li>
-													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/5"><img src="layouts/Gold_60.png"></a></li>
-													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/6"><img src="layouts/Iron_60.png"></a></li>
-													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/7"><img src="layouts/Uranium_60.png"></a></li>
-												</ul></li>
+													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/3"><img style="width:25px;" src="layouts/Aluminum_60.png"></a></li>
+													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/4"><img style="width:25px;" src="layouts/Copper_60.png"></a></li>
+													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/5"><img style="width:25px;" src="layouts/Gold_60.png"></a></li>
+													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/6"><img style="width:25px;" src="layouts/Iron_60.png"></a></li>
+													<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/7"><img style="width:25px;" src="layouts/Uranium_60.png"></a></li>
+												</ul>
+											</li>
 											 {% for dropdown_item in dropdown_items %}{% if dropdown_item["uid"] != zid | int %}
-											<li><a href="#" onclick="cookieCrumble(&quot;{{dropdown_item['session_id']}}&quot;); return false">{{dropdown_item["world_name"]}} Level {{dropdown_item["level"]}} xp {{dropdown_item["xp"]}}</a></li>
+											<li>
+												<a href="#" onclick="cookieCrumble(&quot;{{dropdown_item['session_id']}}&quot;); return false">
+													<div style="position:relative; display: inline-block; vertical-align: top; text-align: left;">
+														<p style="margin-top:8px;">{{dropdown_item["world_name"]}} </p>
+													</div>
+													<div style="position:relative; text-align:center; display: inline-block;">
+														<img src="layouts/xp.png" style="width:30px;"> 
+														<div style="position:absolute; top:40%; left:50%; transform: translate(-50%, -50%); color:black;">
+															{{dropdown_item["level"]}}
+														</div>
+													</div>
+												</a>
+											</li>
 											 {% endif %}{% endfor %}
 										</ul>
 									</li>
