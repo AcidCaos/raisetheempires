@@ -1910,6 +1910,10 @@ def buy_item(meta, code, amount):
 
 def buy_items_response(param):
     print(repr(param))
+    meta = {"newPVE": 0}
+    Resource_Dict = dict(param["itemData"])
+    for Res_code in Resource_Dict:
+        buy_item(meta, Res_code,Resource_Dict[Res_code])
     buy_items_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
     return buy_items_response
@@ -1991,7 +1995,7 @@ def get_cash_cost(item, amount):
     #TODO unit price expirements cost
     #TODO priceTestSettings
     #TODO EXPERIMENT_LE_DISCOUNT_SALE
-    cash_cost = int(item["cost"]["-cash"])
+    cash_cost = float(item["cost"]["-cash"])
 
     required_level = int(item.get("requiredLevel", "0"))
     player_level = session["user_object"]["userInfo"]["player"]["level"]
