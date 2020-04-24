@@ -1628,36 +1628,36 @@ def seen_flag_response(flag):
 
 def random_fleet_challenge_response(host_uid):
     unit_user = "U01,,,,"
-    unit = "BD3,,,,"
+    unit = "U01,,,,"
 
-    user_fleet = {
-        "type": "army",
-        "uid": "0",
-        "name": "FleetName",
-        "status": 0,
-        "target": "",
-        "consumables": [],
-        "inventory": [],
-        "playerLevel": 1,
-        "specialBits": None,
-        "lost": None,
-        "lastUnitLost": None,
-        "lastIndexLost": None,
-        "allies": None,
-        "battleTarget": None,
-        "battleTimestamp": None,
-        "ransomRandom": None,
-        "ransomResource": None,
-        "ransomAmount": None,
-        "units": [
-            unit_user,
-
-                  ],  # only one unit for tutorial [unit, unit, unit],
-        "store": [0],  # [0, 0, 0],
-        "fleets": None,
-        "upgrades": None,
-        "hp": None
-    }
+    # user_fleet = {
+    #     "type": "army",
+    #     "uid": "0",
+    #     "name": "FleetName",
+    #     "status": 0,
+    #     "target": "",
+    #     "consumables": [],
+    #     "inventory": [],
+    #     "playerLevel": 1,
+    #     "specialBits": None,
+    #     "lost": None,
+    #     "lastUnitLost": None,
+    #     "lastIndexLost": None,
+    #     "allies": None,
+    #     "battleTarget": None,
+    #     "battleTimestamp": None,
+    #     "ransomRandom": None,
+    #     "ransomResource": None,
+    #     "ransomAmount": None,
+    #     "units": [
+    #         unit_user,
+    #
+    #               ],  # only one unit for tutorial [unit, unit, unit],
+    #     "store": [0],  # [0, 0, 0],
+    #     "fleets": None,
+    #     "upgrades": None,
+    #     "hp": None
+    # }
 
     fleet = {
         "type": "army",
@@ -1678,9 +1678,9 @@ def random_fleet_challenge_response(host_uid):
         "ransomRandom": None,
         "ransomResource": None,
         "ransomAmount": None,
-        "units": [unit],  # only one unit for tutorial [unit, unit, unit],
+        "units": [unit,unit,unit,unit,unit],  # only one unit for tutorial [unit, unit, unit],
         "store": [0],  # [0, 0, 0],
-        "fleets": [user_fleet],
+        "fleets": [],
         "upgrades": None,
         "hp": None
     }
@@ -1875,15 +1875,21 @@ def add_fleet_response(param):
     return add_fleet_response
 
 def buy_item_response(param):
+    meta = {"newPVE": 0}
     print(param)
+    buy_item(meta, param["code"], param["amount"])
+    buy_item_response = {"errorType": 0, "userId": 1, "metadata": meta,
+                      "data": []}
+    return buy_item_response
+    #TODO buy powerup in combact
 
-    item = lookup_item_by_code(param["code"])
+
+def buy_item(meta, code, amount):
+    item = lookup_item_by_code(code)
     player = session['user_object']["userInfo"]["player"]
     world = session['user_object']["userInfo"]["world"]
     resources = world['resources']
-
     # standard_resources = ["coins", "oil", "wood", "aluminum", "copper", "gold", "iron", "uranium"]
-
     # resources[standard_resources[int(market["item"])]] += market["units"]
     if item["-type"] == 'mercenary':
         print("Buying mercenary")
@@ -1892,20 +1898,14 @@ def buy_item_response(param):
     elif "-resourceType" in item and item["-resourceType"] != "energy":
         resources[item["-resourceType"]] += param["amount"] * int(item.get("resourceYield", "1"))
 
-        print("Buy: received", item["-resourceType"] + ":", str(param["amount"]) +
-                  "(" + str(resources[item["-resourceType"]]) + ")")
+        print("Buy: received", item["-resourceType"] + ":", str(amount) +
+              "(" + str(resources[item["-resourceType"]]) + ")")
     else:
-    # param["useCash"]
+        # param["useCash"]
         item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
-        item_inventory[param["code"]] = item_inventory.get(param["code"], 0) + 1
-
-    player['cash'] -= get_cash_cost(item, param["amount"])
-    meta = {"newPVE": 0}
+        item_inventory[code] = item_inventory.get(code, 0) + 1
+    player['cash'] -= get_cash_cost(item, amount)
     handle_quest_progress(meta, progress_buy_consumable(item))
-    buy_item_response = {"errorType": 0, "userId": 1, "metadata": meta,
-                      "data": []}
-    return buy_item_response
-    #TODO buy powerup in combact
 
 
 def buy_items_response(param):
