@@ -108,6 +108,7 @@ def home():
                            allies=json.dumps(get_allies_friend(saves),
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
                            app_friends=json.dumps(get_allies_id(saves)),
+                           computername=os.environ['COMPUTERNAME'][:1].upper()+os.environ['COMPUTERNAME'].lower()[1:],
                            picture=random_image(),
                            dropdown_items=get_sessions_dropdown_info(saves)
                            )
@@ -980,6 +981,8 @@ def init_user():
     #     "hp": None
     # }
 
+    worldName_ComputerName=os.environ['COMPUTERNAME'][:1].upper()+os.environ['COMPUTERNAME'].lower()[1:]+'\'s Empire'
+
     user = {
         "userInfo": {
             "player": {
@@ -1105,7 +1108,7 @@ def init_user():
                     "deathMatch": None
                 }
             },
-            "worldName": "Nataland",
+            "worldName": worldName_ComputerName,
             "titanName": "Natalie",
             "isCIP": False,
             "dominanceDefaultFleets": [],

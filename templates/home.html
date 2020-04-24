@@ -1,23 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- LOADING BARS -->
-<div id="canvas_throbber">
-	<center>
-		<br><br>
-		<img class="mtl img" src="layouts/loading.gif" alt="" width="32" height="32"/>
-	</center>
-</div>
+
 
 <head>
 	<title id="pageTitle">Empires &amp; Allies on Facebook | Facebook</title>
+	<link rel="shortcut icon" href="layouts/icon.png"/>
 	<link rel="icon" type="image/png" href="layouts/icon.png"/>
 	<meta charset="utf-8"/>
     <link rel="stylesheet" href="layouts/yc_r.css"/>
 <script>
 	function getUserInfo() {
 	    console.log("getUserInfo called")
-	    return {'zid': {{ zid | default(-1000) }}, 'uid': {{ zid | default(-1000) }}, 'first_name': 'Natalie', 'name':'Natalie', "sex":'F', 'pic_square': '{{ picture }}'};
+	    return {'zid': {{ zid | default(-1000) }}, 'uid': {{ zid | default(-1000) }}, 'first_name': '{{ computername }}', 'name':'{{ computername }}', "sex":'F', 'pic_square': '{{ picture }}'};
 	}
 	function getFriendData() {
 	    console.log("getFriendData called")
@@ -422,7 +417,9 @@
 
 									<a title="Discord group" href="https://discord.gg/xrNE6Hg" target="_blank"><div class="zBarButtons" id="zBarButtons" style="background-image: url('layouts/discord.png');"></div></a>
 
-									<a title="Github repository" href="https://github.com/AcidCaos/raisetheempires" target="_blank"><div class="zBarButtons" id="zBarButtons" style="background-image: url('layouts/github.png');"></div></a>
+									<a title="Github repository" href="https://github.com/AcidCaos/raisetheempires#readme" target="_blank"><div class="zBarButtons" id="zBarButtons" style="background-image: url('layouts/github.png');"></div></a>
+
+									<a title="Termux/GNU/Linux version" href="https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native" target="_blank"><div class="zBarButtons" id="zBarButtons" style="background-image: url('layouts/termux.png');"></div></a>
 
 								</div>
 
