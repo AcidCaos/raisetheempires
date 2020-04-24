@@ -1513,7 +1513,9 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
     if step == "place":
         if not from_inventory:
             costs = lookup_item_by_name(item_name).get("cost")
-            if costs:
+            if "-unitClass" in lookup_item_by_name(item_name):
+                do_costs({k: v for k, v in costs.items() if k == "-cash"})
+            else:
                 do_costs(costs)
         else:
             item = lookup_item_by_name(item_name)
