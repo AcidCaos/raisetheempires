@@ -127,6 +127,8 @@ def battle_complete_response(params):
     handle_loss(friendly_strengths)
 
     report_battle_log(friendly_strengths, baddie_strengths, player_turn, player_unit_id, enemy_unit_id, active_consumables)
+    if not player_turn:
+        consume_consumables(active_consumables)
     battle_complete_response = {"errorType": 0, "userId": 1, "metadata": meta, "data": result}
     return battle_complete_response
 
@@ -156,8 +158,14 @@ def process_consumable_end_turn(active_consumables, baddie_strengths, friendly_s
             elif target[0] == "ally":  #if  target[0] == "ally":
                 apply_dot_damage(consumable, target[1], friendly_strengths, "Friendly")
 
-    active_consumables[:] = [(consumable, target, tries - (1 if is_consumable_for_turn(target, player_turn) else 0)) for consumable, target, tries
-                             in active_consumables if tries > (1 if is_consumable_for_turn(target, player_turn) else 0)]
+    # active_consumables[:] = [(consumable, target, tries - (1 if is_consumable_for_turn(target, player_turn) else 0)) for consumable, target, tries
+    #                          in active_consumables if tries > (1 if is_consumable_for_turn(target, player_turn) else 0)]
+
+
+def consume_consumables(active_consumables):
+    active_consumables[:] = [(consumable, target, tries - 1) for consumable, target, tries
+                             in active_consumables if tries > 1]
+
 
 
 def is_consumable_for_turn(target, player_turn):
@@ -570,6 +578,9 @@ def assign_consumable_response(params):
 
         report_battle_log(friendly_strengths, baddie_strengths, not enemy_turn, None, None,
                           active_consumables)
+
+        if targeted and enemy_turn:
+            consume_consumables(active_consumables)
     if casting_ai:
         active_consumables.append(({"consumable": {}}, ("AI", None), -1))
 
