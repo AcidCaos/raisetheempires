@@ -1500,6 +1500,9 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
         click_next_state(True, id, meta, step, reference_item, cancel=cancel)  # place & setstate only
 
     if step == "setState":
+        if lookup_object(id)["referenceItem"] == None and reference_item != None:
+            costs = lookup_item_by_code(reference_item).get("cost")
+            do_costs({k: v for k, v in costs.items() if k != "-cash"})
         lookup_object(id)["referenceItem"] = reference_item
 
     if step == "clear":
@@ -1911,9 +1914,9 @@ def buy_item(meta, code, amount):
 def buy_items_response(param):
     print(repr(param))
     meta = {"newPVE": 0}
-    Resource_Dict = dict(param["itemData"])
-    for Res_code in Resource_Dict:
-        buy_item(meta, Res_code,Resource_Dict[Res_code])
+    resource_Dict = dict(param["itemData"])
+    for Res_code in resource_Dict:
+        buy_item(meta, Res_code,resource_Dict[Res_code])
     buy_items_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
     return buy_items_response

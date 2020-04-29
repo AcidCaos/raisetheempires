@@ -35,7 +35,7 @@ def migrate(meta, version, target_version):
     if version and version.startswith("0.05a") and version != target_version: # upcoming 0.06
         #create_backup("Update to 0.06a")#  for release
         #version = "0.06a"
-        #govt_fixer()
+        govt_fixer()
         session['user_object']["experiments"]["empire_decorations_master"] = 2
         session['user_object']["experiments"]["empire_doober_pickup"] = 3
         #session['save_version'] = version
