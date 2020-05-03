@@ -68,8 +68,8 @@ except ImportError:
 
 # import logging.config
 
-version = "0.05a.2020_04_21"
-release_date = 'Tuesday, 21 Apr 2020'
+version = "0.05a.2020_05_04"
+release_date = 'Monday, 05 May 2020'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -1161,7 +1161,7 @@ def init_user():
         "DEATHMATCH_DURATION": None,
         "clansInfo": None,
         "immunityTimeVariant": 0,
-        "experiments": {"empire_combataicancritical": 2, "empire_decorations_master": 2, "empire_doober_pickup": 3, "empires_consumable_2": 3},
+        "experiments": {"empire_combataicancritical": 2, "empire_decorations_master": 2, "empire_doober_pickup": 3, "empires_consumable_2": 3, "empire_research_shield_upgrade": 2},
         "completedQuests": [],
         "decorationsInfo": None,
         "treasureVaultHighlights": None,

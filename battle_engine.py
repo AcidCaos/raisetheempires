@@ -104,6 +104,10 @@ def battle_complete_response(params):
             print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
             doBattleRewards(hit_type, baddie_max_strength, damage, friendly_max_strength)
             handle_quest_progress(meta, progress_battle_damage_count("battleDamage", damage, friendlies[player_unit_id], baddies[enemy_unit_id]))
+
+        elif damage > 0 and is_shielded(ally_target, active_consumables) == True:
+            consume_shield(ally_target, active_consumables)
+
         else:
             friendly_strengths[player_unit_id] -= damage
             if friendly_strengths[player_unit_id] <= 0:
@@ -118,7 +122,8 @@ def battle_complete_response(params):
         roll = 0
 
 
-    result = {"attackerStunned": None, "psh": 0, "esh": 0, "ps": friendly_strengths[player_unit_id], "es": baddie_strengths[enemy_unit_id], "hv": None, "ur": roll,
+
+    result = {"attackerStunned": None, "psh": 1 if is_shielded(ally_target, active_consumables) else 0, "esh": 0, "ps": friendly_strengths[player_unit_id], "es": baddie_strengths[enemy_unit_id], "hv": None, "ur": roll,
      "playerUnit": player_unit_id, "enemyUnit": enemy_unit_id, "seeds": {"w": get_seed_w(), "z": get_seed_z()},
      "energy": None}
 
@@ -515,7 +520,7 @@ def assign_consumable_response(params):
                 #TODO enemy support heals, accuracy,...
                 else:
                     targeted_baddie = live_baddies_index[round(roll_random_between(0, round(len(live_baddies_index) - 1)))] if len(live_baddies_index) > 1 else live_baddies_index[0]
-                apply_consumable_direct_impact(meta, selected_consumable, targeted_baddie, baddies, baddie_strengths, params, False)
+                apply_consumable_direct_impact(meta, selected_consumable, targeted_baddie, baddies, baddie_strengths, params, False, active_consumables)
                     # session["battle"] = None`
                 # handle_win(baddie_strengths, meta, {})  #TODO next map?
                 # handle_loss()
@@ -534,7 +539,7 @@ def assign_consumable_response(params):
                         round(roll_random_between(0, round(len(live_friendly_index) - 1)))] if len(
                         live_friendly_index) > 1 else live_friendly_index[0]
                 apply_consumable_direct_impact(meta, selected_consumable, targeted_friendly, friendlies, friendly_strengths,
-                                               params, True)
+                                               params, True, active_consumables)
                 target = ('ally', targeted_friendly)
         else:
 
@@ -544,14 +549,14 @@ def assign_consumable_response(params):
 
             if (selected_consumable["consumable"].get("-target") == 'enemy') ^ enemy_turn:
                 for i in range(len(baddies)):
-                    apply_consumable_direct_impact(meta, selected_consumable, i, baddies, baddie_strengths, params, False)
+                    apply_consumable_direct_impact(meta, selected_consumable, i, baddies, baddie_strengths, params, False, active_consumables)
                 if not targeted and not enemy_turn and len(get_alive_unit_index(baddie_strengths)) > 1:
                     roll_random_float() #required roll
                 target = ('enemy', None)
             else:
                 print("target allies")
                 for i in range(len(friendlies)):
-                    apply_consumable_direct_impact(meta, selected_consumable, i, friendlies, friendly_strengths, params, True)
+                    apply_consumable_direct_impact(meta, selected_consumable, i, friendlies, friendly_strengths, params, True, active_consumables)
                 if not targeted and not enemy_turn and len(get_alive_unit_index(friendly_strengths)) > 1:
                     roll_random_float()
                 target = ('ally', None)
@@ -566,6 +571,10 @@ def assign_consumable_response(params):
 
         if int(selected_consumable["consumable"].get("-duration", "0")) > 0:
             active_consumables.append((selected_consumable, target, int(selected_consumable["consumable"].get("-duration", "0"))))
+
+        if selected_consumable["-name"] == "consumable75":
+            print(selected_consumable)
+            defenseshield_activate(friendlies, active_consumables, selected_consumable)
 
         if targeted and enemy_turn:
             print("Consumable use ends enemy turn")
@@ -593,7 +602,7 @@ def get_alive_unit_index(strengths):
     return [i for s, i in zip(strengths, range(len(strengths))) if s > 0]
 
 
-def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, units, units_strengths, params, ally):
+def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, units, units_strengths, params, ally, active_consumables):
     unit_current_strength = units_strengths[targeted_unit]
     direct_impact = int(selected_consumable["consumable"].get("-di", 0))
     damage = direct_impact
@@ -605,7 +614,11 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
     for a in against:
         if a['-type'] in (get_unit_type(units[targeted_unit]), get_unit_terrain(units[targeted_unit])):
             damage *= float(a['-mod'])
-    if units_strengths[targeted_unit] > 0: #can't damage/heal dead units
+
+    if damage > 0 and is_shielded(("ally" if ally else "enemy",targeted_unit), active_consumables) == True:
+        consume_shield(("ally" if ally else "enemy",targeted_unit), active_consumables)
+
+    elif units_strengths[targeted_unit] > 0: #can't damage/heal dead units
         units_strengths[targeted_unit] -= damage
         if not ally and 1 >= units_strengths[targeted_unit] > 0:
             units_strengths[targeted_unit] = 0
@@ -902,3 +915,23 @@ def doBattleRewards(hit_type, max_strength, damage, friendly_max_strength):
         player['energy'] += energy
         resources['energy'] += energy # needed?
         print("Combat rewards", hit_type ,  "energy:", energy, "(" + str(player['energy']) + ")")
+
+
+def defenseshield_activate(friendlies, active_consumables, selected_consumable):
+    for i in range(len(friendlies)):
+        active_consumables.append((selected_consumable, ('ally',i), 9999999))
+        print('ally: ' , i)
+
+
+
+def consume_shield(hit_target, active_consumables):
+    active_consumables[:] = [(consumable, target, tries) for consumable, target, tries
+                             in active_consumables if consumable.get("consumable",{}).get("-givesAbility") != "shield" or target != hit_target]
+
+
+
+def is_shielded(target, active_consumables):
+    for consumable, consumable_target, tries in active_consumables:
+        if (consumable_target == target or consumable_target == (target[0], None)) and consumable.get("consumable",{}).get("-givesAbility") == "shield":
+            return True
+    return False
