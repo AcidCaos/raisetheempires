@@ -1501,7 +1501,7 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
 
     if step == "setState":
         if lookup_object(id)["referenceItem"] == None and reference_item != None:
-            costs = lookup_item_by_code(reference_item).get("cost")
+            costs = lookup_item_by_code(reference_item.split(":")[0]).get("cost")
             do_costs({k: v for k, v in costs.items() if k != "-cash"})
         lookup_object(id)["referenceItem"] = reference_item
 
