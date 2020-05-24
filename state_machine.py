@@ -154,6 +154,12 @@ def do_state_rewards(state, reference_item, meta, playback_tend=False):
     player['socialXpGood'] += int(state.get('-socialXpGood', 0))
     player['socialXpBad'] += int(state.get('-socialXpBad', 0))
 
+    if  str(state.get('-elementZ',0)) != '0':
+        if not state.get('-elementZ',0) in player["inventory"]["items"]:
+            player["inventory"]["items"][state.get('-elementZ',0)] = 1
+        else:
+            player["inventory"]["items"][state.get('-elementZ', 0)] +=1
+
     world = session['user_object']["userInfo"]["world"]
     resources = world['resources']
     resources['coins'] += int(state.get('-coins', 0))

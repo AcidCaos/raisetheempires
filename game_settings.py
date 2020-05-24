@@ -73,6 +73,36 @@ def lookup_visitor_reward(reward_name):
     [reward] = [reward for reward in game_settings['settings']['visitorRewards']["reward"] if reward["-name"] == reward_name]
     return reward
 
+def randomReward(item_name):
+    casino = game_settings["settings"]
+    given_item = item_name
+    item_list = []
+    building_list = []
+    weight_list = []
+    ammount = []
+    rewardstypes =[]
+    for building in casino["casino"]["rewards"]:
+        building_list.append(building["-item"])
+
+    reward_list = [e for e in casino["casino"]["rewards"] if e['-item'] == given_item]
+    reward_list = reward_list[0]["reward"]
+
+    for item in range(len(reward_list)):
+        if not reward_list[item].get("-type") == "item" and reward_list[item].get("-item") == None:
+            item_list.append(reward_list[item].get("-type"))
+        if not reward_list[item].get("-item") == None and reward_list[item].get("-type") == "item":
+            item_list.append(reward_list[item].get("-item"))
+        weight_list.append(reward_list[item].get("-weight"))
+        ammount.append(reward_list[item].get("-count"))
+        rewardstypes.append(reward_list[item].get("-type"))
+
+    weight_list = [int(i) for i in weight_list]
+    ammount = [int(i) for i in ammount]
+    print(item_list)
+    print(weight_list)
+    finelitem = str(random.choices(item_list,weight_list,k=1)[0])
+    return finelitem ,ammount[item_list.index(finelitem)], rewardstypes[item_list.index(finelitem)]
+
 
 # def lookup_built_yield(placed_objects):
 #     built_objects = [e for e in objects if

@@ -51,7 +51,7 @@ import pyamf
 
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
     get_active_island_by_map, set_active_island_by_map, register_random_fleet
-from game_settings import get_zid, initial_island, unlock_expansion, random_image
+from game_settings import get_zid, initial_island, unlock_expansion, random_image, randomReward
 import threading, webbrowser
 import pyamf.amf0
 import json
@@ -1495,7 +1495,7 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
     # next_click_state = lookup_state(state_machine, state['-clickNext']) # not all states have this!! end states? autostate after time?
     # print("next_click_state:", repr(next_click_state))
     meta = {"newPVE": 0}
-
+    print(step)
     if step in ["place", "setState"]:
         click_next_state(True, id, meta, step, reference_item, cancel=cancel)  # place & setstate only
 
@@ -1577,6 +1577,26 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
         item = lookup_item_by_name(item_name)
         decoration["crewInfo"] = [-1, -1 , -1]
         print("staffing full")
+
+    if step == "randomRewards":
+        print(lookup_item_by_name(item_name).get("-code",0))
+        iteminfo = randomReward(lookup_item_by_name(item_name).get("-code",0))
+        itemcode = iteminfo[0]
+        Item_ammount= iteminfo[1]
+        item_type= iteminfo[2]
+        perform_world_response["data"]["typo"] = "cash"
+        perform_world_response["data"]["item"] = "cash"
+        perform_world_response["data"]["count"] = 500
+        if item_type == "item":
+            if not itemcode in session['user_object']["userInfo"]["player"]["inventory"]["items"]:
+                session['user_object']["userInfo"]["player"]["inventory"]["items"][itemcode] = Item_ammount
+            else:
+                session['user_object']["userInfo"]["player"]["inventory"]["items"][itemcode] += Item_ammount
+        elif item_type == "cash":
+            session['user_object']["userInfo"]["player"]["cash"] += Item_ammount
+        else:
+            session['user_object']["userInfo"]["world"]['resources']["coins"] += Item_ammount
+        print("stam")
 
     print("perform_world_response", repr(perform_world_response))
     return perform_world_response
