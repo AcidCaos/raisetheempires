@@ -1161,7 +1161,7 @@ def init_user():
         "DEATHMATCH_DURATION": None,
         "clansInfo": None,
         "immunityTimeVariant": 0,
-        "experiments": {"empire_combataicancritical": 2, "empire_decorations_master": 2, "empire_doober_pickup": 3, "empires_consumable_2": 3, "empire_research_shield_upgrade": 2},
+        "experiments": {"empire_combataicancritical": 2, "empire_decorations_master": 2, "empire_doober_pickup": 3, "empires_consumable_2": 3, "empire_research_shield_upgrade": 2, "empires_support_units" : 5, "empire_buildable_zrig_master" : 3},
         "completedQuests": [],
         "decorationsInfo": None,
         "treasureVaultHighlights": None,
