@@ -1579,23 +1579,24 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
         print("staffing full")
 
     if step == "randomRewards":
-        print(lookup_item_by_name(item_name).get("-code",0))
-        iteminfo = randomReward(lookup_item_by_name(item_name).get("-code",0))
-        itemcode = iteminfo[0]
-        Item_ammount= iteminfo[1]
-        item_type= iteminfo[2]
-        perform_world_response["data"]["type"] = item_type
-        perform_world_response["data"]["item"] = itemcode
-        perform_world_response["data"]["count"] = Item_ammount
+        print(lookup_item_by_name(item_name).get("-code", 0))
+        item_info = randomReward(lookup_item_by_name(item_name).get("-code", 0))
+        item_code = item_info[0]
+        item_amount = item_info[1]
+        item_type = item_info[2]
+        perform_world_response["data"]["data"] = {}
+        perform_world_response["data"]["data"]["type"] = item_type
+        perform_world_response["data"]["data"]["item"] = item_code
+        perform_world_response["data"]["data"]["count"] = item_amount
         if item_type == "item":
-            if not itemcode in session['user_object']["userInfo"]["player"]["inventory"]["items"]:
-                session['user_object']["userInfo"]["player"]["inventory"]["items"][itemcode] = Item_ammount
+            if item_code not in session['user_object']["userInfo"]["player"]["inventory"]["items"]:
+                session['user_object']["userInfo"]["player"]["inventory"]["items"][item_code] = item_amount
             else:
-                session['user_object']["userInfo"]["player"]["inventory"]["items"][itemcode] += Item_ammount
+                session['user_object']["userInfo"]["player"]["inventory"]["items"][item_code] += item_amount
         elif item_type == "cash":
-            session['user_object']["userInfo"]["player"]["cash"] += Item_ammount
+            session['user_object']["userInfo"]["player"]["cash"] += item_amount
         else:
-            session['user_object']["userInfo"]["world"]['resources']["coins"] += Item_ammount
+            session['user_object']["userInfo"]["world"]['resources']["coins"] += item_amount
 
     print("perform_world_response", repr(perform_world_response))
     return perform_world_response
