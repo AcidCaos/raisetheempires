@@ -1584,9 +1584,9 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
         itemcode = iteminfo[0]
         Item_ammount= iteminfo[1]
         item_type= iteminfo[2]
-        perform_world_response["data"]["typo"] = "cash"
-        perform_world_response["data"]["item"] = "cash"
-        perform_world_response["data"]["count"] = 500
+        perform_world_response["data"]["type"] = item_type
+        perform_world_response["data"]["item"] = itemcode
+        perform_world_response["data"]["count"] = Item_ammount
         if item_type == "item":
             if not itemcode in session['user_object']["userInfo"]["player"]["inventory"]["items"]:
                 session['user_object']["userInfo"]["player"]["inventory"]["items"][itemcode] = Item_ammount
