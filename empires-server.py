@@ -1596,7 +1596,6 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
             session['user_object']["userInfo"]["player"]["cash"] += Item_ammount
         else:
             session['user_object']["userInfo"]["world"]['resources']["coins"] += Item_ammount
-        print("stam")
 
     print("perform_world_response", repr(perform_world_response))
     return perform_world_response
