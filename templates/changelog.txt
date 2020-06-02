@@ -1,4 +1,32 @@
 upcoming
+    Invade part 3: invading & repelling Nat 02/06/2020 02:50
+    Element z part 2: fix collection Nat 25/05/2020 17:59
+    Element z part 1 (most fixed except 2 known bugs) Oshere1111 25/05/2020 08:37
+    Element z part 1 (most fixed except 2 known bugs) Oshere1111 25/05/2020 08:33
+    fixed unit buying Oshere1111 25/05/2020 08:27
+    Element z part 1 (most fixed except 2 known bugs) Oshere1111 25/05/2020 00:46
+    deleted dupped trees. releases page AcidCaos 18/05/2020 10:45
+    fixed research crash Oshere1111 08/05/2020 22:51
+    fixed defense shield Oshere1111 04/05/2020 01:42
+    all powerups are shown Oshere1111 01/05/2020 22:28
+    new powerups are usable Oshere1111 01/05/2020 22:12
+    resources gets reduced Oshere1111 29/04/2020 22:47
+    autopickup drops Nat 29/04/2020 22:33
+    fix depleted z-units power-ups out of sync Nat 26/04/2020 00:50
+    obelisk fixed Oshere1111 26/04/2020 00:05
+    xp on hover AcidCaos 24/04/2020 23:08
+    fixed resource needed buying Oshere1111 24/04/2020 15:52
+    resource amount fix Nat 24/04/2020 15:50
+    generic buying item, invade basic battle Nat 24/04/2020 15:40
+    fixed unit buying Oshere1111 24/04/2020 12:03
+    init custom name. favicon fix. AcidCaos 24/04/2020 10:46
+    fixed github repository link Willy030125* 24/04/2020 06:58
+    fixed silence gap in battle music Willy030125* 24/04/2020 06:32
+    fixed resources buying in build menu Oshere1111 23/04/2020 22:39
+    player menu AcidCaos 23/04/2020 12:17
+    adding crewInfo when migrate Oshere1111 22/04/2020 21:07
+    all govt adding crewInfo when migrate Oshere1111 22/04/2020 21:03
+    adding crewInfo when migrate Oshere1111 22/04/2020 15:43
     crewing buildings Nat 21/04/2020 23:39
     ability to cancel units, research, produce, ... Nat 21/04/2020 01:05
     fix quest kill counter Oshere1111 20/04/2020 23:46

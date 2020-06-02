@@ -6,8 +6,15 @@ import sys
 from datetime import datetime
 import daiquiri
 import editor
-from flask import session
+from flask import session,current_app
 import logging
+
+from flask_session import SqlAlchemySessionInterface
+from itsdangerous import want_bytes
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 def lookup_object(id):
     [game_object] = [e for e in session['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
@@ -21,6 +28,12 @@ def lookup_object_save(save, id):
 
 def lookup_objects_by_item_name(id):
     return [e for e in session['user_object']["userInfo"]["world"]["objects"] if e['itemName'] == id]
+
+
+def lookup_objects_save_by_position(save, x, y, r):
+    return [e for e in save['user_object']["userInfo"]["world"]["objects"]
+            if x <= int(e["position"].split(",")[0]) <= (x + r) and
+            y <= int(e["position"].split(",")[1]) <= (y + r)]
 
 
 def create_backup(message):
@@ -77,3 +90,30 @@ logger = daiquiri.getLogger(__name__)
 
 sys.excepthook = exception_handler
 
+
+def get_all_sessions():
+    sess_int: SqlAlchemySessionInterface = current_app.session_interface
+    sess_model = sess_int.sql_session_model
+    # record = sess_model.query.filter_by(
+    #         id=17).first()
+    records = sess_model.query.all()
+    return records
+
+
+def get_saves():
+    return [enrich_save(save, record) for record in get_all_sessions() for save in [pickle.loads(want_bytes(record.data))] if 'user_object' in save]
+
+
+def enrich_save(save, record):
+    save["session_id"] = record.session_id
+    return save
+
+
+def store_session(save):
+    sess_int: SqlAlchemySessionInterface = current_app.session_interface
+    sess_model = sess_int.sql_session_model
+    record = sess_model.query.filter_by(
+            session_id=save["session_id"]).first()
+
+    record.data = pickle.dumps(dict(save))
+    sess_int.db.session.commit()

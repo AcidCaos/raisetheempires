@@ -2,8 +2,6 @@ import getopt
 import os
 import sys
 
-from itsdangerous import want_bytes
-
 os.environ["PBR_VERSION"] = '5.4.3'
 if not os.environ.get('EDITOR'):
     os.environ["EDITOR"] = 'notepad'  # system specific!
@@ -39,13 +37,14 @@ if not debug:
     me = singleton.SingleInstance()
 
 
-from save_engine import save_database_uri, log_path
+from save_engine import save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
+    get_saves, store_session
 from save_migration import migrate
 from builtins import print
 from time import sleep
 
 from flask import Flask, render_template, send_from_directory, request, Response, make_response, redirect
-from flask_session import Session, SqlAlchemySessionInterface
+from flask_session import Session
 from pyamf import remoting
 import pyamf
 
@@ -68,8 +67,8 @@ except ImportError:
 
 # import logging.config
 
-version = "0.05a.2020_05_04"
-release_date = 'Monday, 05 May 2020'
+version = "0.05a.2020_06_02"
+release_date = 'Monday, 02 June 2020'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -125,7 +124,8 @@ def get_allies_id(saves):
 
 
 def get_allies_info():
-    return [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neighbor")]+ get_sessions_info(get_saves())
+    return [ally["info"] for ally in allies.values() if ally["info"] and ally.get("neighbor")]+ get_sessions_info(
+        get_saves())
 
 
 @app.route("/nodebug.html")
@@ -230,34 +230,6 @@ def get_sessions_id(saves):
     else:
         response = []
     return response
-
-
-def get_saves():
-    return [enrich_save(save, record) for record in get_all_sessions() for save in [pickle.loads(want_bytes(record.data))] if 'user_object' in save]
-
-
-def enrich_save(save, record):
-    save["session_id"] = record.session_id
-    return save
-
-
-def get_all_sessions():
-    sess_int: SqlAlchemySessionInterface = app.session_interface
-    sess_model = sess_int.sql_session_model
-    # record = sess_model.query.filter_by(
-    #         id=17).first()
-    records = sess_model.query.all()
-    return records
-
-
-def store_session(save):
-    sess_int: SqlAlchemySessionInterface = app.session_interface
-    sess_model = sess_int.sql_session_model
-    record = sess_model.query.filter_by(
-            session_id=save["session_id"]).first()
-
-    record.data = pickle.dumps(dict(save))
-    sess_int.db.session.commit()
 
 
 @app.route("/gazillionaire", methods=['GET', 'POST'])
@@ -734,7 +706,7 @@ def post_gateway():
         elif reqq.functionName == 'DominationModeService.loadDominationModeBattle':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.loadEnemyFleetForChallenge':
-            resps.append(dummy_response())
+            resps.append(random_enemy_fleet_challenge_response(reqq.params[0]))
         elif reqq.functionName == 'QuestSurvivalModeService.loadQuestSurvivalMode':
             resps.append(dummy_response())
         elif reqq.functionName == 'SurvivalModeService.loadSurvivalMode':
@@ -784,7 +756,7 @@ def post_gateway():
         elif reqq.functionName == 'PVPService.immunityStart':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.occupationPlace':
-            resps.append(dummy_response())
+            resps.append(occupation_place_response(reqq.params))
         elif reqq.functionName == 'PVPService.pillage':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.doFavQuest':
@@ -1376,9 +1348,26 @@ def friend_response():
 
 
 def invader_response():
+
+    # response = invader_entry("1983584376466962")
+
+
     invader_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                        "data": None}
+                        "data": [invader_entry(k[1:]) for k, v in session['user_object']["pvp"]["invaders"].items() if k != "pve"]}
     return invader_response
+
+
+def invader_entry(id):
+    response = {"state": 0,
+                "status": 0,
+                "pFID": "",
+                "eFID": "fleet1_" + id,
+                "eID": id,
+                "isAI": False,
+                "isPVE": False,
+                "isAssist": False
+                }
+    return response
 
 
 def zlingshot_response():
@@ -1705,7 +1694,8 @@ def random_fleet_challenge_response(host_uid):
         "store": [0],  # [0, 0, 0],
         "fleets": [],
         "upgrades": None,
-        "hp": None
+        "hp": None,
+        "invader": False
     }
 
     register_random_fleet(fleet)
@@ -1715,9 +1705,82 @@ def random_fleet_challenge_response(host_uid):
                                            "state": 0,
                                            "challengerFleet": fleet,
                                            "challengeInfo": {"status": 0, "state": 1},
-                                           "maxUnits": 1
+                                           "maxUnits": 5
                                        }}
     return random_fleet_challenge_response
+
+
+
+def random_enemy_fleet_challenge_response(host_uid):
+    unit_user = "U01,,,,"
+    unit = "U01,,,,"
+
+    # user_fleet = {
+    #     "type": "army",
+    #     "uid": "0",
+    #     "name": "FleetName",
+    #     "status": 0,
+    #     "target": "",
+    #     "consumables": [],
+    #     "inventory": [],
+    #     "playerLevel": 1,
+    #     "specialBits": None,
+    #     "lost": None,
+    #     "lastUnitLost": None,
+    #     "lastIndexLost": None,
+    #     "allies": None,
+    #     "battleTarget": None,
+    #     "battleTimestamp": None,
+    #     "ransomRandom": None,
+    #     "ransomResource": None,
+    #     "ransomAmount": None,
+    #     "units": [
+    #         unit_user,
+    #
+    #               ],  # only one unit for tutorial [unit, unit, unit],
+    #     "store": [0],  # [0, 0, 0],
+    #     "fleets": None,
+    #     "upgrades": None,
+    #     "hp": None
+    # }
+
+    fleet = {
+        "type": "army",
+        "uid": host_uid.split("_")[-1],
+        "name": "FleetName",
+        "status": 0,
+        "target": "",
+        "consumables": [],
+        "inventory": [],
+        "playerLevel": 1,
+        "specialBits": None,
+        "lost": None,
+        "lastUnitLost": None,
+        "lastIndexLost": None,
+        "allies": None,
+        "battleTarget": None,
+        "battleTimestamp": None,
+        "ransomRandom": None,
+        "ransomResource": None,
+        "ransomAmount": None,
+        "units": [unit,unit,unit,unit,unit],  # only one unit for tutorial [unit, unit, unit],
+        "store": [0],  # [0, 0, 0],
+        "fleets": [],
+        "upgrades": None,
+        "hp": None,
+        "invader": True
+    }
+
+    register_random_fleet(fleet)
+
+    random_enemy_fleet_challenge_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                                       "data": {
+                                           "state": 0,
+                                           "challengerFleet": fleet,
+                                           "challengeInfo": {"status": 0, "state": 1},
+                                           "maxUnits": 5
+                                       }}
+    return random_enemy_fleet_challenge_response
 
 
 def load_challenge_response(param):
@@ -1728,6 +1791,30 @@ def load_challenge_response(param):
     print("Challenge Player fleet:", param['challengeeFleet']['units'])
 
     return load_challenge_response
+
+
+def occupation_place_response(params):
+    #todo allies
+    [save] = [save for save in get_saves() if str(save['user_object']["userInfo"]["player"]["uid"]) == str(params[0])]
+    occupied_objects = lookup_objects_save_by_position(save, params[1], params[2], 5)
+    occupied_items = [lookup_item_by_name(e["itemName"]) for e in occupied_objects]
+    defense_units = [e for e in occupied_items if "unit" in e]
+    defense_units.sort(key=lambda e: int(e["unit"].get("-strength", "1000")), reverse=True)
+    defense_units = defense_units[:5]
+
+    save['user_object']["pvp"]["invaders"]["u" + str(get_zid())] = {
+        "ts": datetime.now().timestamp(),
+        "status": 1,
+        "pos":  str(params[1]) + "," + str(params[2]),
+        "size": 5,
+        "chID": str(get_zid())
+    }
+    store_session(save)
+
+    occupation_place_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                      "data": []}
+    return occupation_place_response
+
 
 
 def generic_string_response(param):
