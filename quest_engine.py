@@ -524,8 +524,9 @@ def progress_useGeneral_consumable(item,enemy_turn): #DONT USE THIS FUNCTION FOR
         item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
         if item["-subtype"] == "secondary":
             session['user_object']["userInfo"]["player"]["mana"]["value"]-=1
-        else:
-            item_inventory[item["-code"]] -= 1
+        elif session['user_object']["userInfo"]["player"]["tutorialProgress"] != "tut_step_powerUpPowerUsed" and \
+             session['user_object']["userInfo"]["player"]["tutorialProgress"] != "tut_step_powerUpPowerSelected":
+                item_inventory[item["-code"]] -= 1
     return lambda task, progress, i, *args: \
         task["_action"] == "useConsumable"  and item is not None and enemy_turn == False and \
         progress_parameter_implies("_type", item.get("-type", ""))(task, progress, i, *args) and \
