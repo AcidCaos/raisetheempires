@@ -577,7 +577,10 @@ def assign_consumable_response(params):
         else:
 
             # TODO: more consumables
-            # if consumable["consumable"].get("-type") == "all":
+
+
+
+
             print("Consumable", selected_consumable["-code"], selected_consumable["consumable"].get("-diweapon", ""), "affects all")
 
             if (selected_consumable["consumable"].get("-target") == 'enemy') ^ enemy_turn:
@@ -647,11 +650,16 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
     for a in against:
         if a['-type'] in (get_unit_type(units[targeted_unit]), get_unit_terrain(units[targeted_unit])):
             damage *= float(a['-mod'])
-
     if damage > 0 and is_shielded(("ally" if ally else "enemy",targeted_unit), active_consumables) == True:
         consume_shield(("ally" if ally else "enemy",targeted_unit), active_consumables)
 
     elif units_strengths[targeted_unit] > 0: #can't damage/heal dead units
+
+        if selected_consumable["consumable"].get("-type") == "all" and selected_consumable["-subtype"] == "secondary":
+            if "-percent" in selected_consumable["consumable"]:
+                if roll_random_float() > int(selected_consumable["consumable"]["-percent"])/100:
+                   damage =0
+
         units_strengths[targeted_unit] -= damage
         if not ally and 1 >= units_strengths[targeted_unit] > 0:
             units_strengths[targeted_unit] = 0
@@ -803,6 +811,7 @@ def ai_best_unit(first_units, first_units_strengths, second_unit, random, active
     # print("AI best unit" ,repr((first_units, first_units_strengths, second_unit, random)),best_grade, repr(best_units))
     if best_units:
         random_roll = round(random * (len(best_units) - 1))
+        print(best_units[random_roll])
         return best_units[random_roll], best_grade
     else:
         return None, -1

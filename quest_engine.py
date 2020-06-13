@@ -523,7 +523,7 @@ def progress_useGeneral_consumable(item,enemy_turn): #DONT USE THIS FUNCTION FOR
     if enemy_turn == False:
         item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
         if item["-subtype"] == "secondary":
-            session['user_object']["userInfo"]["player"]["mana"]["value"]-=1
+            session['user_object']["userInfo"]["player"]["mana"]["value"]-=int(item["consumable"]["-mana"])
         elif session['user_object']["userInfo"]["player"]["tutorialProgress"] != "tut_step_powerUpPowerUsed" and \
              session['user_object']["userInfo"]["player"]["tutorialProgress"] != "tut_step_powerUpPowerSelected":
                 item_inventory[item["-code"]] -= 1
