@@ -117,3 +117,22 @@ def store_session(save):
 
     record.data = pickle.dumps(dict(save))
     sess_int.db.session.commit()
+
+
+def validate_save(save, blank_allowed = False):
+    return (isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("level", {}), int) and \
+            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("uid", {}), int) and \
+            isinstance(save.get('user_object', {}).get("userInfo", {}).get("worldName", {}), str) and \
+            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("xp", {}), int) and \
+            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("playerResourceType", {}), int) and \
+            isinstance(save.get('user_object', {}).get("userInfo", {}).get("world", {}).get("resources", {}).get("coins", {}), int) and \
+            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("socialXpGood", {}), int) and \
+            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("socialLevelGood", {}), int) and \
+            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("socialXpBad", {}), int) and \
+            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("socialLevelBad", {}), int)) or \
+           (blank_allowed and 'user_object' not in save)
+
+
+class InvalidSaveException(Exception):
+    """Exception when save is invalid while loading."""
+    pass

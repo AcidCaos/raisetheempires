@@ -38,7 +38,7 @@ if not debug:
 
 
 from save_engine import save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
-    get_saves, store_session
+    get_saves, store_session, validate_save, InvalidSaveException
 from save_migration import migrate
 from builtins import print
 from time import sleep
@@ -67,8 +67,8 @@ except ImportError:
 
 # import logging.config
 
-version = "0.05a.2020_06_02"
-release_date = 'Monday, 02 June 2020'
+version = "0.05a.2020_06_13"
+release_date = 'Saturday, 13 June 2020'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -101,6 +101,9 @@ def index():
 @app.route("/home.html")
 def home():
     print("home")
+    if not validate_save(session, True):
+        print("Invalid save game")
+        return make_response(redirect('/save-editor')) #todo disable save editor toggle?
     saves = get_saves()
     return render_template("home.html", time=datetime.now().timestamp(), zid=str(get_zid()),
                            version=version,
@@ -176,7 +179,7 @@ def get_sessions_dropdown_info(saves):
             "world_name": save['user_object']["userInfo"]["worldName"],
             "level": save['user_object']["userInfo"]["player"]["level"],
             "xp": save['user_object']["userInfo"]["player"]["xp"],
-        } for save in saves]
+        } for save in saves if validate_save(save)]
     else:
         response = []
     return response
@@ -194,7 +197,7 @@ def get_sessions_friends(saves):
                 "portrait": one_image,
                 "pic": one_image,
                 "pic_square": one_image
-        } for save in saves if save['user_object']["userInfo"]["player"]["level"] >= -6]
+        } for save in saves if validate_save(save) and save['user_object']["userInfo"]["player"]["level"] >= -6]
     else:
         response = []
     return response
@@ -218,7 +221,7 @@ def get_sessions_info(saves):
             "tending": {
                 "actions": 3
             }
-        } for save in saves if save['user_object']["userInfo"]["player"]["level"] >= -6]
+        } for save in saves if validate_save(save) and save['user_object']["userInfo"]["player"]["level"] >= -6]
     else:
         response = []
     return response
@@ -226,7 +229,7 @@ def get_sessions_info(saves):
 
 def get_sessions_id(saves):
     if saves:
-        response = [save['user_object']["userInfo"]["player"]["uid"] for save in saves if save['user_object']["userInfo"]["player"]["level"] >= -6]
+        response = [save['user_object']["userInfo"]["player"]["uid"] for save in saves if validate_save(save) and save['user_object']["userInfo"]["player"]["level"] >= -6]
     else:
         response = []
     return response
@@ -364,7 +367,7 @@ def save_editor():
             'saved': session['saved'] if 'saved' in session else None,
             'save_version': session['save_version'] if 'save_version' in session else None,
             'original_save_version': session['original_save_version'] if 'original_save_version' in session else None,
-        }, default=lambda o: '<not serializable>', sort_keys=False, indent=2), uid=get_zid(), backups=backups)
+        }, default=lambda o: '<not serializable>', sort_keys=False, indent=2), uid=get_zid(), backups=backups, valid=validate_save(session, False))
 
 
 @app.route("/save-editor", methods=['POST'])
@@ -472,7 +475,12 @@ def post_gateway():
     resps = []
     for reqq in resp_msg.bodies[0][1].body[1]:
         if reqq.functionName == 'UserService.initUser':
-            resps.append(user_response())
+            try:
+                resps.append(user_response())
+            except InvalidSaveException as error:
+                print('Handling InvalidSaveException error:', error)
+                # return make_response(redirect('/save-editor')) #can't do it here
+
         elif reqq.functionName == 'DataServicesService.getRequestFriends':
             resps.append(friend_response())
         elif reqq.functionName == 'PVPService.getUsersInvaderChallenges':
@@ -1198,6 +1206,9 @@ def init_user():
 def user_response():
     if 'user_object' in session:
         print("Loading user from save")
+        if not validate_save(session):
+            print("invalid save file")
+            raise InvalidSaveException
         user = session['user_object']
         user["userInfo"]["player"]["uid"] = get_zid()
         if session.get('save_version') != version:

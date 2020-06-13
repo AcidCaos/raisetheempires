@@ -77,6 +77,9 @@
 											<div class="clearfix uiHeaderTop">
 												<div>
 													<h2 class="uiHeaderTitle" aria-hidden="true"> Raise The Empires Save Editor uid: {{uid}}</h2>
+													{% if not valid %}<div style="color: crimson; font-size: 40px;"><b>Your savegame is corrupt.</b></div>
+													<div style="color: crimson; font-size: 20px;">Restore a backup or fix your error. Your save game is required to have a "user object" key, beneath that a "userInfo" key and a "player" key with all needed attributes.</div>{% endif %}
+
 												</div>
 											</div>
 										</div>
