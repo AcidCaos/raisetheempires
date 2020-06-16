@@ -306,7 +306,7 @@ def init_battle(params):
             print("Ally direct target")
             friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
                           session['fleets'][params['fleet'] if params['fleet'] else params['name']]]
-            if simple_list(session['fleets'][get_next_fleet(params['fleet'] if params['fleet'] else params['name'])])[0]["name"] == "FleetName":
+            if simple_list(session['fleets'][get_next_fleet(params['fleet'] if params['fleet'] else params['name'])])[0].get("name") == "FleetName":
                 baddies = [lookup_item_by_code(baddy.split(',')[0]) for sub_fleet in
                            simple_list(session['fleets'][get_next_fleet(params['fleet'] if params['fleet'] else params['name'])])
                            for baddy in sub_fleet["units"]]
