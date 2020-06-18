@@ -449,6 +449,11 @@ def friends_page():
     saves = get_saves()
     return render_template("friends.html", version=version, release_date=release_date, dropdown_items=get_sessions_dropdown_info(saves), zid=str(get_zid()))
 
+@app.route("/login.html")
+def login_page():
+    saves = get_saves()
+    return render_template("login.html", version=version, release_date=release_date, dropdown_items=get_sessions_dropdown_info(saves))
+
 @app.route("/changelog.txt")
 def change_log():
     return render_template("changelog.txt")

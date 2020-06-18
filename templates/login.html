@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title id="pageTitle">Empires &amp; Allies on Facebook | Facebook</title>
+	<link rel="shortcut icon" href="layouts/icon.png"/>
+	<link rel="icon" type="image/png" href="layouts/icon.png"/>
+	<meta charset="utf-8"/>
+    <link rel="stylesheet" href="layouts/yc_r.css"/>
+</head>
+
+<body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US" 
+style="overflow: hidden;">
+	<div class="-cx-PRIVATE-fbLayout__root">
+	  	<div id="pagelet_bluebar" data-referrer="pagelet_bluebar">
+	  		<div id="blueBarHolder">
+	  			<div id="blueBar">
+	  				<div>
+	  					<div class="loggedout_menubar_container">
+	  						<div class="clearfix loggedout_menubar">
+	  							<a class="lfloat" href="#" title="Go to Facebook Home">
+	  								<i class="fb_logo img sp_e2gpgs sx_584554">
+	  									<u>Facebook logo</u>
+	  								</i>
+	  							</a>
+	  						</div>
+	  					</div>
+			  		</div>
+			  	</div>
+	  		</div>
+		</div>
+	</div>
+	<br>
+	<br>
+	<br>
+	<div class="mvl ptm uiInterstitial canvas_error_page uiInterstitialLarge uiBoxWhite" title="">
+		<div class="uiHeader uiHeaderBottomBorder mhl mts uiHeaderPage interstitialHeader">
+			<div class="clearfix uiHeaderTop">
+				<div>
+					<h2 class="uiHeaderTitle" aria-hidden="true" style="float: left"> Empires &amp; Allies</h2>
+					<img src="layouts/epoints.png" height="18px" style="margin-left: 5px">
+				</div>
+			</div>
+		</div>
+		<div class="phl ptm uiInterstitialContent">
+			By Raise the Empires team |  Version alpha {{ version | default("UNKNOWN version")}} from {{ release_date | default("UNKNOWN version")}}
+			<br>
+			<br>
+			<div style="margin-left:20px; font-size:13px;">
+				<p style="font-size:14px;"><b>Choose your empire:</b></p>
+				<div style="margin-left:15px; overflow-y: scroll; max-height: 200px;">
+					{% for dropdown_item in dropdown_items %}
+					  	<a href="#" style="text-decoration: none;">
+					  		<div style="border: 1px solid #3b5998; border-radius: 5px; margin-right:40px; display: block;">
+							  	<div style="position:relative; text-align:center; display: inline-block;" title="User avatar">
+									<img src="layouts/epoints.png" style="height:35px;">
+								</div>
+								<div style="position:relative; display: inline-block; vertical-align: top; text-align: left;">
+									<p style="margin-top:8px;">{{dropdown_item["world_name"]}} </p>
+								</div>
+								<div style="position:relative; text-align:center; display: inline-block;" title="{{dropdown_item["xp"]}} xp">
+									<img src="layouts/xp.png" style="width:30px;"> 
+									<div style="position:absolute; top:40%; left:50%; transform: translate(-50%, -50%); color:black;">
+										{{dropdown_item["level"]}}
+									</div>
+								</div>
+							</div>
+						</a>
+						<br>
+					{% endfor %}
+					<br>
+				</div>
+				<p style="font-size:14px;"><b>or <a href="#">Create new empire</a></b></p>
+			</div>
+		</div>
+	</div>
+</div>
