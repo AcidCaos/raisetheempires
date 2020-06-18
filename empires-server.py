@@ -444,6 +444,11 @@ def quest_settings_file():
 def releases():
     return render_template("releases.html", version=version)
 
+@app.route("/friends.html")
+def friends_page():
+    saves = get_saves()
+    return render_template("friends.html", version=version, release_date=release_date, dropdown_items=get_sessions_dropdown_info(saves), zid=str(get_zid()))
+
 @app.route("/changelog.txt")
 def change_log():
     return render_template("changelog.txt")
