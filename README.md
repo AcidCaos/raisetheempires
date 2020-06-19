@@ -25,8 +25,9 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 :email: raisetheempires@gmail.com
 
 ## Tools
-
 :iphone: [Empires & Allies Termux/GNU/Linux Version](https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native)
+
+:minidisc: [Empires & Allies Servers Support](SERVERS.md)
 
 :world_map: [Empires & Allies Empire Map Editor](https://github.com/AcidCaos/ea-empire-editor)
 
