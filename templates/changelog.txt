@@ -1,4 +1,15 @@
 upcoming
+    Servers: Basic documentation AcidCaos 19/06/2020 11:57
+    Profile avatar images Willy030125* 19/06/2020 02:52
+    Servers: login template AcidCaos 18/06/2020 20:50
+    Servers: friends/neighbours page AcidCaos 18/06/2020 19:10
+    fixed self bar heal oshere1111 16/06/2020 11:56
+    fixed secondary abillty Oshere1111 14/06/2020 00:32
+    fix invalid edited saves from breaking the game Nat 13/06/2020 02:34
+    gas poison fix oshere1111 10/06/2020 19:24
+    Flag for current "stable" version questandachievementProjects* 07/06/2020 06:34
+    Chinese(Simplified) fixed index quotation marks AcidCaos 06/06/2020 20:11
+    added Chinese(Simplified) language (unknown revision) AcidCaos 05/06/2020 20:56
     Invade part 3: invading & repelling Nat 02/06/2020 02:50
     Element z part 2: fix collection Nat 25/05/2020 17:59
     Element z part 1 (most fixed except 2 known bugs) Oshere1111 25/05/2020 08:37
