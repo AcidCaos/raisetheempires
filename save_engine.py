@@ -16,6 +16,8 @@ try:
 except ImportError:
     import pickle
 
+crash_log = True
+
 def lookup_object(id):
     [game_object] = [e for e in session['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
     return game_object
@@ -67,17 +69,25 @@ def log_path():
         return "."
 
 
+def set_crash_log(toggle):
+    global crash_log
+
+    crash_log = toggle
+
+
 def exception_handler(exc_type, exc_value, exc_traceback):
     if issubclass(exc_type, KeyboardInterrupt):
         sys.__excepthook__(exc_type, exc_value, exc_traceback)
         return
 
     logger.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
-    text = editor.edit(filename=os.path.join(log_path(), "log.txt"))
+    if crash_log:
+        text = editor.edit(filename=os.path.join(log_path(), "log.txt"))
 
 # logger = logging.getLogger(__name__)
 # handler = logging.StreamHandler(stream=sys.stdout)
 # logger.addHandler(handler)
+
 
 config = configparser.ConfigParser()
 config.read('RaiseTheEmpires.ini')

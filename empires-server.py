@@ -8,7 +8,7 @@ if not os.environ.get('EDITOR'):
 
 import editor
 from tendo import singleton
-opts, args = getopt.getopt(sys.argv[1:],"",["debug", "host=", "port=", "http-host=", "http-path=", "no-popup"])
+opts, args = getopt.getopt(sys.argv[1:],"",["debug", "host=", "port=", "http-host=", "http-path=", "no-popup", "no-crash-log"])
 
 debug = False
 host = '127.0.0.1'  # host to listen on 0.0.0.0 for all interfaces, 127.0.0.1 for only localhost
@@ -16,6 +16,7 @@ http_host = '127.0.0.1' # host to open on the webbrowser, can't be 0.0.0.0
 http_path = '' # in order to open a specific page on startup
 port = 5005
 open_browser = True
+crash_log = True
 
 for o, a in opts:
     if o == '--host':
@@ -30,6 +31,8 @@ for o, a in opts:
         debug = True
     elif o == '--no-popup':
         open_browser = False
+    elif o == '--no-crash-log':
+        crash_log = False
     else:
         print("Warning: Unknown option " + o + ".")
 
@@ -38,7 +41,7 @@ if not debug:
 
 
 from save_engine import save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
-    get_saves, store_session, validate_save, InvalidSaveException
+    get_saves, store_session, validate_save, InvalidSaveException, set_crash_log
 from save_migration import migrate
 from builtins import print
 from time import sleep
@@ -2189,7 +2192,8 @@ def delete_save(message):
 
 @app.errorhandler(500)
 def server_error_page(error):
-    text = editor.edit(filename=os.path.join(log_path(), "log.txt"))
+    if crash_log:
+        text = editor.edit(filename=os.path.join(log_path(), "log.txt"))
     return 'It went wrong'
 
 
@@ -2197,7 +2201,7 @@ if __name__ == '__main__':
     if 'WERKZEUG_RUN_MAIN' not in os.environ and open_browser:
         threading.Timer(1.25, lambda: webbrowser.open("http://" + http_host + ":" + str(port) + "/" + http_path)).start()
     # init_db(app, db)
-
+    set_crash_log(crash_log)
     compress.init_app(app)
     socketio.init_app(app)
     sess.init_app(app)
