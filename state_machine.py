@@ -52,8 +52,11 @@ def click_next_state(do_click, id, meta, step, reference_item, speed_up=False, t
                 print("state has autoNext, but not enough time was passed")
                 break
 
-        if (do_click or tend) and ('-clickNext' if not cancel else '-cancelNext') in state:
-            next_state_id = state['-clickNext'] if not cancel else state['-cancelNext']
+        if (do_click or tend):
+            try:
+               next_state_id = state['-clickNext'] if not cancel else state['-cancelNext']
+            except:
+                next_state_id = state['-clickNext']
             if reference_item != cur_object.get('referenceItem'):
                 state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'],
                                                      game_item['stateMachineValues'].get('define', []),
@@ -64,7 +67,7 @@ def click_next_state(do_click, id, meta, step, reference_item, speed_up=False, t
             print("next_click_state:", repr(next_click_state))
             if cancel:
                 print("canceled state")
-            elif not tending:
+            if not tending:
                 do_state_rewards(next_click_state, cur_object.get('referenceItem'), meta, playback_tend=playback_tend)
                 handle_world_state_change(meta, next_click_state, state_machine, game_item, step, state, reference_item, cur_object.get('referenceItem'))
             else:
