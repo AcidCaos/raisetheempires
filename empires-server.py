@@ -68,7 +68,7 @@ import copy
 
 # import logging.config
 
-version = "0.05a.2020_07_11"
+version = "0.06a"
 release_date = 'Saturday, 11 July 2020'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',

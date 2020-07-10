@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "RaiseTheEmpires"
-#define MyAppVersion "0.05a"
+#define MyAppVersion "0.06a"
 #define MyAppPublisher "RaiseTheEmpires"
 #define MyAppURL "https://github.com/AcidCaos/empires-and-allies"
 #define MyAppExeName "empires-server.exe"
@@ -129,6 +129,13 @@ type
   VC_2017_REDIST_X64_ADD = '{9D29FC96-9EEE-4253-943F-96B3BBFDD0B6}';
   VC_2017_REDIST_X64_MIN = '{F1B0FB3A-E0EA-47A6-9383-3650655403B0}';
 
+  { Visual C++ 2015 Redistributable 14.0.23026 }
+  VC_2015_REDIST_X86_MIN = '{A2563E55-3BEC-3828-8D67-E5E8B9E8B675}';
+  VC_2015_REDIST_X64_MIN = '{0D3E9E15-DE7A-300B-96F1-B4AF12B96488}';
+
+  VC_2015_REDIST_X86_ADD = '{BE960C1C-7BAD-3DE6-8B1A-2616FE532845}';
+  VC_2015_REDIST_X64_ADD = '{BC958BD2-5DAC-3862-BB1A-C1BE0790438D}';
+
 function MsiQueryProductState(szProduct: string): INSTALLSTATE;
   external 'MsiQueryProductState{#AW}@msi.dll stdcall';
 
@@ -139,10 +146,10 @@ end;
 
 function VCRedistNeedsInstall: Boolean;
 begin
-  Result := not VCVersionInstalled(VC_2017_REDIST_X64_MIN);
+  Result := not VCVersionInstalled(VC_2015_REDIST_X64_MIN);
 end;
 
 function VCRedist86NeedsInstall: Boolean;
 begin
-  Result := not VCVersionInstalled(VC_2017_REDIST_X84_MIN);
+  Result := not VCVersionInstalled(VC_2015_REDIST_X84_MIN);
 end;
