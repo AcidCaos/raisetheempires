@@ -129,7 +129,7 @@ def battle_complete_response(params):
      "energy": None}
 
     process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, player_turn)
-    handle_win(baddie_strengths, meta, params)
+    handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths)
     handle_loss(friendly_strengths)
 
     report_battle_log(friendly_strengths, baddie_strengths, player_turn, player_unit_id, enemy_unit_id, active_consumables)
@@ -197,7 +197,7 @@ def handle_loss(friendly_strengths):
         session["battle"] = None
 
 
-def handle_win(baddie_strengths, meta, params):
+def handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths):
     if sum(baddie_strengths) == 0:
         print("Enemy defeated")
         session["battle"] = None
@@ -218,24 +218,54 @@ def handle_win(baddie_strengths, meta, params):
                 set_active_island_by_map(map_name, len(map_item['island']))
         elif "attackHostId" in params:
             print("challenge won")
-            [save] = [save for save in get_saves() if
-                      str(save['user_object']["userInfo"]["player"]["uid"]) == str(params["attackHostId"])]
-            save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]["status"] = 2
-            store_session(save)
+            invasion_complete(params["attackHostId"], params, friendlies, friendly_strengths)
         elif params.get('target') == "FleetName":
-            print("repel won")
-            del session['user_object']["pvp"]["invaders"]["u" + session['fleets'][get_next_fleet(params["fleet"])]["uid"].split("_")[-1]]
+            if get_next_fleet(params["fleet"]).get("invaded_uid"):
+                print("neighbor repel won")
+                neighbor_repelled(get_next_fleet(params["fleet"]))
+            else:
+                print("repel won")
+                fleet_name = params["fleet"]
+                del session['user_object']["pvp"]["invaders"]["u" + get_next_fleet(fleet_name)["uid"]]
         elif params.get('name') == "FleetName":
             [(fleet_name, enemy_fleet)] = [(k, v) for k, v in session['fleets'].items() if isinstance(v, dict) and v.get('name') == "FleetName"]
             if enemy_fleet["invader"]:
-                print("repel with consumable won")
-                del session['user_object']["pvp"]["invaders"]["u" + enemy_fleet['uid']]
+                if enemy_fleet.get("invaded_uid"):
+                    print("neighbor repel with consumable won")
+                    neighbor_repelled(enemy_fleet)
+                else:
+                    print("repel with consumable won")
+                    del session['user_object']["pvp"]["invaders"]["u" + enemy_fleet['uid']]
             else:
                 print("challenge with consumable won")
-                [save] = [save for save in get_saves() if
-                          str(save['user_object']["userInfo"]["player"]["uid"]) == str(enemy_fleet['uid'])]
-                save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]["status"] = 2
-                store_session(save)
+                invasion_complete(enemy_fleet['uid'], params, friendlies, friendly_strengths)
+
+
+def neighbor_repelled(enemy_fleet):
+    [save] = [save for save in get_saves() if
+              str(save['user_object']["userInfo"]["player"]["uid"]) == str(enemy_fleet.get("invaded_uid"))]
+    save['user_object']["pvp"]["invaders"]["u" + str(enemy_fleet.get("uid"))]["dID"] = get_zid()
+    store_session(save)
+
+
+def invasion_complete(enemy_fleet_uid, params, friendlies, friendly_strengths):
+    [save] = [save for save in get_saves() if
+              str(save['user_object']["userInfo"]["player"]["uid"]) == str(enemy_fleet_uid)]
+    save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]["status"] = 2
+    save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]["attacker_fleet"] = [format_player_fleet(friendlies[i]["-code"]) for i in get_alive_unit_index(friendly_strengths)]
+    store_session(save)
+
+
+def cancel_unstarted_invasions():
+    for save in get_saves():
+        if save['user_object']["pvp"]["invaders"].get("u" + str(get_zid()), {}).get("status") == 1:
+            del save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]
+            store_session(save)
+
+
+def get_next_fleet(fleet_name):
+    return session['fleets'][get_next_fleet_name(fleet_name)]
+
 
 def handle_damage_upgrades(damage, friendlies, player_unit_id):
     research = session['user_object']["userInfo"]["world"]["research"]
@@ -289,10 +319,10 @@ def init_battle(params):
             print("AI fleet")
             future_enemy_fleet = get_new_enemy_fleet_name()
             friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                          session['fleets'][get_previous_fleet(get_previous_fleet(get_previous_fleet(future_enemy_fleet)))]]
+                          session['fleets'][get_previous_fleet_name(get_previous_fleet_name(get_previous_fleet_name(future_enemy_fleet)))]]
             baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in
                        simple_list(
-                           session['fleets'][get_previous_fleet(get_previous_fleet(future_enemy_fleet))])
+                           session['fleets'][get_previous_fleet_name(get_previous_fleet_name(future_enemy_fleet))])
                        for baddy, count in sub_fleet.items()
                        for i in range(int(count))]
         elif params['name'] == "FleetName":
@@ -301,18 +331,18 @@ def init_battle(params):
             baddies = [lookup_item_by_code(baddy.split(',')[0])
                        for baddy in enemy_fleet["units"]]
             friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                          session['fleets'][get_previous_fleet(fleet_name)]]
+                          session['fleets'][get_previous_fleet_name(fleet_name) if get_previous_fleet_name(fleet_name) in session['fleets'] else get_previous_fleet_name(get_previous_fleet_name(fleet_name))]]
         elif isinstance(simple_list(session['fleets'][params['fleet'] if params['fleet'] else params['name']])[0], str):
             print("Ally direct target")
             friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
                           session['fleets'][params['fleet'] if params['fleet'] else params['name']]]
-            if simple_list(session['fleets'][get_next_fleet(params['fleet'] if params['fleet'] else params['name'])])[0].get("name") == "FleetName":
+            if simple_list(session['fleets'][get_next_fleet_name(params['fleet'] if params['fleet'] else params['name'])])[0].get("name") == "FleetName":
                 baddies = [lookup_item_by_code(baddy.split(',')[0]) for sub_fleet in
-                           simple_list(session['fleets'][get_next_fleet(params['fleet'] if params['fleet'] else params['name'])])
+                           simple_list(session['fleets'][get_next_fleet_name(params['fleet'] if params['fleet'] else params['name'])])
                            for baddy in sub_fleet["units"]]
             else:
                 baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in
-                           simple_list(session['fleets'][get_next_fleet(params['fleet'] if params['fleet'] else params['name'])])
+                           simple_list(session['fleets'][get_next_fleet_name(params['fleet'] if params['fleet'] else params['name'])])
                            for baddy, count in sub_fleet.items()
                            for i in range(int(count))]
         else :
@@ -320,7 +350,7 @@ def init_battle(params):
                        for baddy, count in sub_fleet.items()
                        for i in range(int(count))]
             friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                          session['fleets'][get_previous_fleet(params['fleet'] if params['fleet'] else params['name'])]]
+                          session['fleets'][get_previous_fleet_name(params['fleet'] if params['fleet'] else params['name'])]]
     elif params['target'].startswith('fleet'):
         baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][params['target']])
                    for baddy, count in sub_fleet.items()
@@ -330,7 +360,7 @@ def init_battle(params):
     elif params['target'] == "FleetName":
         print("Invader target")
         baddies = [lookup_item_by_code(baddy.split(',')[0]) for sub_fleet in
-                   simple_list(session['fleets'][get_next_fleet(params['fleet'])])
+                   simple_list(session['fleets'][get_next_fleet_name(params['fleet'])])
                    for baddy in sub_fleet["units"]]
         friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
                       session['fleets'][params['fleet']]]
@@ -353,12 +383,12 @@ def init_battle(params):
     return friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables
 
 
-def get_previous_fleet(name):
+def get_previous_fleet_name(name):
     print("Using previous fleet as friendlies for ally consumables")
     return name[:5] + str(int(name[5:name.index('_')]) - 1) + name[name.index('_'):]
 
 
-def get_next_fleet(name):
+def get_next_fleet_name(name):
     print("Using next fleet as baddies for ally targeted consumables")
     return name[:5] + str(int(name[5:name.index('_')]) + 1) + name[name.index('_'):]
 
@@ -618,7 +648,7 @@ def assign_consumable_response(params):
         elif not enemy_turn:
             process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, True)
 
-        handle_win(baddie_strengths, meta, params)
+        handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths)
         handle_loss(friendly_strengths)
 
         report_battle_log(friendly_strengths, baddie_strengths, not enemy_turn, None, None,
@@ -977,3 +1007,7 @@ def is_shielded(target, active_consumables):
         if (consumable_target == target or consumable_target == (target[0], None)) and consumable.get("consumable",{}).get("-givesAbility") == "shield":
             return True
     return False
+
+
+def format_player_fleet(code):
+    return code + ",,,,"

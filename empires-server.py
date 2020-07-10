@@ -45,6 +45,7 @@ from save_engine import save_database_uri, log_path, lookup_objects_save_by_posi
 from save_migration import migrate
 from builtins import print
 from time import sleep
+from datetime import timedelta
 
 from flask import Flask, render_template, send_from_directory, request, Response, make_response, redirect
 from flask_session import Session
@@ -52,8 +53,9 @@ from pyamf import remoting
 import pyamf
 
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
-    get_active_island_by_map, set_active_island_by_map, register_random_fleet
-from game_settings import get_zid, initial_island, unlock_expansion, random_image, randomReward
+    get_active_island_by_map, set_active_island_by_map, register_random_fleet, format_player_fleet, \
+    cancel_unstarted_invasions
+from game_settings import get_zid, initial_island, random_image, randomReward
 import threading, webbrowser
 import pyamf.amf0
 import json
@@ -63,15 +65,11 @@ from quest_engine import *
 from state_machine import *
 from logger import socketio, report_tutorial_step, report_world_log, report_other_log
 import copy
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
 
 # import logging.config
 
-version = "0.05a.2020_06_20"
-release_date = 'Saturday, 20 June 2020'
+version = "0.05a.2020_07_11"
+release_date = 'Saturday, 11 July 2020'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -94,6 +92,7 @@ app.config['SESSION_TYPE'] = 'sqlalchemy'
 app.config['SQLALCHEMY_DATABASE_URI'] = save_database_uri()
 app.config['SESSION_SQLALCHEMY'] = db
 app.config['SESSION_COOKIE_HTTPONLY'] = False
+app.permanent_session_lifetime = timedelta(weeks=520)
 
 
 @app.route("/")
@@ -221,6 +220,9 @@ def get_sessions_info(saves):
             "socialLevelBad": save['user_object']["userInfo"]["player"]["socialLevelBad"],
             "profilePic": one_image,
             "dominanceRank": 1,
+            "pvpNumOccupiers": len([k for k, v in save['user_object']["pvp"]["invaders"].items() if k != "pve"]),
+            "pvpNumOccupiersNotDefended": len([k for k, v in save['user_object']["pvp"]["invaders"].items() if k != "pve"]),
+            "pvpInfo": next((v for k, v in save['user_object']["pvp"]["invaders"].items() if k == "u" + str(get_zid())), None),
             "tending": {
                 "actions": 3
             }
@@ -421,7 +423,7 @@ def record_stats():
 def flashFile():
     # return send_from_directory("assets", "ZGame.109338.swf")
     return send_from_directory("assets", "ZGame.109338_tracer2.swf")  # regular one
-    #return send_from_directory("assets", "ZGame.109338_tracer2a.swf")  # with extra debug logging
+    # return send_from_directory("assets", "ZGame.109338_tracer2a.swf")  # with extra debug logging
 
 
 @app.route("/gameSettings.xml")
@@ -617,7 +619,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.acceptedTOS':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.acceptFriendRepel':
-            resps.append(dummy_response())
+            resps.append(accept_friend_repel_response(reqq.params[0]))
         elif reqq.functionName == 'CrossPromoService.accepted':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.acknowledgeTOSStatus':
@@ -665,7 +667,7 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.calculateRansom':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.cancelUnstartedChallenge':
-            resps.append(dummy_response())
+            resps.append(cancel_unstarted_challenge_response())
         elif reqq.functionName == 'UserService.checkForPromoReward':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.clearOldFlashTokens':
@@ -713,7 +715,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.getLeaderboards':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.getNeighborVisitChallenges':
-            resps.append(dummy_response())
+            resps.append(neighbor_invader_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.getPrisonerInfo':
             resps.append(dummy_response())
         elif reqq.functionName == 'DataServicesService.getPromoData':
@@ -779,7 +781,7 @@ def post_gateway():
         elif reqq.functionName == 'PVPService.occupationPlace':
             resps.append(occupation_place_response(reqq.params))
         elif reqq.functionName == 'PVPService.pillage':
-            resps.append(dummy_response())
+            resps.append(pillage_response(reqq.params))
         elif reqq.functionName == 'UserService.doFavQuest':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.doSeenQuestNotification':
@@ -797,7 +799,7 @@ def post_gateway():
         elif reqq.functionName == 'PVPService.rejectDefenseTowerRepel':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.rejectFriendRepel':
-            resps.append(dummy_response())
+            resps.append(reject_friend_repel_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.removeExpiredInventory':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.removeExtraInventoryBuildings':
@@ -821,7 +823,7 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.resetParliamentDestroyed':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.retrieveNeighborRepelChallenge':
-            resps.append(dummy_response())
+            resps.append(neighbor_repel_challenge_response(reqq.params))
         elif reqq.functionName == 'PVPService.reviveAllies':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.reviveUnits':
@@ -1372,13 +1374,55 @@ def friend_response():
 
 
 def invader_response():
-
-    # response = invader_entry("1983584376466962")
-
-
     invader_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                         "data": [invader_entry(k[1:]) for k, v in session['user_object']["pvp"]["invaders"].items() if k != "pve"]}
     return invader_response
+
+
+def neighbor_invader_response(uid):
+    saves = [save for save in get_saves() if
+              str(save['user_object']["userInfo"]["player"]["uid"]) == str(uid)]
+
+    if saves:
+        neigbor_invader_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                            "data": [invader_entry(k[1:]) for k, v in saves[0]['user_object']["pvp"]["invaders"].items() if k != "pve"]}
+    else:
+        neigbor_invader_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                                    "data": []}
+    return neigbor_invader_response
+
+
+def neighbor_repel_challenge_response(params):
+    [save] = [save for save in get_saves() if
+              str(save['user_object']["userInfo"]["player"]["uid"]) == str(params[0])]
+
+    neigbor_invader_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                        "data": next((invader_entry(k[1:] + "_" + str(params[0])) for k, v in save['user_object']["pvp"]["invaders"].items() if k == "u" + str(params[1])), None)}
+    return neigbor_invader_response
+
+
+def accept_friend_repel_response(invader_uid):
+    accept_friend_repel_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                        "data": []}
+
+    del session['user_object']["pvp"]["invaders"]["u" + invader_uid]
+    return accept_friend_repel_response
+
+
+def reject_friend_repel_response(invader_uid):
+    reject_friend_repel_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                        "data": []}
+
+    del session['user_object']["pvp"]["invaders"]["u" + str(invader_uid)]["dID"]
+    return reject_friend_repel_response
+
+
+def cancel_unstarted_challenge_response():
+    cancel_unstarted_invasions()
+    cancel_unstarted_challenge_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                        "data": []}
+
+    return cancel_unstarted_challenge_response
 
 
 def invader_entry(id):
@@ -1695,8 +1739,13 @@ def random_fleet_challenge_response(host_uid):
     #     "hp": None
     # }
 
+    [save] = [save for save in get_saves() if str(save['user_object']["userInfo"]["player"]["uid"]) == str(host_uid)]
+    defender_fleet = save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]["defender_fleet"]
+
+    subtype = lookup_item_by_code(defender_fleet[0].split(',')[0])["-subtype"]
+
     fleet = {
-        "type": "army",
+        "type": subtype,
         "uid": host_uid,
         "name": "FleetName",
         "status": 0,
@@ -1714,7 +1763,7 @@ def random_fleet_challenge_response(host_uid):
         "ransomRandom": None,
         "ransomResource": None,
         "ransomAmount": None,
-        "units": [unit,unit,unit,unit,unit],  # only one unit for tutorial [unit, unit, unit],
+        "units": defender_fleet,
         "store": [0],  # [0, 0, 0],
         "fleets": [],
         "upgrades": None,
@@ -1734,8 +1783,7 @@ def random_fleet_challenge_response(host_uid):
     return random_fleet_challenge_response
 
 
-
-def random_enemy_fleet_challenge_response(host_uid):
+def random_enemy_fleet_challenge_response(enemy_fleet_id):
     unit_user = "U01,,,,"
     unit = "U01,,,,"
 
@@ -1768,9 +1816,21 @@ def random_enemy_fleet_challenge_response(host_uid):
     #     "hp": None
     # }
 
+    placeholder_fleet = [format_player_fleet("PT24"), format_player_fleet("PT23"), format_player_fleet("PT02"), format_player_fleet("PT22"), format_player_fleet("PT12")]
+
+    if len(enemy_fleet_id.split("_")) <= 2:
+        attacker_fleet = session['user_object']["pvp"]["invaders"]["u" + enemy_fleet_id.split("_")[1]].get('attacker_fleet', placeholder_fleet)
+    else:
+        [save] = [save for save in get_saves() if
+                  str(save['user_object']["userInfo"]["player"]["uid"]) == str(enemy_fleet_id.split("_")[2])]
+        attacker_fleet = save['user_object']["pvp"]["invaders"]["u" + enemy_fleet_id.split("_")[1]].get('attacker_fleet', placeholder_fleet)
+
+    subtype = lookup_item_by_code(attacker_fleet[0].split(',')[0])["-subtype"]
+
     fleet = {
-        "type": "army",
-        "uid": host_uid.split("_")[-1],
+        "type": subtype,
+        "uid": enemy_fleet_id.split("_")[1],
+        "invaded_uid": enemy_fleet_id.split("_")[2] if len(enemy_fleet_id.split("_")) > 2 else None,
         "name": "FleetName",
         "status": 0,
         "target": "",
@@ -1787,7 +1847,7 @@ def random_enemy_fleet_challenge_response(host_uid):
         "ransomRandom": None,
         "ransomResource": None,
         "ransomAmount": None,
-        "units": [unit,unit,unit,unit,unit],  # only one unit for tutorial [unit, unit, unit],
+        "units": attacker_fleet,  # [unit,unit,unit,unit,unit],  # only one unit for tutorial [unit, unit, unit],
         "store": [0],  # [0, 0, 0],
         "fleets": [],
         "upgrades": None,
@@ -1818,26 +1878,59 @@ def load_challenge_response(param):
 
 
 def occupation_place_response(params):
-    #todo allies
+    cancel_unstarted_invasions()
+
     [save] = [save for save in get_saves() if str(save['user_object']["userInfo"]["player"]["uid"]) == str(params[0])]
     occupied_objects = lookup_objects_save_by_position(save, params[1], params[2], 5)
+    # todo defenders from larger area?
+    # occupied_objects_double = lookup_objects_save_by_position(save, params[1] - 3, params[2] - 3, 11)
     occupied_items = [lookup_item_by_name(e["itemName"]) for e in occupied_objects]
     defense_units = [e for e in occupied_items if "unit" in e]
     defense_units.sort(key=lambda e: int(e["unit"].get("-strength", "1000")), reverse=True)
+
+    subtype = defense_units[0]["-subtype"] if defense_units else "army"
+
+    defense_units = [e for e in defense_units if e["-subtype"] == subtype]
+
     defense_units = defense_units[:5]
+
+    defense_fleet = [format_player_fleet(e["-code"]) for e in defense_units][:5]
+
+    if not defense_fleet:
+        defense_fleet = [format_player_fleet("PT24"), format_player_fleet("PT23"), format_player_fleet("PT02"), format_player_fleet("PT22"), format_player_fleet("PT12")]
+    else:
+        defense_fleet = (defense_fleet + [format_player_fleet("U01" if subtype == "army" else ("U43" if subtype == "navy" else "U66"))] * 2)[:5]
 
     save['user_object']["pvp"]["invaders"]["u" + str(get_zid())] = {
         "ts": datetime.now().timestamp(),
+        "pillTS": datetime.now().timestamp(),
         "status": 1,
         "pos":  str(params[1]) + "," + str(params[2]),
         "size": 5,
-        "chID": str(get_zid())
+        "chID": str(get_zid()),
+        "defender_fleet": defense_fleet
     }
     store_session(save)
 
     occupation_place_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
     return occupation_place_response
+
+
+def pillage_response(params):
+    [save] = [save for save in get_saves() if str(save['user_object']["userInfo"]["player"]["uid"]) == str(params[0])]
+    # occupied_objects = lookup_objects_save_by_position(save, params[1], params[2], 5)
+    # occupied_items = [lookup_item_by_name(e["itemName"]) for e in occupied_objects]
+    # defense_units = [e for e in occupied_items if "unit" in e]
+    # defense_units.sort(key=lambda e: int(e["unit"].get("-strength", "1000")), reverse=True)
+    # defense_units = defense_units[:5]
+
+    save['user_object']["pvp"]["invaders"]["u" + str(get_zid())]["pillTS"] = datetime.now().timestamp()
+    store_session(save)
+
+    pillage_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                      "data": []}
+    return pillage_response
 
 
 
@@ -1938,6 +2031,7 @@ def load_world_response(params):
             ally["expansions"] = save['user_object']["userInfo"]["player"]["expansions"]
             ally["worldName"] = save['user_object']["userInfo"]["worldName"]
             ally["titanName"] = save['user_object']["userInfo"]["titanName"]
+            ally["pvpInvaders"] = save['user_object']["pvp"]["invaders"]
 
         # ally["gf"] = False
         # ally["yimf"] = ""

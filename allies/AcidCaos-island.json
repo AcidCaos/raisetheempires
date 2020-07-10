@@ -22,7 +22,9 @@
     "dominanceRank": 1,
     "tending": {
       "actions": 2
-    }
+    },
+     "inactive____pvpInfo": {"status":2, "ts": 1591142368, "pillTS":1591142368},
+    "pvpImmunityTimestamp": 1893456000
   },
   "friend": {
     "zid": 111,

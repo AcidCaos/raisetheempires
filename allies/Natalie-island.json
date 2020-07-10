@@ -13,7 +13,8 @@
     "dominanceRank": 1,
     "tending": {
       "actions": 3
-    }
+    },
+    "pvpImmunityTimestamp": 1893456000
   },
   "friend": {
     "zid": 123,
