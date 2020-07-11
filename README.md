@@ -13,7 +13,7 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 | Version | Update | Release date |  Source  | Download |
 | ------- | ------ | ------------ | ------ | -------- |
-| **alpha 0.06a**   | **Invasion Update**       | July 11, 2020   | :label: [tag](../../releases/tag/0.6a) | :tickets: [**Installer**](../../releases/download/0.06a/empires-setup_0.06a.exe) |
+| **alpha 0.06a**   | **Invasion Update**       | July 11, 2020   | :label: [tag](../../releases/tag/0.06a) | :tickets: [**Installer**](../../releases/download/0.06a/empires-setup_0.06a.exe) |
 | alpha 0.05a   | Multiplayer Update       | February 3, 2020   | :label: [tag](../../releases/tag/0.05a) | :tickets: [Installer](../../releases/download/0.05a/empires-setup_0.05.exe) |
 | alpha 0.04a   | Combat Update            | November 14, 2019  | :label: [tag](../../releases/tag/0.04a) | :tickets: [Installer](../../releases/download/0.04a/empires-setup_0.04.exe) |
 | alpha 0.03a   | Stability Update         | October 14, 2019   | :label: [tag](../../releases/tag/0.03a) | :tickets: [Installer](../../releases/download/0.03a/empires-setup_0.03.exe) |
@@ -23,7 +23,7 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 ## Reporting Bugs and Contacting
 :speech_balloon: Check our [Discord group](https://discord.gg/xrNE6Hg)  [![Discord Channel](https://img.shields.io/discord/536575691563466772?label=)](https://discord.gg/xrNE6Hg)
 
-:email: raisetheempires@gmail.com
+
 
 ## Tools
 :iphone: [Empires & Allies Termux/GNU/Linux Version](https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native)
@@ -36,6 +36,8 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 :beginner: [Empires & Allies Wiki (FANDOM)](https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2)
 
 :clapper: [Empires & Allies Trailer](https://www.youtube.com/watch?v=pAdlyz9miqo)
+
+:smiley_cat: [Empires & Allies subreddit](https://reddit.com/r/EmpiresAndAllies)
 
 ## On archives and accessibility to digital heritage
 - [Exemption to PCCPSACT](https://www.federalregister.gov/documents/2018/10/26/2018-23241/exemption-to-prohibition-on-circumvention-of-copyright-protection-systems-for-access-control), exemptions to the provision of the Digital Millennium Copyright Act (“DMCA”). 
