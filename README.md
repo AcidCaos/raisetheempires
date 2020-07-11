@@ -14,7 +14,7 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 | Version | Update | Release date |  Source  | Download |
 | ------- | ------ | ------------ | ------ | -------- |
 | **alpha 0.06a**   | **Invasion Update**       | July 11, 2020   | :label: [tag](../../releases/tag/0.6a) | :tickets: [**Installer**](../../releases/download/0.06a/empires-setup_0.06a.exe) |
-| alpha 0.05a   | Multiplayer Update       | February 3, 2020   | :label: [tag](../../releases/tag/0.05a) | :tickets: [**Installer**](../../releases/download/0.05a/empires-setup_0.05.exe) |
+| alpha 0.05a   | Multiplayer Update       | February 3, 2020   | :label: [tag](../../releases/tag/0.05a) | :tickets: [Installer](../../releases/download/0.05a/empires-setup_0.05.exe) |
 | alpha 0.04a   | Combat Update            | November 14, 2019  | :label: [tag](../../releases/tag/0.04a) | :tickets: [Installer](../../releases/download/0.04a/empires-setup_0.04.exe) |
 | alpha 0.03a   | Stability Update         | October 14, 2019   | :label: [tag](../../releases/tag/0.03a) | :tickets: [Installer](../../releases/download/0.03a/empires-setup_0.03.exe) |
 | alpha 0.02a   | Campaign Update          | September 14, 2019 | :label: [tag](../../releases/tag/0.02a) | :ticket: [Launcher](../../releases/download/0.02a/raise_the_empires_0.02a.zip) |
