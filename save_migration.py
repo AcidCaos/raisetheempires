@@ -44,11 +44,11 @@ def migrate(meta, version, target_version):
         session['user_object']["experiments"]["empire_buildable_zrig_master"] = 3
         #session['save_version'] = version
     if version == "0.06a" and version != target_version: # upcoming 0.07
-        # create_backup("Update to 0.06a") # for release
-        # version = "0.07a"
-        #
-        pass
-        # session['user_object']["experiments"]["empire_decorations_master"] = 2
+        create_backup("Update to 0.06a") # for release
+
+        session['user_object']["experiments"]["empire_decorations_master"] = 2
+        version = "0.06a"
+        session['save_version'] = version
 
 
 

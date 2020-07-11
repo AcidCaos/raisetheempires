@@ -65,10 +65,10 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 [Files]
 ;x64
 Source: "C:\empires\redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Check: Is64BitInstallMode; Flags: deleteafterinstall
-Source: "C:\dist_mini005_x64\empires-server.exe"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion
+Source: "C:\dist_mini006_x64\empires-server.exe"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion
 ;x86
 Source: "C:\empires\\redist\vc_redist.x86.exe"; DestDir: "{tmp}"; Check: not Is64BitInstallMode; Flags: deleteafterinstall
-Source: "C:\dist_mini005_x86\empires-server.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak ignoreversion
+Source: "C:\dist_mini006_x86\empires-server.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak ignoreversion
 ;common
 Source: "C:\empires\allies\*"; DestDir: "{userdocs}\My Games\{#MyAppName}\allies"; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
 Source: "C:\empires\assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -151,5 +151,5 @@ end;
 
 function VCRedist86NeedsInstall: Boolean;
 begin
-  Result := not VCVersionInstalled(VC_2015_REDIST_X84_MIN);
+  Result := not VCVersionInstalled(VC_2015_REDIST_X86_MIN);
 end;
