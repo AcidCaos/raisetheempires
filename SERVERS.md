@@ -14,6 +14,7 @@
 |``--http-path <page_path>``| Sets a specific page to open on startup                        | Default: `page_path = ''`                  |
 |``--debug``                | Sets debugging option to `true`                                | Default: debugging option disabled</br> Not recommended for servers |
 |``--no-crash-log``         | Disables crash log popups                                      | Default: notepads are opened on error</br> Recommended for servers |
+|``--no-compression``         | Disables compression                                      | Default: compression is used</br> Not recommended for servers |
 
 
 :fax: Setup your router and firewall configuration

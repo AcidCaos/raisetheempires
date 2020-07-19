@@ -8,7 +8,7 @@ if not os.environ.get('EDITOR'):
 
 import editor
 from tendo import singleton
-opts, args = getopt.getopt(sys.argv[1:],"",["debug", "host=", "port=", "http-host=", "http-path=", "no-popup", "no-crash-log"])
+opts, args = getopt.getopt(sys.argv[1:],"",["debug", "host=", "port=", "http-host=", "http-path=", "no-popup", "no-crash-log", "no-compression"])
 
 debug = False
 host = '127.0.0.1'  # host to listen on 0.0.0.0 for all interfaces, 127.0.0.1 for only localhost
@@ -17,6 +17,7 @@ http_path = '' # in order to open a specific page on startup
 port = 5005
 open_browser = True
 crash_log = True
+compression = True
 
 for o, a in opts:
     if o == '--host':
@@ -33,6 +34,8 @@ for o, a in opts:
         open_browser = False
     elif o == '--no-crash-log':
         crash_log = False
+    elif o == '--no-compression':
+        compression = False
     else:
         print("Warning: Unknown option " + o + ".")
 
@@ -60,11 +63,16 @@ import threading, webbrowser
 import pyamf.amf0
 import json
 from flask_sqlalchemy import SQLAlchemy
-from flask_compress import Compress
 from quest_engine import *
 from state_machine import *
 from logger import socketio, report_tutorial_step, report_world_log, report_other_log
 import copy
+
+try:
+    from flask_compress import Compress
+except ImportError as error:
+    print("Warning: compression can't be initialized. Compression is disabled.", error)
+    compression = False
 
 # import logging.config
 
@@ -80,7 +88,7 @@ COMPRESS_MIN_SIZE = 500
 rand_seed_w = 5445  # very random
 rand_seed_z = 844
 
-compress = Compress()
+compress = Compress() if compression else None
 sess = Session()
 db = SQLAlchemy()
 
@@ -2296,7 +2304,8 @@ if __name__ == '__main__':
         threading.Timer(1.25, lambda: webbrowser.open("http://" + http_host + ":" + str(port) + "/" + http_path)).start()
     # init_db(app, db)
     set_crash_log(crash_log)
-    compress.init_app(app)
+    if compression:
+        compress.init_app(app)
     socketio.init_app(app)
     sess.init_app(app)
     db.init_app(app)
