@@ -4,6 +4,8 @@ import json
 import os
 import sys
 from datetime import datetime
+from functools import reduce
+
 import daiquiri
 import editor
 from flask import session,current_app
@@ -130,17 +132,22 @@ def store_session(save):
 
 
 def validate_save(save, blank_allowed = False):
-    return (isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("level", {}), int) and \
-            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("uid", {}), int) and \
-            isinstance(save.get('user_object', {}).get("userInfo", {}).get("worldName", {}), str) and \
-            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("xp", {}), int) and \
-            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("playerResourceType", {}), int) and \
-            isinstance(save.get('user_object', {}).get("userInfo", {}).get("world", {}).get("resources", {}).get("coins", {}), int) and \
-            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("socialXpGood", {}), int) and \
-            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("socialLevelGood", {}), int) and \
-            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("socialXpBad", {}), int) and \
-            isinstance(save.get('user_object', {}).get("userInfo", {}).get("player", {}).get("socialLevelBad", {}), int)) or \
+    player = get_dict(save, "user_object", "userInfo", "player")
+    return (isinstance(player.get("level"), int) and
+            isinstance(player.get("uid", {}), int) and
+            isinstance(get_dict(save, "user_object", "userInfo").get("worldName"), str) and
+            isinstance(player.get("xp", {}), (int, float)) and
+            isinstance(player.get("playerResourceType", {}), int) and
+            isinstance(get_dict(save, "user_object", "userInfo", "world", "resources").get("coins"), (int, float)) and
+            isinstance(player.get("socialXpGood", {}), (int, float)) and
+            isinstance(player.get("socialLevelGood", {}), int) and
+            isinstance(player.get("socialXpBad", {}), (int, float)) and
+            isinstance(player.get("socialLevelBad", {}), int)) or \
            (blank_allowed and 'user_object' not in save)
+
+
+def get_dict(*args):
+    return reduce((lambda a, b: a.get(b, {}) if isinstance(a.get(b, {}), dict) else {}), args)
 
 
 class InvalidSaveException(Exception):

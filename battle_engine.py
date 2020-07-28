@@ -120,9 +120,8 @@ def battle_complete_response(params):
         print("Stun skipped turn")
         player_unit_id = next((i for strength, i in zip(friendly_strengths,range(len(friendly_strengths))) if strength > 0), None)
         enemy_unit_id = next((i for strength, i in zip(baddie_strengths,range(len(baddie_strengths))) if strength > 0), None)
+        ally_target = ("ally", player_unit_id)
         roll = 0
-
-
 
     result = {"attackerStunned": None, "psh": 1 if is_shielded(ally_target, active_consumables) else 0, "esh": 0, "ps": friendly_strengths[player_unit_id], "es": baddie_strengths[enemy_unit_id], "hv": None, "ur": roll,
      "playerUnit": player_unit_id, "enemyUnit": enemy_unit_id, "seeds": {"w": get_seed_w(), "z": get_seed_z()},

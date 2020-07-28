@@ -76,8 +76,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.06a"
-release_date = 'Saturday, 11 July 2020'
+version = "0.06a.2020_07_29"
+release_date = 'Wednesday, 29 July 2020'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -408,7 +408,7 @@ def save_savegame():
     session['battle'] = save_game['battle']
     session['fleets'] = save_game['fleets']
     session['population'] = save_game['population']
-    session['save_version'] = save_game['save_version']
+    session['save_version'] = save_game.get('save_version')
 
     response = make_response(redirect('/home.html'))
     return response
@@ -418,8 +418,8 @@ def save_savegame():
 def format_backup_message(backup):
     return datetime.fromtimestamp(backup.get('saved_on', 0)).strftime("%d %b %Y %H:%M:%S") + ' - ' \
            + datetime.fromtimestamp(backup.get('replaced_on', 0)).strftime("%d %b %Y %H:%M:%S") + ' @' \
-           + backup.get('save_version', 'UNKNOWN VERSION') + ' ' \
-           + backup.get("message", "")
+           + str(backup.get('save_version', 'UNKNOWN VERSION')) + ' ' \
+           + str(backup.get("message", ""))
 
 
 @app.route("/127.0.0.1record_stats.php", methods=['GET', 'POST'])

@@ -33,8 +33,8 @@ def migrate(meta, version, target_version):
         version = "0.05a"
         session['save_version'] = version
     if version and version.startswith("0.05a") and version != target_version: # upcoming 0.06
-        #create_backup("Update to 0.06a")#  for release
-        #version = "0.06a"
+        create_backup("Update to 0.06a")
+        version = "0.06a"
         govt_fixer()
         session['user_object']["experiments"]["empire_decorations_master"] = 2
         session['user_object']["experiments"]["empire_doober_pickup"] = 3
@@ -42,13 +42,12 @@ def migrate(meta, version, target_version):
         session['user_object']["experiments"]["empire_research_shield_upgrade"] = 2
         session['user_object']["experiments"]["empires_support_units"] = 5
         session['user_object']["experiments"]["empire_buildable_zrig_master"] = 3
-        #session['save_version'] = version
-    if version == "0.06a" and version != target_version: # upcoming 0.07
-        create_backup("Update to 0.06a") # for release
-
-        session['user_object']["experiments"]["empire_decorations_master"] = 2
-        version = "0.06a"
         session['save_version'] = version
+    if version and version.startswith("0.06a") and version != target_version: # upcoming 0.07
+        # create_backup("Update to 0.07a") # for release
+        pass
+        #version = "0.07a"
+        #session['save_version'] = version
 
 
 

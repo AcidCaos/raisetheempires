@@ -1,5 +1,10 @@
 upcoming
-
+    save validation fix, fix unit shields status when stunned side Nat 29/07/2020 01:00
+    fixed brotli compression import missing binary handling Nat 19/07/2020 12:09
+    Readme Update: add subreddit AcidCaos* 11/07/2020 19:28
+    Update README.md Natlies* 11/07/2020 02:56
+    Update README.md Natlies* 11/07/2020 02:55
+    release files Nat 11/07/2020 02:05
 alpha v0.06a
     0.06a release Nat 11/07/2020 01:29
     Invade part 4: Neighbor repel, invade, longer sessions, titan Nat 11/07/2020 00:42
