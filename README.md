@@ -9,6 +9,8 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 [![size](https://img.shields.io/badge/size-220%20MB-brightgreen)](#)
 [![downloads](https://img.shields.io/github/downloads/AcidCaos/raisetheempires/total?label=downloads%40all)](../../releases/latest)
 
+---
+
 ## Releases
 
 | Version | Update | Release date |  Source  | Download |
@@ -23,12 +25,14 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 ## Reporting Bugs and Contacting
 :speech_balloon: Check our [Discord group](https://discord.gg/xrNE6Hg)  [![Discord Channel](https://img.shields.io/discord/536575691563466772?label=)](https://discord.gg/xrNE6Hg)
 
-
+:paw_prints: The project [Contributors](../../contributors)
 
 ## Tools
-:iphone: [Empires & Allies Termux/GNU/Linux Version](https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native)
+:iphone: [Empires & Allies Android(Termux) ~ GNU/Linux ~ macOS ~ iOS(iSH) versions](https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native#readme)
 
 :minidisc: [Empires & Allies Servers Support](SERVERS.md)
+
+:file_cabinet: [Emipres & Allies Revision History](https://github.com/AcidCaos/empires-revision-history#readme)
 
 :world_map: [Empires & Allies Empire Map Editor](https://github.com/AcidCaos/ea-empire-editor)
 
@@ -46,8 +50,9 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 - [The Internet Archive](https://archive.org/), a digital library of Internet sites and other cultural artifacts in digital form.
 - [BlueMaxima's Flashpoint](https://bluemaxima.org/flashpoint/), the webgame preservation project.
 
-<br><br>
-[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue)](http://www.gnu.org/licenses/gpl-3.0)
+---
+
+## License [![GPL v3](https://img.shields.io/badge/GPL%20v3-blue)](http://www.gnu.org/licenses/gpl-3.0)
 ```
 Old Empires and Allies preservation project Copyright (C) 2019-2020 by the Raise the Empires team.
 
