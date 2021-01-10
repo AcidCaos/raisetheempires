@@ -6,17 +6,31 @@ import random
 import libscrc
 from flask import session
 from datetime import datetime
+
+import mod_engine
 from save_engine import my_games_path
 
-with open(os.path.join(my_games_path() ,"gamesettings-converted.json"), 'r') as f:
-    game_settings = json.load(f)
-    print("Gamesettings loaded: ",  len(game_settings['settings']), " setting sections loaded")
+game_settings_path = os.path.join(my_games_path(), "gamesettings-converted.json")
+initial_island_path = os.path.join(my_games_path(), "allies/initial-island.json")
 
-with open(os.path.join(my_games_path() ,"allies/initial-island.json"), 'r') as f:
-    initial_island = json.load(f)
-    print("Initial island template", len(initial_island["objects"]), "objects loaded", len(initial_island["roads"]),
-          "roads loaded")
-    # game_objects = [o for o in game_objects_2 if int(o["position"].split(",")[0]) > 62 and int(o["position"].split(",")[1]) > 58]
+
+def read_games_settings():
+    with open(game_settings_path, 'r') as f:
+        return json.load(f)
+
+
+def read_initial_island():
+    with open(initial_island_path, 'r') as f:
+        return json.load(f)
+
+
+game_settings = json.loads(mod_engine.mod.get(game_settings_path)()) if game_settings_path in mod_engine.mod else read_games_settings()
+print("Gamesettings loaded: ",  len(game_settings['settings']), " setting sections loaded")
+
+initial_island = json.loads(mod_engine.mod.get(initial_island_path)()) if initial_island_path in mod_engine.mod else read_initial_island()
+print("Initial island template", len(initial_island["objects"]), "objects loaded", len(initial_island["roads"]),
+      "roads loaded")
+# game_objects = [o for o in game_objects_2 if int(o["position"].split(",")[0]) > 62 and int(o["position"].split(",")[1]) > 58]
 
 allies = {str(e["info"]["uid"] if e["info"] else e["friend"]["uid"]): e for e in
           [json.load(open(os.path.join(root, file_name), 'r')) for root, _, file_names in os.walk(os.path.join(my_games_path() ,"allies")) for

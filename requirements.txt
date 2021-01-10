@@ -9,3 +9,5 @@ flask_socketio
 libscrc
 daiquiri
 python-editor
+xmldiff
+jsonpatch

@@ -63,6 +63,10 @@ def my_games_path():
     return config['InstallFolders']['MyGamesPath']
 
 
+def install_path():
+    return config['InstallFolders']['InstallPath']
+
+
 def log_path():
     if os.path.exists(my_games_path()):
         return my_games_path()

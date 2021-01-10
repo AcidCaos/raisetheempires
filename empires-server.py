@@ -50,11 +50,12 @@ from builtins import print
 from time import sleep
 from datetime import timedelta
 
-from flask import Flask, render_template, send_from_directory, request, Response, make_response, redirect
+from flask import Flask, render_template, send_from_directory, request, Response, make_response, redirect, safe_join
 from flask_session import Session
 from pyamf import remoting
 import pyamf
 
+import mod_engine
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
     get_active_island_by_map, set_active_island_by_map, register_random_fleet, format_player_fleet, \
     cancel_unstarted_invasions
@@ -429,29 +430,29 @@ def record_stats():
 
 @app.route("/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf")
 def flashFile():
-    # return send_from_directory("assets", "ZGame.109338.swf")
-    return send_from_directory("assets", "ZGame.109338_tracer2.swf")  # regular one
-    # return send_from_directory("assets", "ZGame.109338_tracer2a.swf")  # with extra debug logging
+    # return send_from_directory_mod("assets", "ZGame.109338.swf")
+    return send_from_directory_mod("assets", "ZGame.109338_tracer2.swf")  # regular one
+    # return send_from_directory_mod("assets", "ZGame.109338_tracer2a.swf")  # with extra debug logging
 
 
 @app.route("/gameSettings.xml")
 def game_settings_file():
-    # return send_from_directory("assets/32995", "gameSettings.xml")
-    # return send_from_directory("assets/32995", "gameSettings.xml")
-    # return send_from_directory("assets/29oct2012", "gameSettings.xml")
-    # return send_from_directory("assets/29oct2012", "gameSettings_placeholders.xml")
-    return send_from_directory("assets/29oct2012", "gameSettings_with_fixes.xml")
+    # return send_from_directory_mod("assets/32995", "gameSettings.xml")
+    # return send_from_directory_mod("assets/32995", "gameSettings.xml")
+    # return send_from_directory_mod("assets/29oct2012", "gameSettings.xml")
+    # return send_from_directory_mod("assets/29oct2012", "gameSettings_placeholders.xml")
+    return send_from_directory_mod("assets/29oct2012", "gameSettings_with_fixes.xml")
 
 
 @app.route("/127.0.0.1en_US.xml")
 def en_us_file():
-    # return send_from_directory("assets/32995", "en_US.xml")
-    return send_from_directory("assets/29oct2012", "en_US.xml")
+    # return send_from_directory_mod("assets/32995", "en_US.xml")
+    return send_from_directory_mod("assets/29oct2012", "en_US.xml")
 
 
 @app.route("/127.0.0.1questSettings.xml")
 def quest_settings_file():
-    return send_from_directory("assets/29oct2012", "questSettings_with_fixes.xml")
+    return send_from_directory_mod("assets/29oct2012", "questSettings_with_fixes.xml")
 
 @app.route("/releases.html")
 def releases():
@@ -473,15 +474,22 @@ def change_log():
 
 @app.route("/layouts/<path:path>")
 def template_layouts(path):
-    return send_from_directory("templates/layouts", path)
+    return send_from_directory_mod("templates/layouts", path)
 
 @app.route('/nullassets/<path:path>')
 def send_sol_assets(path):
-    return send_from_directory('assets/sol_assets_octdict/assets', path)
+    return send_from_directory_mod('assets/sol_assets_octdict/assets', path)
 
 @app.route('/assets/<path:path>')
 def send_sol_assets_alternate(path):
-    return send_from_directory('assets/sol_assets_octdict/assets', path)
+    return send_from_directory_mod('assets/sol_assets_octdict/assets', path)
+
+
+def send_from_directory_mod(directory, filename, **options):
+    path = safe_join(os.fspath(directory), os.fspath(filename))
+    print(path)
+
+    return mod_engine.mod.get(path)() if path in mod_engine.mod else send_from_directory(directory, filename, **options)
 
 
 @app.route('/files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php', methods=['POST'])
