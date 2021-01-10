@@ -28,13 +28,16 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 :paw_prints: The project [Contributors](../../contributors)
 
 ## Tools
+
+:compass: [Empires & Allies Modding Support](mods)
+
 :iphone: [Empires & Allies Android(Termux) ~ GNU/Linux ~ macOS ~ iOS(iSH) versions](https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native#readme)
 
 :minidisc: [Empires & Allies Servers Support](SERVERS.md)
 
-:file_cabinet: [Emipres & Allies Revision History](https://github.com/AcidCaos/empires-revision-history#readme)
+:classical_building: [Emipres & Allies Revision History](https://github.com/AcidCaos/empires-revision-history#readme)
 
-:world_map: [Empires & Allies Empire Map Editor](https://github.com/AcidCaos/ea-empire-editor)
+:world_map: [Empires & Allies Empire Map Editor](https://github.com/AcidCaos/ea-empire-editor#readme)
 
 ## External Links
 :beginner: [Empires & Allies Wiki (FANDOM)](https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2)
