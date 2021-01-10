@@ -29,7 +29,7 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 ## Tools
 
-:compass: [Empires & Allies Modding Support](mods)
+:compass: [Empires & Allies Modding Support](mods#readme)
 
 :iphone: [Empires & Allies Android(Termux) ~ GNU/Linux ~ macOS ~ iOS(iSH) versions](https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native#readme)
 
