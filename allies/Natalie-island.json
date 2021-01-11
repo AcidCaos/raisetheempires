@@ -29,7 +29,7 @@
   "neighbor": true,
   "worldName": "Natalie's Empire",
   "titanName": "Natalie",
-  "expansions":{"data":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},
+  "expansions": {"data": [0,0,0,0,805306368,6291456,49152,0,0,0,0]},
   "recommendedFriends": true,
   "zyngaFriends": false,
   "empireFriends": true,

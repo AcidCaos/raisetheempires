@@ -2020,7 +2020,7 @@ def load_world_response(params):
     meta = {"newPVE": 0}
     handle_quest_progress(meta, progress_action("visit"))
 
-    print("world resp", int(params[0]), session['user_object']["userInfo"]["player"]["uid"])
+    print("world response. requested uid=", int(params[0]), session['user_object']["userInfo"]["player"]["uid"])
     if int(params[0]) == session['user_object']["userInfo"]["player"]["uid"]:
         ally = session['user_object']["userInfo"]
         # qc = session['quests']

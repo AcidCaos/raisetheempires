@@ -36,9 +36,15 @@ allies = {str(e["info"]["uid"] if e["info"] else e["friend"]["uid"]): e for e in
           [json.load(open(os.path.join(root, file_name), 'r')) for root, _, file_names in os.walk(os.path.join(my_games_path() ,"allies")) for
            file_name in
            file_names if 'island.json' in file_name and file_name != "initial-island.json"]}
-print("Ally islands", len(allies.keys()), "allies loaded",
-      sum([len(ally["objects"]) for ally in allies.values() if ally["objects"]]), "objects loaded",
-      sum([len(ally["roads"]) for ally in allies.values() if ally["roads"]]), "roads loaded")
+print("Ally islands")
+print("-", len(allies.keys()), "allies loaded")
+for key in allies.keys():
+    ally = allies[key]
+    try:
+        wName = ally["worldName"]
+    except KeyError as e:
+        wName = "<no world Name>"
+    print(" * ", key, ":", wName, " --> ", str(len(ally["objects"]) if ally["objects"] else 0), "objects, ", str(len(ally["roads"]) if ally["roads"] else 0), "roads")
 
 
 def lookup_item_by_name(item_name):
