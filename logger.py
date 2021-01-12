@@ -36,9 +36,9 @@ def report_other_log(service, response, req, endpoint):
 def report_battle_log(friendly_strengths, baddie_strengths, player_turn, player_unit_id, enemy_unit_id, active_consumables):
     friendly_strengths_ = [str(s) for s in friendly_strengths]
     baddie_strengths_ = [str(s) for s in baddie_strengths]
-    if player_unit_id:
+    if player_unit_id is not None:
         mark_array_element(friendly_strengths_, player_unit_id)
-    if enemy_unit_id:
+    if enemy_unit_id is not None:
         mark_array_element(baddie_strengths_, enemy_unit_id)
     for consumable, consumable_target, tries in active_consumables:
         if consumable_target[1] is None:
