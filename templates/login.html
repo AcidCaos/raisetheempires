@@ -8,6 +8,17 @@
     <link rel="stylesheet" href="layouts/yc_r.css"/>
 </head>
 
+<script>
+
+	function cookieCrumble(sessionId) {
+        console.log("session " + sessionId);
+        console.log(sessionId.replace(":", "=")+"; max-age="+(60*60*24*365*2));
+        document.cookie=sessionId.replace(":", "=")+"; max-age="+(60*60*24*365*2);
+        location.href = "/home.html";
+    }
+
+</script>
+
 <body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US" 
 style="overflow: hidden;">
 	<div class="-cx-PRIVATE-fbLayout__root">
@@ -17,7 +28,7 @@ style="overflow: hidden;">
 	  				<div>
 	  					<div class="loggedout_menubar_container">
 	  						<div class="clearfix loggedout_menubar">
-	  							<a class="lfloat" href="#" title="Go to Facebook Home">
+	  							<a class="lfloat" href="/" title="Go to Facebook Home">
 	  								<i class="fb_logo img sp_e2gpgs sx_584554">
 	  									<u>Facebook logo</u>
 	  								</i>
@@ -47,9 +58,9 @@ style="overflow: hidden;">
 			<br>
 			<div style="margin-left:20px; font-size:13px;">
 				<p style="font-size:14px;"><b>Choose your empire:</b></p>
-				<div style="margin-left:15px; overflow-y: scroll; max-height: 200px;">
+				<div style="margin-left:15px; overflow-y: scroll; max-height: 300px;">
 					{% for dropdown_item in dropdown_items %}
-					  	<a href="#" style="text-decoration: none;">
+					  	<a href="/home.html" onclick="cookieCrumble(&quot;{{dropdown_item['session_id']}}&quot;); return false" style="text-decoration: none;">
 					  		<div style="border: 1px solid #3b5998; border-radius: 5px; margin-right:40px; display: block;">
 							  	<div style="position:relative; text-align:center; display: inline-block;" title="User avatar">
 									<img src="layouts/epoints.png" style="height:35px;">
@@ -69,7 +80,7 @@ style="overflow: hidden;">
 					{% endfor %}
 					<br>
 				</div>
-				<p style="font-size:14px;"><b>or <a href="#">Create new empire</a></b></p>
+				<p style="font-size:12px;"><b>or <a href="/new.html">Create new empire</a></b></p>
 			</div>
 		</div>
 	</div>

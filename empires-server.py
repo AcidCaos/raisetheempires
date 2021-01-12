@@ -468,6 +468,17 @@ def login_page():
     saves = get_saves()
     return render_template("login.html", version=version, release_date=release_date, dropdown_items=get_sessions_dropdown_info(saves))
 
+def get_avail_avatars():
+    # list(set([u for u in fetch_urls() if u.endswith('.png')]))
+    # return avatar_file_names in os.walk(os.path.join(my_games_path() ,"templates/layouts"))
+    # TODO
+    return ["2_PincusCP_100.png", "4_NavyCP_04_100.png", "5_NavyCP_03_100.png"]
+
+@app.route("/new.html")
+def new_player_page():
+    saves = get_saves()
+    return render_template("new.html", version=version, release_date=release_date, avatars=get_avail_avatars())
+
 @app.route("/changelog.txt")
 def change_log():
     return render_template("changelog.txt")

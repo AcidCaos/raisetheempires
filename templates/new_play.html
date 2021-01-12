@@ -131,13 +131,7 @@
         document.cookie= "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 		console.log("session cookie eaten");
         location.reload();
-	}
-	
-	function logout() {
-		document.cookie= "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-		console.log("session cookie eaten");
-		location.href = "/login.html";
-	}
+    }
 
 </script>
 <style>
@@ -259,9 +253,6 @@
 												</div>
 											</div> 
 											<i class="img sp_ctntui sx_612416_new"></i>
-											<a class="uiButton uiButtonConfirm" href="#" onclick="logout(); return false" role="button" name="try_again_button">
-												<span class="uiButtonText">Logout</span>
-											</a>
 											{% endif %}{% endfor %}
 										</b>
 										<ul class="dropdownUser">
@@ -509,7 +500,10 @@
 									<param name=FlashVars value="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1">  <!--serverTime=1565300889& mute=true& &zlingshot_zoom= skipFacebook=false&decouple_from_facebook=false&decoupled_facebook_id=5452 -->
 									<param NAME=quality VALUE=high>
 									<param NAME=bgcolor VALUE=#333399>
-					                <param name="allowFullScreen" value="true" />
+					                		<param name="allowFullScreen" value="true" />
+									NEW (Shumway):
+									<iframe src="shumway/iframe/viewer.html?swf=/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf" WIDTH="1000" HEIGHT="750" frameborder="0"></iframe>
+									OLD:
 									<embed src="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf" allowFullScreen="true" FlashVars="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1" quality=high bgcolor=#333399 WIDTH="1000" HEIGHT="750" NAME="ea" ALIGN="" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
 									</embed>
 								</object>

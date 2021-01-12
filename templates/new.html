@@ -8,6 +8,16 @@
     <link rel="stylesheet" href="layouts/yc_r.css"/>
 </head>
 
+<script>
+
+	function eatCookie() {
+        document.cookie= "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+		console.log("session cookie eaten");
+        location.href = "/home.html";
+	}
+	
+</script>
+
 <body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US" 
 style="overflow: hidden;">
 	<div class="-cx-PRIVATE-fbLayout__root">
@@ -17,23 +27,21 @@ style="overflow: hidden;">
 	  				<div>
 	  					<div class="loggedout_menubar_container">
 	  						<div class="clearfix loggedout_menubar">
-	  							<a class="lfloat" href="#" title="Go to Facebook Home">
+	  							<a class="lfloat" href="/" title="Go to Facebook Home">
 	  								<i class="fb_logo img sp_e2gpgs sx_584554">
 	  									<u>Facebook logo</u>
 	  								</i>
 	  							</a>
 	  						</div>
 	  					</div>
-	  				<div class="signupBanner">
-	  					<div class="signup_bar_container">
-	  						<div class="signup_box clearfix">
-			  				</div>
-			  			</div>
 			  		</div>
 			  	</div>
 	  		</div>
 		</div>
 	</div>
+	<br>
+	<br>
+	<br>
 	<div class="mvl ptm uiInterstitial canvas_error_page uiInterstitialLarge uiBoxWhite" title="">
 		<div class="uiHeader uiHeaderBottomBorder mhl mts uiHeaderPage interstitialHeader">
 			<div class="clearfix uiHeaderTop">
@@ -44,34 +52,22 @@ style="overflow: hidden;">
 			</div>
 		</div>
 		<div class="phl ptm uiInterstitialContent">
-			By Raise the Empires team
+			By Raise the Empires team |  Version alpha {{ version | default("UNKNOWN version")}} from {{ release_date | default("UNKNOWN version")}}
 			<br>
 			<br>
-			<b>Game version:</b> alpha {{ version | default("UNKNOWN version")}}
-			<br>
-			<b>Release date:</b> {{ release_date | default("UNKNOWN version")}}
-			<br>
-			<br>
-
-			<div style="position:relative;padding-top:56.25%;">
-				<iframe style="position:absolute;top:0;left:0;width:100%;height:100%;" src="https://www.youtube.com/embed/pAdlyz9miqo?controls=0&autoplay=1" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-			</div>
-		</div>
-		<div class="uiInterstitialBar uiBoxGray topborder">
-			<div class="clearfix">
-				<div class="rfloat">
-					<a class="uiButton uiButtonConfirm" href="login.html" role="button" name="try_again_button">
-						<span class="uiButtonText">Play now</span>
-					</a>
-					<a class="inputaux uiButton" href="https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2" role="button" name="exit_button" target="_blank">
-						<span class="uiButtonText">E&amp;A Wiki</span>
-					</a>
-					<a class="inputaux uiButton" href="releases.html" role="button" name="exit_button">
-						<span class="uiButtonText">Change log</span>
-					</a>
+			<div style="margin-left:20px; font-size:13px;">
+				<p style="font-size:14px;"><b>Choose your avatar</b></p>
+				<div style="margin-left:15px; overflow-y: scroll; max-height: 200px;">
+					{% for avatar in avatars %}
+						<img src="layouts/avatars/{{avatar}}" height=70px>
+					{% endfor %}
+					<br>
 				</div>
-				<div class="pts">
-				</div>
+				<br><br>
+				<a class="uiButton uiButtonConfirm" href="#" onclick="eatCookie(); return false" role="button" name="try_again_button">
+					<span class="uiButtonText">Create new Empire</span>
+				</a>
+				<p style="font-size:12px; display: inline;"><b> or <a href="/login.html">I already have an empire</a></b></p>
 			</div>
 		</div>
 	</div>
