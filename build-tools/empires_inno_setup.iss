@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "RaiseTheEmpires"
-#define MyAppVersion "0.06a"
+#define MyAppVersion "0.07a"
 #define MyAppPublisher "RaiseTheEmpires"
 #define MyAppURL "https://github.com/AcidCaos/empires-and-allies"
 #define MyAppExeName "empires-server.exe"
@@ -65,12 +65,14 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 [Files]
 ;x64
 Source: "C:\empires\redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Check: Is64BitInstallMode; Flags: deleteafterinstall
-Source: "C:\dist_mini006_x64\empires-server.exe"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion
+Source: "C:\dist_mini007_x64\empires-server.exe"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion
 ;x86
 Source: "C:\empires\\redist\vc_redist.x86.exe"; DestDir: "{tmp}"; Check: not Is64BitInstallMode; Flags: deleteafterinstall
-Source: "C:\dist_mini006_x86\empires-server.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak ignoreversion
+Source: "C:\dist_mini007_x86\empires-server.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak ignoreversion
 ;common
 Source: "C:\empires\allies\*"; DestDir: "{userdocs}\My Games\{#MyAppName}\allies"; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
+Source: "C:\empires\mods\*"; DestDir: "{userdocs}\My Games\{#MyAppName}\mods"; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
+Source: "C:\empires\mods\README.MD"; DestDir: "{app}\mods"; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
 Source: "C:\empires\assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\empires\templates\*"; DestDir: "{app}\templates"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\empires\gamesettings-converted.json"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Flags: ignoreversion

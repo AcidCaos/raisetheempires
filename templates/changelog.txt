@@ -1,4 +1,22 @@
 upcoming
+alpha v0.07a
+    0.07a release Nat 13/01/2021 04:31
+    update mods md AcidCaos* 13/01/2021 02:04
+    Mod: 107829 settings and swf separated AcidCaos 13/01/2021 01:16
+    Battle logging Nat 13/01/2021 00:56
+    Mod: 107829 json Nat 13/01/2021 00:56
+    Mod: 107829 game revision AcidCaos 12/01/2021 17:28
+    Mods config. Mod enable/disable AcidCaos 12/01/2021 16:49
+    delete shumway template AcidCaos* 12/01/2021 13:16
+    Simple login system. TODO: dynamic avatar loading, avatar selection AcidCaos 12/01/2021 13:13
+    Steele's island: Done. (?) Well, there's that bug... AcidCaos 12/01/2021 03:00
+    Steele island: all objects placed. TODO: set buildings properties AcidCaos 11/01/2021 22:48
+    Trying to fix Steele's error with Expansions AcidCaos 11/01/2021 22:47
+    updated readme AcidCaos* 10/01/2021 22:10
+    updated readme AcidCaos* 10/01/2021 22:09
+    rename, markdown fix AcidCaos* 10/01/2021 22:02
+    Modding support Nat 10/01/2021 14:07
+    Update README AcidCaos* 16/10/2020 17:50
     save validation fix, fix unit shields status when stunned side Nat 29/07/2020 01:00
     fixed brotli compression import missing binary handling Nat 19/07/2020 12:09
     Readme Update: add subreddit AcidCaos* 11/07/2020 19:28

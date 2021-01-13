@@ -11,3 +11,4 @@ daiquiri
 python-editor
 xmldiff
 jsonpatch
+setuptools

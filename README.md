@@ -5,7 +5,7 @@
 The Old Empires & Allies preservation project by the Raise the Empires team.
 This project is dedicated to preserving this Flash game so that it's not lost to time.
 
-[![version](https://img.shields.io/badge/version-0.06a-blue)](../../releases/tag/0.06a)
+[![version](https://img.shields.io/badge/version-0.07a-blue)](../../releases/tag/0.07a)
 [![size](https://img.shields.io/badge/size-220%20MB-brightgreen)](#)
 [![downloads](https://img.shields.io/github/downloads/AcidCaos/raisetheempires/total?label=downloads%40all)](../../releases/latest)
 
@@ -15,7 +15,8 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 | Version | Update | Release date |  Source  | Download |
 | ------- | ------ | ------------ | ------ | -------- |
-| **alpha 0.06a**   | **Invasion Update**       | July 11, 2020   | :label: [tag](../../releases/tag/0.06a) | :tickets: [**Installer**](../../releases/download/0.06a/empires-setup_0.06a.exe) |
+| **alpha 0.07a**   | **Return of the Flash**       | January 13, 2021   | :label: [tag](../../releases/tag/0.07a) | :tickets: [**Installer**](../../releases/download/0.07a/empires-setup_0.07a.exe) |
+| alpha 0.06a   | Invasion Update       | July 11, 2020   | :label: [tag](../../releases/tag/0.06a) | :tickets: [Installer](../../releases/download/0.06a/empires-setup_0.06a.exe) |
 | alpha 0.05a   | Multiplayer Update       | February 3, 2020   | :label: [tag](../../releases/tag/0.05a) | :tickets: [Installer](../../releases/download/0.05a/empires-setup_0.05.exe) |
 | alpha 0.04a   | Combat Update            | November 14, 2019  | :label: [tag](../../releases/tag/0.04a) | :tickets: [Installer](../../releases/download/0.04a/empires-setup_0.04.exe) |
 | alpha 0.03a   | Stability Update         | October 14, 2019   | :label: [tag](../../releases/tag/0.03a) | :tickets: [Installer](../../releases/download/0.03a/empires-setup_0.03.exe) |
@@ -45,6 +46,11 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 :clapper: [Empires & Allies Trailer](https://www.youtube.com/watch?v=pAdlyz9miqo)
 
 :smiley_cat: [Empires & Allies subreddit](https://reddit.com/r/EmpiresAndAllies)
+
+## Flash Continuation
+:fox_face: [Old Firefox versions](https://support.mozilla.org/en-US/kb/install-older-version-firefox)
+
+:flashlight: [Old Flash versions (Archive.org)](https://web.archive.org/web/20200110185527/https://fpdownload.macromedia.com/pub/labs/flashruntimes/flashplayer/install_flash_player.exe)
 
 ## On archives and accessibility to digital heritage
 - [Exemption to PCCPSACT](https://www.federalregister.gov/documents/2018/10/26/2018-23241/exemption-to-prohibition-on-circumvention-of-copyright-protection-systems-for-access-control), exemptions to the provision of the Digital Millennium Copyright Act (“DMCA”). 
