@@ -1,6 +1,6 @@
-## Mods
+# Mods
 You can make your own mods
-### Making mods
+## Making mods
 There are 3 ways of making a mod: providing a replacement file or for xml files a small diff with just the changes
 
 First you have to determine which file to edit, say you want to change a value of a unit in the gamesettings file.
@@ -12,19 +12,22 @@ For this you see:
 
 ```
 ├── mods
+│   └── mods.conf
 │   └── active-limited-edition
 │   │   └── assets
 │   │       └── 29oct2012
 │   │           └── gameSettings.xml.xmldiff
 ```
 
+The file `mods.conf` needs to be modified in order to activate the mod e.g. `active-limited-edition = true`.
+
 This will apply the differences to the `gameSettings.xml` file, another mod could add a different thing which is why it important to use diffs so multiple mods can work together.
 
-### XMLDIFF
+### 1. XMLDIFF
 You need to create an `.xmldiff` file for the xml you want to replace
 
 
-### JSON
+### 2. JSON
 The flash client reads the xml, the server reads a json that is converted from a xml. For a lot of things this file needs to be edition too.
 
 For this there is a `.jsonpatch` possibility. 
@@ -46,8 +49,9 @@ This would change the strength of a Cadet Soldiers. note that it tries to locate
 
 Save as `gameSettings.json.jsonpatch` directly in the mod's folder.
 
-### Overwriting files
+### 3. Overwriting files
 Other files could be replaced immediately e.g. by creating a `mods/mod_name/assets/sol_assets_octdict/assets/game/buildings/Buildings_Icons.swf`
 
 ## Running mods
 If you have mods you can add them to the mods folder in your `My Games\RaiseTheEmpires\mods` folder. Mods should be unzipped so it's like the folder structure above.
+Mods can be enabled and disabled in the `mods/mods.conf` file by setting its folder name to true or false e.g. `folder_name = true` for enabling the mod inside `mods/folder_name`
