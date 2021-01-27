@@ -6,12 +6,15 @@ The Old Empires & Allies preservation project by the Raise the Empires team.
 This project is dedicated to preserving this Flash game so that it's not lost to time.
 
 [![version](https://img.shields.io/badge/version-0.07a-blue)](../../releases/tag/0.07a)
-[![size](https://img.shields.io/badge/size-220%20MB-brightgreen)](#)
+[![size](https://img.shields.io/badge/size-249%20MB-brightgreen)](#)
 [![downloads](https://img.shields.io/github/downloads/AcidCaos/raisetheempires/total?label=downloads%40all)](../../releases/latest)
 
 ---
 
 ## Releases
+
+| :exclamation: Check the [Flash Continuation](#flash-continuation) documentation |
+| :---: |
 
 | Version | Update | Release date |  Source  | Download |
 | ------- | ------ | ------------ | ------ | -------- |
@@ -23,13 +26,26 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 | alpha 0.02a   | Campaign Update          | September 14, 2019 | :label: [tag](../../releases/tag/0.02a) | :ticket: [Launcher](../../releases/download/0.02a/raise_the_empires_0.02a.zip) |
 | pre-alpha 0.01a   | The Empires Strikes Back | July 21, 2019      | :label: [tag](../../releases/tag/0.01a) | :ticket: [Launcher](../../releases/download/0.01a/RaiseTheEmpires-prealpa_0.01a.zip) |
 
+## Flash Continuation
+To play Empires & Allies you'll need the *Adobe Flash Player* and a *browser with Flash support*:
+
+:flashlight: **Adobe Flash Player** 
+
+> [Flash Player 32.0.0.371](https://archive.org/download/flashplayerarchive/pub/flashplayer/installers/archive/fp_32.0.0.371_archive.zip/32_0_r0_371%2Fflashplayer32_0r0_371_win.exe) 
+> the last Flash player version without Adobe's End-of-Life kill switch. (Adobe Inc. [Flash Player](https://archive.org/download/flashplayerarchive/) archive.org)
+
+:mag: **Browsers with Flash support**
+
+> [Firefox 84.0 64-bit](https://download-installer.cdn.mozilla.net/pub/firefox/releases/84.0/win64/en-US/Firefox%20Setup%2084.0.exe) (14 Dec 2020), the final version to support Flash. Also in [other languages](https://ftp.mozilla.org/pub/firefox/releases/84.0/win64/) and for [other architectures](https://ftp.mozilla.org/pub/firefox/releases/84.0/).
+> 
+> [Basilisk Browser](https://www.basilisk-browser.org/), which fully supports all NPAPI plugins (i.e. Flash). It's a fork of the Mozilla/Firefox code.
+
 ## Reporting Bugs and Contacting
 :speech_balloon: Check our [Discord group](https://discord.gg/xrNE6Hg)  [![Discord Channel](https://img.shields.io/discord/536575691563466772?label=)](https://discord.gg/xrNE6Hg)
 
 :paw_prints: The project [Contributors](../../contributors)
 
 ## Tools
-
 :compass: [Empires & Allies Modding Support](mods#readme)
 
 :iphone: [Empires & Allies Android(Termux) ~ GNU/Linux ~ macOS ~ iOS(iSH) versions](https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native#readme)
@@ -47,23 +63,19 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 :smiley_cat: [Empires & Allies subreddit](https://reddit.com/r/EmpiresAndAllies)
 
-## Flash Continuation
-:fox_face: [Old Firefox versions](https://support.mozilla.org/en-US/kb/install-older-version-firefox)
-
-:flashlight: [Old Flash versions (Archive.org)](https://web.archive.org/web/20200110185527/https://fpdownload.macromedia.com/pub/labs/flashruntimes/flashplayer/install_flash_player.exe)
-
 ## On archives and accessibility to digital heritage
 - [Exemption to PCCPSACT](https://www.federalregister.gov/documents/2018/10/26/2018-23241/exemption-to-prohibition-on-circumvention-of-copyright-protection-systems-for-access-control), exemptions to the provision of the Digital Millennium Copyright Act (“DMCA”). 
 - [EFGAMP](https://efgamp.eu/), the European Federation of Video Game Archives, Museums and Preservation projects.
 - [UNESCO PERSIST Programme](https://unescopersist.org/), helps ensure that digital information can continue to be accessed in the future.
 - [The Internet Archive](https://archive.org/), a digital library of Internet sites and other cultural artifacts in digital form.
 - [BlueMaxima's Flashpoint](https://bluemaxima.org/flashpoint/), the webgame preservation project.
+- [Adobe Flash Player Archive](https://archive.org/download/flashplayerarchive/), the Adobe Inc. archive.org Flash Player Archive.
 
 ---
 
 ## License [![GPL v3](https://img.shields.io/badge/GPL%20v3-blue)](http://www.gnu.org/licenses/gpl-3.0)
 ```
-Old Empires and Allies preservation project Copyright (C) 2019-2020 by the Raise the Empires team.
+Old Empires and Allies preservation project Copyright (C) 2019-2021 by the Raise the Empires team.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
