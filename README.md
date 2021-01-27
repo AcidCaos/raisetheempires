@@ -32,11 +32,13 @@ To play Empires & Allies you'll need the *Adobe Flash Player* and a *browser wit
 :flashlight: **Adobe Flash Player** 
 
 > [Flash Player 32.0.0.371](https://archive.org/download/flashplayerarchive/pub/flashplayer/installers/archive/fp_32.0.0.371_archive.zip/32_0_r0_371%2Fflashplayer32_0r0_371_win.exe) 
-> the last Flash player version without Adobe's End-of-Life kill switch. (Adobe Inc. [Flash Player](https://archive.org/download/flashplayerarchive/) archive.org)
+> the last version without End-of-Life kill switch. (Adobe Inc. [Flash Player](https://archive.org/download/flashplayerarchive/) archive.org)
 
 :mag: **Browsers with Flash support**
 
-> [Firefox 84.0 64-bit](https://download-installer.cdn.mozilla.net/pub/firefox/releases/84.0/win64/en-US/Firefox%20Setup%2084.0.exe) (14 Dec 2020), the final version to support Flash. Also in [other languages](https://ftp.mozilla.org/pub/firefox/releases/84.0/win64/) and for [other architectures](https://ftp.mozilla.org/pub/firefox/releases/84.0/).
+> [Firefox 84.0 64-bit](https://download-installer.cdn.mozilla.net/pub/firefox/releases/84.0/win64/en-US/Firefox%20Setup%2084.0.exe) or [32-bit](https://download-installer.cdn.mozilla.net/pub/firefox/releases/84.0/win32/en-US/Firefox%20Setup%2084.0.exe) (14 Dec 2020), the final version to support Flash.
+> 
+> **Important:** By default, Firefox is set for automatic updates. To prevent Firefox from automatically updating itself after you install an older version, you'll need to change your Firefox update settings: Click the menu button (三) and select *Options*. In the *General* panel, go to the *Firefox Updates* section.
 > 
 > [Basilisk Browser](https://www.basilisk-browser.org/), which fully supports all NPAPI plugins (i.e. Flash). It's a fork of the Mozilla/Firefox code.
 
