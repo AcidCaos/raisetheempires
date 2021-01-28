@@ -40,6 +40,8 @@ To play Empires & Allies you'll need the *Adobe Flash Player* and a *browser wit
 > 
 > **Important:** By default, Firefox is set for automatic updates. To prevent Firefox from automatically updating itself after you install an older version, you'll need to change your Firefox update settings: Click the menu button (三) and select *Options*. In the *General* panel, go to the *Firefox Updates* section.
 > 
+> [Chromium 82.0](https://chromium.en.uptodown.com/windows/download/2181158), the open-source projects behind the Google Chrome browser.
+> 
 > [Basilisk Browser](https://www.basilisk-browser.org/), which fully supports all NPAPI plugins (i.e. Flash). It's a fork of the Mozilla/Firefox code.
 
 ## Reporting Bugs and Contacting
