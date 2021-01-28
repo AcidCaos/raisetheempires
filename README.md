@@ -29,10 +29,14 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 ## Flash Continuation
 To play Empires & Allies you'll need the *Adobe Flash Player* and a *browser with Flash support*:
 
-:flashlight: **Adobe Flash Player** 
-
-> [Flash Player 32.0.0.371](https://archive.org/download/flashplayerarchive/pub/flashplayer/installers/archive/fp_32.0.0.371_archive.zip/32_0_r0_371%2Fflashplayer32_0r0_371_win.exe) 
-> the last version without End-of-Life kill switch. (Adobe Inc. [Flash Player](https://archive.org/download/flashplayerarchive/) archive.org)
+:flashlight: **Adobe Flash Player**
+> 
+>
+> [Download Flash Player](https://archive.org/download/flashplayerarchive/pub/flashplayer/installers/archive/fp_32.0.0.371_archive.zip/32_0_r0_371%2Fflashplayer32_0r0_371_win.exe) for **Firefox** and **Basilisk** – NPAPI
+> 
+> [Download Flash Player](https://archive.org/download/flashplayerarchive/pub/flashplayer/installers/archive/fp_32.0.0.371_archive.zip/32_0_r0_371%2Fflashplayer32_0r0_371_winpep.exe) for Opera and **Chromium** based applications – PPAPI
+>
+> *Note:* All downloads are for Flash Player [32.0.0.371](https://archive.org/download/flashplayerarchive/pub/flashplayer/installers/archive/fp_32.0.0.371_archive.zip/), the last version without [End-of-Life](https://www.adobe.com/products/flashplayer/end-of-life.html) kill switch, from the Adobe Inc. [Flash Player Archive](https://archive.org/download/flashplayerarchive/).
 
 :mag: **Browsers with Flash support**
 
