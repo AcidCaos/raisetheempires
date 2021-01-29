@@ -56,7 +56,7 @@ To play Empires & Allies you'll need the *Adobe Flash Player* and a *browser wit
 ## Tools
 :compass: [Empires & Allies Modding Support](mods#readme)
 
-:iphone: [Empires & Allies Android(Termux) ~ GNU/Linux ~ macOS ~ iOS(iSH) versions](https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native#readme)
+:iphone: [Empires & Allies Android(Termux) ~ GNU/Linux ~ macOS](https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native#readme)
 
 :minidisc: [Empires & Allies Servers Support](SERVERS.md)
 
