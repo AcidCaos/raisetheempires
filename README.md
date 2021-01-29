@@ -46,6 +46,8 @@ To play Empires & Allies you'll need the *Adobe Flash Player* and a *browser wit
 > 
 > [Chromium 82.0](https://chromium.en.uptodown.com/windows/download/2181158), the open-source projects behind the Google Chrome browser.
 > 
+> **Important:** By default, Flash is disabled in Chromium. You need to enable Flash in Chromium settings.
+> 
 > [Basilisk Browser](https://www.basilisk-browser.org/), which fully supports all NPAPI plugins (i.e. Flash). It's a fork of the Mozilla/Firefox code.
 
 ## Reporting Bugs and Contacting
