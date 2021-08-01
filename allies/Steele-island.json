@@ -3390,134 +3390,115 @@
       "id":2500,
       "itemName":"Cottage",
       "position":"23,41,0",
-      "referenceItem": null,
-      "state": 9
+      "referenceItem": null
     },
     {
       "id":2501,
       "itemName":"Small Cottage",
       "position":"26,41,0",
-      "referenceItem": null,
-      "state": 9
+      "referenceItem": null
     },
     {
       "id":2502,
       "itemName":"Cottage",
       "position":"35,24,0",
-      "referenceItem": null,
-      "state": 9
+      "referenceItem": null
     },
     {
       "id":2503,
       "itemName":"Large Cottage",
       "position":"32,24,0",
-      "referenceItem": null,
-      "state": 9
+      "referenceItem": null
     },
     {
       "id":2504,
       "itemName":"Large Cottage",
       "position":"20,41,0",
-      "referenceItem": null,
-      "state": 9
+      "referenceItem": null
     },
     {
       "id":2505,
       "itemName":"Large Bungalow",
       "position":"20,34,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":2506,
       "itemName":"Bungalow",
       "position":"23,34,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":2507,
       "itemName":"Bungalow",
       "position":"23,30,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":2508,
       "itemName":"Small Bungalow",
       "position":"26,34,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":2509,
       "itemName":"Small Bungalow",
       "position":"26,30,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":2510,
       "itemName":"Small Greek House",
       "position":"27,20,0",
-      "referenceItem": null,
-      "state": 9
+      "referenceItem": null
     },
     {
       "id":2511,
       "itemName":"Greek House",
       "position":"25,20,0",
-      "referenceItem": null,
-      "state": 9
+      "referenceItem": null
     },
     {
       "id":2512,
       "itemName":"Large Greek House",
       "position":"23,20,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":2513,
       "itemName":"Large Island Hut",
       "position":"30,16,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":2514,
       "itemName":"Large Island Hut",
       "position":"36,16,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":2515,
       "itemName":"Island Hut",
       "position":"33,16,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":2516,
       "itemName":"Island Hut",
       "position":"39,16,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":2517,
       "itemName":"Brick House",
       "position":"35,20,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":2518,
       "itemName":"Large Brick House",
       "position":"32,20,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":2519,
@@ -4077,22 +4058,19 @@
       "id":3054,
       "itemName":"Lumbermill 02",
       "position":"24,75,0",
-      "referenceItem": "L07",
-      "state": 9
+      "referenceItem": null
     },
     {
       "id":3056,
       "itemName":"Lumbermill",
       "position":"24,72,0",
-      "referenceItem": "L07",
-      "state": 9
+      "referenceItem": null
     },
     {
       "id":3057,
       "itemName":"Drydocks 02",
-      "position":"53,79,3",
-      "referenceItem": "U43",
-      "state": 11
+      "position":"53,79,0",
+      "referenceItem": null
     },
     {
       "id":3058,
@@ -4710,8 +4688,7 @@
       "id":3171,
       "itemName":"Small Farm",
       "position":"26,54,0",
-      "referenceItem": "WH",
-      "state": 10
+      "referenceItem": null
     },
     {
       "id":3174,
@@ -6027,8 +6004,7 @@
       "id":4177,
       "itemName":"Airport 01",
       "position":"51,14,0",
-      "referenceItem": null,
-      "state": 1
+      "referenceItem": null
     },
     {
       "id":4178,
@@ -6556,57 +6532,49 @@
       "id":4269,
       "itemName":"Airport 02",
       "position":"67,31,0",
-      "referenceItem": null,
-      "state": 1
+      "referenceItem": null
     },
     {
       "id":4270,
       "itemName":"Army Base",
       "position":"83,33,0",
-      "referenceItem": null,
-      "state": 1
+      "referenceItem": null
     },
     {
       "id":4271,
       "itemName":"Army Base",
       "position":"75,33,0",
-      "referenceItem": null,
-      "state": 1
+      "referenceItem": null
     },
     {
       "id":4272,
       "itemName":"Barracks 02",
       "position":"77,33,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":4273,
       "itemName":"Barracks 02",
       "position":"81,33,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":4274,
       "itemName":"Barracks 01",
       "position":"79,37,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":4275,
       "itemName":"Hangar 01",
       "position":"57,18,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":4276,
       "itemName":"Hangar 02",
       "position":"53,18,0",
-      "referenceItem": null,
-      "state": 8
+      "referenceItem": null
     },
     {
       "id":4277,
@@ -8217,306 +8185,7 @@
       "itemName":"tree24",
       "position":"88,79,0",
       "referenceItem": null
-    },
-
-
-
-    {
-      "id":6000,
-      "itemName":"infantry01",
-      "position":"83,36,0",
-      "referenceItem": null
-    },
-    {
-      "id":6001,
-      "itemName":"infantry01",
-      "position":"84,36,0",
-      "referenceItem": null
-    },
-    {
-      "id":6002,
-      "itemName":"vehicle11",
-      "position":"83,37,0",
-      "referenceItem": null
-    },
-    {
-      "id":6003,
-      "itemName":"vehicle11",
-      "position":"84,37,0",
-      "referenceItem": null
-    },
-    {
-      "id":6004,
-      "itemName":"vehicle11",
-      "position":"83,38,0",
-      "referenceItem": null
-    },
-    {
-      "id":6005,
-      "itemName":"vehicle11",
-      "position":"84,38,0",
-      "referenceItem": null
-    },
-    {
-      "id":6006,
-      "itemName":"infantry02",
-      "position":"81,36,0",
-      "referenceItem": null
-    },
-    {
-      "id":6007,
-      "itemName":"infantry02",
-      "position":"82,36,0",
-      "referenceItem": null
-    },
-    {
-      "id":6009,
-      "itemName":"vehicle12",
-      "position":"81,37,0",
-      "referenceItem": null
-    },
-    {
-      "id":6010,
-      "itemName":"vehicle12",
-      "position":"82,37,0",
-      "referenceItem": null
-    },
-    {
-      "id":6011,
-      "itemName":"vehicle12",
-      "position":"81,38,0",
-      "referenceItem": null
-    },
-    {
-      "id":6012,
-      "itemName":"vehicle12",
-      "position":"82,38,0",
-      "referenceItem": null
-    },
-    {
-      "id":6013,
-      "itemName":"vehicle13",
-      "position":"85,41,0",
-      "referenceItem": null
-    },
-    {
-      "id":6014,
-      "itemName":"vehicle13",
-      "position":"86,41,0",
-      "referenceItem": null
-    },
-    {
-      "id":6015,
-      "itemName":"vehicle13",
-      "position":"85,42,0",
-      "referenceItem": null
-    },
-    {
-      "id":6016,
-      "itemName":"vehicle13",
-      "position":"86,42,0",
-      "referenceItem": null
-    },
-    {
-      "id":6017,
-      "itemName":"plane07",
-      "position":"53,28,0",
-      "referenceItem": null
-    },
-    {
-      "id":6018,
-      "itemName":"plane07",
-      "position":"55,28,0",
-      "referenceItem": null
-    },
-    {
-      "id":6019,
-      "itemName":"plane07",
-      "position":"57,28,0",
-      "referenceItem": null
-    },
-    {
-      "id":6020,
-      "itemName":"plane07",
-      "position":"59,28,0",
-      "referenceItem": null
-    },
-    {
-      "id":6021,
-      "itemName":"plane01",
-      "position":"53,22,0",
-      "referenceItem": null
-    },
-    {
-      "id":6022,
-      "itemName":"plane01",
-      "position":"55,22,0",
-      "referenceItem": null
-    },
-    {
-      "id":6023,
-      "itemName":"plane01",
-      "position":"57,22,0",
-      "referenceItem": null
-    },
-    {
-      "id":6024,
-      "itemName":"plane01",
-      "position":"59,22,0",
-      "referenceItem": null
-    },
-    {
-      "id":6025,
-      "itemName":"plane03",
-      "position":"53,24,0",
-      "referenceItem": null
-    },
-    {
-      "id":6026,
-      "itemName":"plane03",
-      "position":"55,24,0",
-      "referenceItem": null
-    },
-    {
-      "id":6027,
-      "itemName":"plane03",
-      "position":"57,24,0",
-      "referenceItem": null
-    },
-    {
-      "id":6029,
-      "itemName":"plane20",
-      "position":"66,27,0",
-      "referenceItem": null
-    },
-    {
-      "id":6030,
-      "itemName":"plane20",
-      "position":"68,27,0",
-      "referenceItem": null
-    },
-    {
-      "id":6031,
-      "itemName":"plane20",
-      "position":"70,27,0",
-      "referenceItem": null
-    },
-    {
-      "id":6032,
-      "itemName":"plane20",
-      "position":"72,27,0",
-      "referenceItem": null
-    },
-    {
-      "id":6033,
-      "itemName":"plane19",
-      "position":"75,29,0",
-      "referenceItem": null
-    },
-    {
-      "id":6034,
-      "itemName":"plane19",
-      "position":"73,29,0",
-      "referenceItem": null
-    },
-    {
-      "id":6035,
-      "itemName":"plane19",
-      "position":"69,29,0",
-      "referenceItem": null
-    },
-    {
-      "id":6036,
-      "itemName":"plane19",
-      "position":"67,29,0",
-      "referenceItem": null
-    },
-    {
-      "id":6037,
-      "itemName":"infantry05",
-      "position":"88,40,0",
-      "referenceItem": null
-    },
-    {
-      "id":6038,
-      "itemName":"infantry05",
-      "position":"87,40,0",
-      "referenceItem": null
-    },
-    {
-      "id":6039,
-      "itemName":"infantry04",
-      "position":"87,42,0",
-      "referenceItem": null
-    },
-    {
-      "id":6040,
-      "itemName":"infantry04",
-      "position":"88,42,0",
-      "referenceItem": null
-    },
-    {
-      "id":6041,
-      "itemName":"plane26",
-      "position":"53,20,0",
-      "referenceItem": null
-    },
-    {
-      "id":6042,
-      "itemName":"plane26",
-      "position":"55,20,0",
-      "referenceItem": null
-    },
-    {
-      "id":6043,
-      "itemName":"plane26",
-      "position":"57,20,0",
-      "referenceItem": null
-    },
-    {
-      "id":6044,
-      "itemName":"plane26",
-      "position":"59,20,0",
-      "referenceItem": null
-    },
-    {
-      "id":6045,
-      "itemName":"plane05",
-      "position":"51,21,0",
-      "referenceItem": null
-    },
-      {
-      "id":6046,
-      "itemName":"plane04",
-      "position":"53,26,0",
-      "referenceItem": null
-    },
-    {
-      "id":6047,
-      "itemName":"plane04",
-      "position":"55,26,0",
-      "referenceItem": null
-    },
-    {
-      "id":6048,
-      "itemName":"plane04",
-      "position":"57,26,0",
-      "referenceItem": null
-    },
-
-
-
-    {
-      "id":9999,
-      "comment":" TODO error temp. fix",
-      "itemName":"Army Base",
-      "position":"75,33,0",
-      "referenceItem": null,
-      "state": 4
     }
-
-
-
   ],
   "roads": [
     "46,44|46,44",
