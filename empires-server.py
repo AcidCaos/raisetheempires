@@ -77,8 +77,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.07a"
-release_date = 'Wednesday, 13 January 2021'
+version = "0.08a"
+release_date = 'Saturday, 7 August 2021'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -2204,16 +2204,14 @@ def purchase_energy_refill_response(param):
 
 def buy_quest_task_response(param):
     print(param,type(param))
-
-   # reqq.params[2][0].get('referenceItem')
-
+    
+    # reqq.params[2][0].get('referenceItem')
     # player = session['user_object']["userInfo"]["player"]
     # world = session['user_object']["userInfo"]["world"]
 
-    #TODO
-
-    buy_quest_task_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                      "data": []}
+    meta = {"newPVE": 0}
+    meta = quest_auto_complete(param, meta)
+    buy_quest_task_response = {"errorType": 0, "userId": 1, "metadata": meta, "data": []}
     return buy_quest_task_response
 
 
@@ -2320,7 +2318,11 @@ def server_error_page(error):
 
 if __name__ == '__main__':
     if 'WERKZEUG_RUN_MAIN' not in os.environ and open_browser:
-        threading.Timer(1.25, lambda: webbrowser.open("http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+        try:
+            os.chdir("chromium")
+            threading.Timer(1.25, lambda: os.system("chrome.exe " + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+        except:
+            threading.Timer(1.25, lambda: webbrowser.open("http://" + http_host + ":" + str(port) + "/" + http_path)).start()
     # init_db(app, db)
     set_crash_log(crash_log)
     if compression:

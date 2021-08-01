@@ -25,6 +25,25 @@ def new_quest(quest):
     return {"name": quest['_name'], "complete": all(completes), "expired": False, "progress": progress, "completedTasks": reduce((lambda x, y: x << 1 | y), [False] + completes[::-1])}
 
 
+def quest_auto_complete(param,meta):
+    new_quests=[]
+    quest_finished = lookup_quest(param["name"])
+    quest_in_session = [r for r in session['quests'] if r["name"] == quest_finished["_name"]]
+    quest_in_session[0]["progress"]=[]
+    for task in quest_finished["tasks"]["task"]:
+        quest_in_session[0]["progress"].append(int(task["_total"]))
+
+
+    quest_in_session[0]["completedTasks"] = int(len(quest_finished["tasks"]["task"]))
+    quest_in_session[0]["complete"] = True
+    meta['QuestComponent'] = []
+    do_quest_rewards(lookup_quest(quest_in_session[0]['name']), meta)
+    activate_sequels(quest_in_session[0], new_quests, meta)
+    merge_quest_progress([quest_in_session[0]] + new_quests, meta['QuestComponent'], "output quest")
+    merge_quest_progress(new_quests, session['quests'], "session quest")
+    return meta
+
+
 def prepopulate_task(task):
     if task["_action"] == 'countPlaced':
         item = lookup_item_by_code(task["_item"])

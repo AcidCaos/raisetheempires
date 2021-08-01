@@ -47,11 +47,10 @@ def migrate(meta, version, target_version):
         create_backup("Update to 0.07a")
         version = "0.07a"
         session['save_version'] = version
-    if version and version.startswith("0.07a") and version != target_version: # upcoming 0.08
-        # create_backup("Update to 0.07a") # for release
-        pass
-        #version = "0.07a"
-        #session['save_version'] = version
+    if version and version.startswith("0.07a") and version != target_version: # 0.08
+        create_backup("Update to 0.08a")
+        version = "0.08a"
+        session['save_version'] = version
 
 
 
