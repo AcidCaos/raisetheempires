@@ -472,7 +472,22 @@ def get_avail_avatars():
     # list(set([u for u in fetch_urls() if u.endswith('.png')]))
     # return avatar_file_names in os.walk(os.path.join(my_games_path() ,"templates/layouts"))
     # TODO
-    return ["2_PincusCP_100.png", "4_NavyCP_04_100.png", "5_NavyCP_03_100.png"]
+    avatar_list = ["2_PincusCP_100.png",
+                    "4_NavyCP_04_100.png",
+                    "5_NavyCP_03_100.png",
+                    "6_NavyCP_02_100.png",
+                    "7_NavyCP_01_100.png",
+                    "8_HansCP_100.png",
+                    "9_ArtCP_100.png",
+                    "10_ArmyCP_04_100.png",
+                    "11_ArmyCP_03_100.png",
+                    "12_ArmyCP_02_100.png",
+                    "13_ArmyCP_01_100.png",
+                    "14_AirForceCP_04_100.png",
+                    "15_AirForceCP_03_100.png",
+                    "16_AirForceCP_02_100.png",
+                    "17_AirForceCP_01_100.png"]
+    return avatar_list
 
 @app.route("/new.html")
 def new_player_page():
