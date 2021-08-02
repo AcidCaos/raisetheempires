@@ -4,6 +4,10 @@ from pathlib import Path
 from save_engine import my_games_path, install_path
 from xmldiff.main import patch_text
 from jsonpatch import apply_patch
+from init_settings import *
+from tqdm import tqdm
+from base64 import b32encode
+
 import xmldiff
 
 import configparser
@@ -11,9 +15,13 @@ config = configparser.ConfigParser()
 
 def read_file(file_name):
     with open(file_name, 'rb') as f:
-        print("Reading " + file_name)
+        # print("Reading " + file_name)
         return f.read()
 
+def write_file(file_name, content):
+    with open(file_name, 'wb') as f:
+        # print("Writing " + file_name)
+        return f.write(content)
 
 def is_mod(file_name):
     return is_xml_diff(file_name) or is_json_patch(file_name)
@@ -36,8 +44,13 @@ def apply_mod(source, mod_file, name):
         return lambda: read_file(mod_file)
 
 
+def get_cache_filename(original_path):
+    return b32encode(original_path.encode()).decode("utf-8")
+
+
 mod = {}
 mod_folders = ['mods']
+mod_stats = []
 
 if my_games_path() != install_path():
     mod_folders += [os.path.join(my_games_path(), 'mods')]
@@ -70,12 +83,72 @@ for mod_folder in mod_folders:
 
                                 source = mod.get(source_file, lambda: read_file(source_file))  # lambda chaining
                                 mod[source_file] = apply_mod(source, mod_file, name)
+
+                                stats = os.stat(mod_file)
+                                mod_stats.append("%s: %i %i %i" % (mod_file, stats.st_size,stats.st_ctime_ns, stats.st_mtime_ns))
     else:
         print("mods.conf not found.")
 
+cache_path = os.path.join(my_games_path(), 'cache')
+if caching:
+    try:
+        os.mkdir(cache_path)
+    except FileExistsError:
+        pass
+    except OSError as error:
+        print(error)
+        print("WARNING: cache directory can't be created in ", my_games_path(), ", caching is disabled, this may decrease performance and increase loading times.")
+        caching = False
+else:
+    print("WARNING: caching is disabled by choice, this may decrease performance and increase loading times.")
+
+config_raw = repr({section: dict(config[section]) for section in config.sections()})
+# for path in sorted(mod):
+#     print(repr(os.stat(path)))
+
+if caching:
+
+    if not os.path.exists(os.path.join(cache_path, 'mods.config.cache')) \
+            or read_file(os.path.join(cache_path, 'mods.config.cache')) != config_raw.encode() or \
+            not os.path.exists(os.path.join(cache_path, 'directory.cache')) \
+            or read_file(os.path.join(cache_path, 'directory.cache')) != "\n".join(mod_stats).encode() :
+
+        print("Updating cache")
+        # Clear cache
+        for filename in os.listdir(cache_path):
+            file_path = os.path.join(cache_path, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception as e:
+                print('ERROR: Failed to delete %s. Reason: %s' % (filename, e))
+                print("Cache can't update, caching deactivated, this may decrease performance and increase loading times.")
+                caching = False
+        # Write cache
+        if caching:
+            for path in tqdm(sorted(mod), file=sys.stdout):
+                try:
+                    write_file(os.path.join(cache_path, get_cache_filename(path)), mod[path]())
+                except Exception as e:
+                    print('ERROR: Failed to write cache file %s. Reason: %s' % (get_cache_filename(path), e))
+                    print("Cache can't update, caching deactivated, this may decrease performance and increase loading times.")
+                    caching = False
+            if caching:
+                write_file(os.path.join(cache_path, 'mods.config.cache'), config_raw.encode())
+                write_file(os.path.join(cache_path, 'directory.cache'), "\n".join(mod_stats).encode())
+                print("Cache creation complete")
+    else:
+        print("Cache up to date")
+    # Swap modded files with cache
+    if caching:
+        for path in sorted(mod):
+            if os.path.exists(os.path.join(cache_path, get_cache_filename(path))):
+                mod[path] = lambda: read_file(os.path.join(cache_path, get_cache_filename(path)))
+            else:
+                print('ERROR: Cache miss, Cache file %s missing for original %s. ' % (get_cache_filename(path), path))
+                print("This may decrease performance and increase loading times.")
+
+
 print("mod " + repr(mod))
+print("config " + config_raw)
 
-
-
-        # for name in dirs:
-        #     print(os.path.join(root, name))

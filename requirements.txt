@@ -11,4 +11,5 @@ daiquiri
 python-editor
 xmldiff
 jsonpatch
+tqdm
 setuptools
