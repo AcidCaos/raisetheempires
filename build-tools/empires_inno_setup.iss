@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "RaiseTheEmpires"
-#define MyAppVersion "0.07a"
+#define MyAppVersion "0.08a"
 #define MyAppPublisher "RaiseTheEmpires"
 #define MyAppURL "https://github.com/AcidCaos/empires-and-allies"
 #define MyAppExeName "empires-server.exe"
@@ -24,6 +24,8 @@ DisableProgramGroupPage=yes
 UsedUserAreasWarning=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 PrivilegesRequired=lowest
+; License file
+LicenseFile=C:\empires\License.txt
 ;PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=C:\empires-installer
 OutputBaseFilename=empires-setup
@@ -58,26 +60,39 @@ Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "turkish"; MessagesFile: "compiler:Languages\Turkish.isl"
 Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 
+[Types]
+Name: "full"; Description: "Full installation"
+Name: "compact"; Description: "Minimum installation"
+Name: "custom"; Description: "Custom installation"; Flags: iscustom
+
+[Components]
+Name: "required"; Description: "Empires and Allies main files"; Types: full compact custom; Flags: fixed
+Name: "chromium"; Description: "Chromium 82.0 (required if you don't have any Flash-enabled browser)"; Types: full
+Name: "savespack"; Description: "Titan savegame (if you want to try using Titan) and bonus starter-pack world. Please backup your savegame first, it will replace your save!!"; Types: full 
+
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 6.1; Check: not IsAdminInstallMode
 
 [Files]
 ;x64
-Source: "C:\empires\redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Check: Is64BitInstallMode; Flags: deleteafterinstall
-Source: "C:\dist_mini007_x64\empires-server.exe"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion
+Source: "C:\empires\redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Components: required; Check: Is64BitInstallMode; Flags: deleteafterinstall
+Source: "C:\dist_mini008_x64\empires-server.exe"; DestDir: "{app}"; Components: required; Check: Is64BitInstallMode; Flags: ignoreversion
 ;x86
-Source: "C:\empires\\redist\vc_redist.x86.exe"; DestDir: "{tmp}"; Check: not Is64BitInstallMode; Flags: deleteafterinstall
-Source: "C:\dist_mini007_x86\empires-server.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak ignoreversion
+Source: "C:\empires\\redist\vc_redist.x86.exe"; DestDir: "{tmp}"; Components: required; Check: not Is64BitInstallMode; Flags: deleteafterinstall
+Source: "C:\dist_mini008_x64\empires-server.exe"; DestDir: "{app}"; Components: required; Check: not Is64BitInstallMode; Flags: solidbreak ignoreversion
 ;common
-Source: "C:\empires\allies\*"; DestDir: "{userdocs}\My Games\{#MyAppName}\allies"; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
-Source: "C:\empires\mods\*"; DestDir: "{userdocs}\My Games\{#MyAppName}\mods"; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
-Source: "C:\empires\mods\README.MD"; DestDir: "{app}\mods"; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
-Source: "C:\empires\assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\empires\templates\*"; DestDir: "{app}\templates"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\empires\gamesettings-converted.json"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Flags: ignoreversion
-Source: "C:\empires\questsettings-converted.json"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Flags: ignoreversion
-Source: "C:\empires\save.db"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Flags: onlyifdoesntexist uninsneveruninstall
+Source: "C:\empires\redist\flashplayer32_0r0_371_winpep.exe"; DestDir: "{tmp}"; Components: chromium; Flags: deleteafterinstall
+Source: "C:\empires\allies\*"; DestDir: "{userdocs}\My Games\{#MyAppName}\allies"; Components: required; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
+Source: "C:\empires\mods\*"; DestDir: "{userdocs}\My Games\{#MyAppName}\mods"; Components: required; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
+Source: "C:\empires\mods\README.MD"; DestDir: "{app}\mods"; Components: required; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
+Source: "C:\empires\assets\*"; DestDir: "{app}\assets"; Components: required; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\empires\templates\*"; DestDir: "{app}\templates"; Components: required; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\empires\chromium\*"; DestDir: "{app}\chromium"; Components: chromium; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\empires\gamesettings-converted.json"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Components: required; Flags: ignoreversion
+Source: "C:\empires\questsettings-converted.json"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Components: required; Flags: ignoreversion
+Source: "C:\empires\savespack\save.db"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Components: savespack; Flags: uninsneveruninstall
+Source: "C:\empires\save.db"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Components: required; Flags: onlyifdoesntexist uninsneveruninstall
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -104,6 +119,7 @@ Type: files; Name: "{app}\RaiseTheEmpires.ini"
 Type: dirifempty; Name: "{app}"
 
 [Run]
+Filename: "{tmp}\flashplayer32_0r0_371_winpep.exe"; Components: chromium; Flags: shellexec; StatusMsg: Installing Adobe Flash Player 32.0.0.371 PPAPI...
 Filename: "{tmp}\vc_redist.x64.exe"; Check: Is64BitInstallMode and VCRedistNeedsInstall; StatusMsg: Installing Visual Studio Runtime x64 Libraries...
 Filename: "{tmp}\vc_redist.x86.exe"; Check: (not Is64BitInstallMode) and VCRedist86NeedsInstall; StatusMsg: Installing Visual Studio Runtime x86 Libraries...
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
