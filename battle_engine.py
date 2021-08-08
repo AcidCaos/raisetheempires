@@ -709,27 +709,29 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
         print("Consumable", selected_consumable["-code"], selected_consumable["consumable"].get("-diweapon", ""), "not used to dead " + ("friendly" if ally else "baddie:"), targeted_unit, "di", direct_impact, "damage", damage)
 
     if "-chipFactor" in selected_consumable["consumable"]:
-        for i in range(len(units)):
-            if units_strengths[i] > 0:
-                collateral_unit_current_strength = units_strengths[i]
-                colateral_damage = math.ceil(get_adjacent_factor(targeted_unit, i, len(units)) *
-                                             int(selected_consumable["consumable"]["-chipFactor"]) *
-                                             int(selected_consumable["consumable"].get("-di", 0)) / 100)
-                for a in against:
-                    if a['-type'] in (get_unit_type(units[i]), get_unit_terrain(units[i])):
-                        colateral_damage *= float(a['-mod'])
-                units_strengths[i] -= colateral_damage
-                if not ally and 1 >= units_strengths[i] > 0:
-                    units_strengths[i] = 0
-                    print("Enemy inced to prevent 1 strength")
-                print("Enemy unit" if not ally else "Friendly unit suffered", collateral_unit_current_strength - units_strengths[i], "collateral damage")
-                if units_strengths[i] <= 0:
-                    units_strengths[i] = 0  # dead
-                    print("Enemy unit" if not ally else "Friendly unit", i, "down by collateral damage")
-                    if ally:
-                        handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, {},
-                                                                                 units[i]))
-                        doBattleRewards("kill", collateral_unit_current_strength, collateral_unit_current_strength, 0)
+        # dead units are removed from battle side so units adjacent to the dead unit are now counted as adjacent to
+        # each other for collateral damage
+        live_index = get_alive_unit_index(units_strengths)
+        for i in range(len(live_index)):
+            collateral_unit_current_strength = units_strengths[live_index[i]]
+            colateral_damage = math.ceil(get_adjacent_factor(targeted_unit, i, len(live_index)) *
+                                         int(selected_consumable["consumable"]["-chipFactor"]) *
+                                         int(selected_consumable["consumable"].get("-di", 0)) / 100)
+            for a in against:
+                if a['-type'] in (get_unit_type(units[live_index[i]]), get_unit_terrain(units[live_index[i]])):
+                    colateral_damage *= float(a['-mod'])
+            units_strengths[live_index[i]] -= colateral_damage
+            if not ally and 1 >= units_strengths[live_index[i]] > 0:
+                units_strengths[live_index[i]] = 0
+                print("Enemy inced to prevent 1 strength")
+            print("Enemy unit" if not ally else "Friendly unit suffered", collateral_unit_current_strength - units_strengths[live_index[i]], "collateral damage")
+            if units_strengths[live_index[i]] <= 0:
+                units_strengths[live_index[i]] = 0  # dead
+                print("Enemy unit" if not ally else "Friendly unit", live_index[i], "down by collateral damage")
+                if ally:
+                    handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, {},
+                                                                             units[live_index[i]]))
+                    doBattleRewards("kill", collateral_unit_current_strength, collateral_unit_current_strength, 0)
 
 
 def get_adjacent_factor(unit_1, unit_2, count):
