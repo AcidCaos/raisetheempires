@@ -1,7 +1,7 @@
 import getopt
 import sys
 
-opts, args = getopt.getopt(sys.argv[1:], "", ["debug", "host=", "port=", "http-host=", "http-path=", "no-popup", "no-crash-log", "no-compression", "no-caching"])
+opts, args = getopt.getopt(sys.argv[1:], "", ["debug", "host=", "port=", "http-host=", "http-path=", "no-popup", "no-crash-log", "no-compression", "no-caching", "no-app_mode"])
 
 debug = False
 host = '127.0.0.1'  # host to listen on 0.0.0.0 for all interfaces, 127.0.0.1 for only localhost
@@ -12,6 +12,7 @@ open_browser = True
 crash_log = True
 compression = True
 caching = True
+app_mode = True
 
 for o, a in opts:
     if o == '--host':
@@ -32,5 +33,7 @@ for o, a in opts:
         compression = False
     elif o == '--no-caching':
         caching = False
+    elif o == '--no-app_mode':
+        app_mode = False
     else:
         print("Warning: Unknown option " + o + ".")

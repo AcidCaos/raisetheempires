@@ -2312,9 +2312,9 @@ def server_error_page(error):
 if __name__ == '__main__':
     if 'WERKZEUG_RUN_MAIN' not in os.environ and open_browser:
         if os.path.exists(os.path.join("chromium", "chrome.exe")):
-            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome.exe") + " --allow-outdated-plugins " + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome.exe") + " --allow-outdated-plugins " + ("--app=" if app_mode else "") + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
         elif os.path.exists(os.path.join("chromium", "chrome")):
-            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome") + " --–allow-outdated-plugins " + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome") + " --–allow-outdated-plugins " + ("--app=" if app_mode else "") + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
         else:
             threading.Timer(1.25, lambda: webbrowser.open("http://" + http_host + ":" + str(port) + "/" + http_path)).start()
     # init_db(app, db)
