@@ -848,7 +848,7 @@ def post_gateway():
         elif reqq.functionName == 'PVPService.seenStrikeTeamComment':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.select':
-            resps.append(dummy_response())
+            resps.append(select_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.setCommandoAnimationDone':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.setCurrentCampaign':
@@ -2253,6 +2253,15 @@ def get_cash_cost(item, amount):
                 le_discount = .10
 
     return math.ceil(cash_cost * amount * (1 - le_discount))
+
+
+def select_response(param):
+    meta = {"newPVE": 0}
+    handle_quest_progress(meta, all_lambda(progress_action("select"),
+                                           progress_parameter_equals("_item", param['itemCode'])))
+    select_response = {"errorType": 0, "userId": 1, "metadata": meta,
+                          "data": []}
+    return select_response
 
 
 def dummy_response():
