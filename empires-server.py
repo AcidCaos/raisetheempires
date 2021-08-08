@@ -2302,14 +2302,12 @@ def server_error_page(error):
 
 if __name__ == '__main__':
     if 'WERKZEUG_RUN_MAIN' not in os.environ and open_browser:
-        try:
-            os.chdir("chromium")
-            threading.Timer(1.25, lambda: os.system("chrome.exe " + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
-        except:
+        if os.path.exists(os.path.join("chromium", "chrome.exe")):
+            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome.exe") + " " + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+        elif os.path.exists(os.path.join("chromium", "chrome")):
+            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome") + " " + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+        else:
             threading.Timer(1.25, lambda: webbrowser.open("http://" + http_host + ":" + str(port) + "/" + http_path)).start()
-    working_dir = str(os.getcwd())
-    if 'chromium' in working_dir:
-        threading.Timer(2.50, lambda: os.chdir("../")).start()
     # init_db(app, db)
     set_crash_log(crash_log)
     if compression:
