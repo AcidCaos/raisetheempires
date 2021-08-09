@@ -13,7 +13,7 @@ if not debug:
 
 
 from save_engine import save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
-    get_saves, store_session, validate_save, InvalidSaveException, set_crash_log
+    get_saves, store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path
 from save_migration import migrate
 from builtins import print
 from time import sleep
@@ -2312,9 +2312,9 @@ def server_error_page(error):
 if __name__ == '__main__':
     if 'WERKZEUG_RUN_MAIN' not in os.environ and open_browser:
         if os.path.exists(os.path.join("chromium", "chrome.exe")):
-            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome.exe") + " --allow-outdated-plugins " + ("--app=" if app_mode else "") + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome.exe") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --allow-outdated-plugins " + ("--app=" if app_mode else "") + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
         elif os.path.exists(os.path.join("chromium", "chrome")):
-            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome") + " --–allow-outdated-plugins " + ("--app=" if app_mode else "") + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --–allow-outdated-plugins " + ("--app=" if app_mode else "") + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
         else:
             threading.Timer(1.25, lambda: webbrowser.open("http://" + http_host + ":" + str(port) + "/" + http_path)).start()
     # init_db(app, db)

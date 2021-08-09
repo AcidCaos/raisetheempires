@@ -4,3 +4,6 @@
 /*.spec
 *.rar
 /log.txt
+/chromium
+/chromium-profile
+/cache
