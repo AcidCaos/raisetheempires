@@ -56,17 +56,14 @@ style="overflow: hidden;">
 			<br>
 			<br>
 			<div style="margin-left:20px; font-size:13px;">
-				<p style="font-size:14px;"><b>Choose your avatar</b></p>
+				<p style="font-size:14px;"><b>Choose your avatar:</b></p>
 				<div style="margin-left:15px; overflow-y: scroll; max-height: 200px;">
 					{% for avatar in avatars %}
-						<img src="layouts/avatars/{{avatar}}" height=70px>
+						<a title="Choose this avatar" onclick="eatCookie(); return true" href="/chooseavatar/{{avatar}}"><img src="layouts/avatars/{{avatar}}" height=70px></a>
 					{% endfor %}
 					<br>
 				</div>
 				<br><br>
-				<a class="uiButton uiButtonConfirm" href="#" onclick="eatCookie(); return false" role="button" name="try_again_button">
-					<span class="uiButtonText">Create new Empire</span>
-				</a>
 				<p style="font-size:12px; display: inline;"><b> or <a href="/login.html">I already have an empire</a></b></p>
 			</div>
 		</div>

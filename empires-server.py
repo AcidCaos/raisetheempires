@@ -80,6 +80,7 @@ def index():
 
 @app.route("/home.html")
 def home():
+    default_empireName = os.environ['COMPUTERNAME'][:1].upper()+os.environ['COMPUTERNAME'].lower()[1:]
     print("home")
     if not validate_save(session, True):
         print("Invalid save game")
@@ -90,8 +91,8 @@ def home():
                            allies=json.dumps(get_allies_friend(saves),
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
                            app_friends=json.dumps(get_allies_id(saves)),
-                           computername=os.environ['COMPUTERNAME'][:1].upper()+os.environ['COMPUTERNAME'].lower()[1:],
-                           picture=random_image(),
+                           computername=session['user_object']["userInfo"]["worldName"] if 'user_object' in session else default_empireName,
+                           picture=get_avatar_pic(),
                            dropdown_items=get_sessions_dropdown_info(saves)
                            )
 
@@ -120,7 +121,7 @@ def no_debug():
                            allies=json.dumps(get_allies_friend(saves),
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
                            app_friends=json.dumps(get_allies_id(saves)),
-                           picture=random_image(),
+                           picture=get_avatar_pic(),
                            dropdown_items=get_sessions_dropdown_info(saves)
                            )
 
@@ -166,7 +167,6 @@ def get_sessions_dropdown_info(saves):
 
 
 def get_sessions_friends(saves):
-    one_image = random_image() # one random for performance reasons
     if saves:
         response = [{
                 "zid":  save['user_object']["userInfo"]["player"]["uid"],
@@ -174,9 +174,9 @@ def get_sessions_friends(saves):
                 "first_name": save['user_object']["userInfo"]["worldName"],
                 "name": save['user_object']["userInfo"]["worldName"],
                 "sex": "F",
-                "portrait": one_image,
-                "pic": one_image,
-                "pic_square": one_image
+                "portrait": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save else random_image(),
+                "pic": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save else random_image(),
+                "pic_square": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save else random_image()
         } for save in saves if validate_save(save) and save['user_object']["userInfo"]["player"]["level"] >= -6]
     else:
         response = []
@@ -184,7 +184,6 @@ def get_sessions_friends(saves):
 
 
 def get_sessions_info(saves):
-    one_image = random_image() # one random for performance reasons, turn list to load once on start
     if saves:
         response = [{
             "uid": save['user_object']["userInfo"]["player"]["uid"],
@@ -196,7 +195,7 @@ def get_sessions_info(saves):
             "socialLevelGood": save['user_object']["userInfo"]["player"]["socialLevelGood"],
             "socialXpBad": save['user_object']["userInfo"]["player"]["socialXpBad"],
             "socialLevelBad": save['user_object']["userInfo"]["player"]["socialLevelBad"],
-            "profilePic": one_image,
+            "profilePic": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save else random_image(),
             "dominanceRank": 1,
             "pvpNumOccupiers": len([k for k, v in save['user_object']["pvp"]["invaders"].items() if k != "pve"]),
             "pvpNumOccupiersNotDefended": len([k for k, v in save['user_object']["pvp"]["invaders"].items() if k != "pve"]),
@@ -343,6 +342,7 @@ def save_editor():
     return render_template("save-editor.html", savegame=json.dumps(
         {
             'user_object': session['user_object'] if 'user_object' in session else None,
+            'profilePic': session['profilePic'] if 'profilePic' in session else None,
             'quests': session['quests'] if 'quests' in session else None,
             'battle': session['battle'] if 'battle' in session else None,
             'fleets': session['fleets'] if 'fleets' in session else None,
@@ -374,6 +374,7 @@ def save_savegame():
     create_backup(message)
     session['saved'] = str(session.get('saved', "")) + "edit"
     session['user_object'] = save_game['user_object']
+    session['profilePic'] = save_game['profilePic']
     session['quests'] = save_game['quests']
     session['battle'] = save_game['battle']
     session['fleets'] = save_game['fleets']
@@ -462,6 +463,17 @@ def get_avail_avatars():
 def new_player_page():
     saves = get_saves()
     return render_template("new.html", version=version, release_date=release_date, avatars=get_avail_avatars())
+
+@app.route("/chooseavatar/<path:path>", methods=['GET', 'POST'])
+def choose_avatar(path):
+    avatar = path
+    session['profilePic'] = avatar
+    response = make_response(redirect('/home.html'))
+    return response
+
+def get_avatar_pic():
+    avatar_pic = "layouts/avatars/" + session['profilePic'] if 'profilePic' in session else random_image()
+    return avatar_pic
 
 @app.route("/changelog.txt")
 def change_log():
@@ -1115,7 +1127,7 @@ def init_user():
                 }
             },
             "worldName": worldName_ComputerName,
-            "titanName": "Natalie",
+            "titanName": "Titan",
             "isCIP": False,
             "dominanceDefaultFleets": [],
             "bookmarkReward": 0,
