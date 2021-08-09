@@ -28,7 +28,8 @@ import mod_engine
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
     get_active_island_by_map, set_active_island_by_map, register_random_fleet, format_player_fleet, \
     cancel_unstarted_invasions
-from game_settings import get_zid, initial_island, random_image, randomReward
+from game_settings import get_zid, initial_island, random_image, randomReward, get_sessions_friends, \
+    get_sessions_id
 import threading, webbrowser
 import pyamf.amf0
 import json
@@ -165,27 +166,6 @@ def get_sessions_dropdown_info(saves):
         response = []
     return response
 
-
-def get_sessions_friends(saves):
-    if saves:
-        response = [{
-                "zid":  save['user_object']["userInfo"]["player"]["uid"],
-                "uid":  save['user_object']["userInfo"]["player"]["uid"],
-                "first_name": save['user_object']["userInfo"]["worldName"],
-                "name": save['user_object']["userInfo"]["worldName"],
-                "sex": "F",
-                "portrait": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save else random_image(),
-                "pic": "",
-                "pic_square": ""
-        } for save in saves if validate_save(save) and save['user_object']["userInfo"]["player"]["level"] >= -6]
-        for item in response:
-            item["pic"] = item["portrait"]
-            item["pic_square"] = item["portrait"]
-    else:
-        response = []
-    return response
-
-
 def get_sessions_info(saves):
     if saves:
         response = [{
@@ -207,14 +187,6 @@ def get_sessions_info(saves):
                 "actions": 3
             }
         } for save in saves if validate_save(save) and save['user_object']["userInfo"]["player"]["level"] >= -6]
-    else:
-        response = []
-    return response
-
-
-def get_sessions_id(saves):
-    if saves:
-        response = [save['user_object']["userInfo"]["player"]["uid"] for save in saves if validate_save(save) and save['user_object']["userInfo"]["player"]["level"] >= -6]
     else:
         response = []
     return response

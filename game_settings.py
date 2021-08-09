@@ -8,7 +8,7 @@ from flask import session
 from datetime import datetime
 
 import mod_engine
-from save_engine import my_games_path
+from save_engine import my_games_path, validate_save
 
 game_settings_path = os.path.join(my_games_path(), "gamesettings-converted.json")
 initial_island_path = os.path.join(my_games_path(), "allies/initial-island.json")
@@ -240,3 +240,31 @@ def simple_list(raw_list):
 
 def get_zid():
     return libscrc.iso(session.sid.encode()) // 2048
+
+
+def get_sessions_friends(saves):
+    if saves:
+        response = [{
+                "zid":  save['user_object']["userInfo"]["player"]["uid"],
+                "uid":  save['user_object']["userInfo"]["player"]["uid"],
+                "first_name": save['user_object']["userInfo"]["worldName"],
+                "name": save['user_object']["userInfo"]["worldName"],
+                "sex": "F",
+                "portrait": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save else random_image(),
+                "pic": "",
+                "pic_square": ""
+        } for save in saves if validate_save(save) and save['user_object']["userInfo"]["player"]["level"] >= -6]
+        for item in response:
+            item["pic"] = item["portrait"]
+            item["pic_square"] = item["portrait"]
+    else:
+        response = []
+    return response
+
+
+def get_sessions_id(saves):
+    if saves:
+        response = [save['user_object']["userInfo"]["player"]["uid"] for save in saves if validate_save(save) and save['user_object']["userInfo"]["player"]["level"] >= -6]
+    else:
+        response = []
+    return response

@@ -1,7 +1,7 @@
 from quest_settings import quest_settings
 from game_settings import game_settings, lookup_item_by_code, lookup_state_machine, replenish_energy, lookup_yield, \
-    allies,lookup_items_by_type_and_subtype,unlock_expansion
-from save_engine import lookup_objects_by_item_name, create_backup
+    allies, lookup_items_by_type_and_subtype, unlock_expansion, get_sessions_friends
+from save_engine import lookup_objects_by_item_name, create_backup, get_saves
 from flask import session
 from functools import reduce
 import math
@@ -139,7 +139,7 @@ def progress_neighbor_count():
 
 
 def progress_neighbors(maximum_total, extra, progress):
-    neighbor_count = len([ally for ally in allies.values() if ally.get("friend") and ally.get("neighbor")])
+    neighbor_count = len([ally for ally in allies.values() if ally.get("friend") and ally.get("neighbor")] + get_sessions_friends(get_saves()))
     total = min(neighbor_count, int(maximum_total))
     extra["total"] = total
     return total != progress
