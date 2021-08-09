@@ -10,7 +10,7 @@
 <script>
 	function getUserInfo() {
 	    console.log("getUserInfo called")
-	    return {'zid': {{ zid | default(-1000) }}, 'uid': {{ zid | default(-1000) }}, 'first_name': '{{ computername }}', 'name':'{{ computername }}', "sex":'F', 'pic_square': '{{ picture }}'};
+	    return {'zid': {{ zid | default(-1000) }}, 'uid': {{ zid | default(-1000) }}, 'first_name': {{ computername | tojson }}, 'name':{{ computername | tojson }}, "sex":'F', 'pic_square': '{{ picture }}'};
 	}
 	function getFriendData() {
 	    console.log("getFriendData called")
