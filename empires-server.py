@@ -175,9 +175,12 @@ def get_sessions_friends(saves):
                 "name": save['user_object']["userInfo"]["worldName"],
                 "sex": "F",
                 "portrait": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save else random_image(),
-                "pic": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save else random_image(),
-                "pic_square": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save else random_image()
+                "pic": "",
+                "pic_square": ""
         } for save in saves if validate_save(save) and save['user_object']["userInfo"]["player"]["level"] >= -6]
+        for item in response:
+            item["pic"] = item["portrait"]
+            item["pic_square"] = item["portrait"]
     else:
         response = []
     return response

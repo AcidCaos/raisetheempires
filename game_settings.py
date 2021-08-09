@@ -12,7 +12,7 @@ from save_engine import my_games_path
 
 game_settings_path = os.path.join(my_games_path(), "gamesettings-converted.json")
 initial_island_path = os.path.join(my_games_path(), "allies/initial-island.json")
-
+cached_urls = []
 
 def read_games_settings():
     with open(game_settings_path, 'r') as f:
@@ -208,7 +208,10 @@ def random_image():
     return random.choice(list(set([u for u in fetch_urls() if u.endswith('.png')])))
 
 def fetch_urls():
-    return fetch_url_dict(game_settings)
+    global cached_urls
+    if not cached_urls:
+        cached_urls = fetch_url_dict(game_settings)
+    return cached_urls
 
 def fetch_url_dict(d):
     urls =  [v for k, v in d.items() if k == '-url']
