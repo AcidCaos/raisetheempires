@@ -288,11 +288,11 @@ def progress_parameter_implies(key, value):
 
 
 def progress_nested_parameter_implies(key, key2, value):
-    return lambda task, *args: task.get(key, {}).get(key2) == None or task.get(key, {}).get(key2, "_NO_MATCH_") == value
+    return lambda task, *args: task.get(key) == '' or task.get(key, {}).get(key2) == None or task.get(key, {}).get(key2, "_NO_MATCH_") == value
 
 
 def progress_nested_parameter_implies_contains(key, key2, value):
-    return lambda task, *args: task.get(key, {}).get(key2) == None or any(i in task.get(key, {}).get(key2, "_NO_MATCH_").split(",") for i in value.split(","))
+    return lambda task, *args: task.get(key) == '' or task.get(key, {}).get(key2) == None or any(i in task.get(key, {}).get(key2, "_NO_MATCH_").split(",") for i in value.split(","))
 
 
 def progress_parameter_implies_contains(key, value):
