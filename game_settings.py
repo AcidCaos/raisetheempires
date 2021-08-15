@@ -84,6 +84,11 @@ def lookup_items_by_type_and_subtype(type, subtype):
     return items
 
 
+def lookup_items_by_unit_class(unit_class):
+    items = [e for e in game_settings['settings']['items']['item'] if e.get('-unitClass') == unit_class]
+    return items
+
+
 def lookup_yield():  #TODO buildstate
     yields = {e['-name']: int(e['yield']['-workers']) for e in lookup_items_with_workers_yield()}
     return sum([yields[e['itemName']] for e in session['user_object']["userInfo"]["world"]["objects"] if e['itemName'] in yields.keys()])

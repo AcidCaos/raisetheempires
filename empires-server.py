@@ -29,7 +29,7 @@ from battle_engine import battle_complete_response, spawn_fleet, next_campaign_r
     get_active_island_by_map, set_active_island_by_map, register_random_fleet, format_player_fleet, \
     cancel_unstarted_invasions
 from game_settings import get_zid, initial_island, random_image, randomReward, get_sessions_friends, \
-    get_sessions_id
+    get_sessions_id, unlock_expansion
 import threading, webbrowser
 import pyamf.amf0
 import json
@@ -1217,6 +1217,7 @@ def init_user():
 
 # Q0516 ? start
 def user_response():
+    new_quests = []
     if 'user_object' in session:
         print("Loading user from save")
         if not validate_save(session):
@@ -1232,21 +1233,20 @@ def user_response():
 
         user["neighbors"] = get_allies_info()
 
-        meta = {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]}
+        meta = {"newPVE": 0, "QuestComponent": [e for e in session['quests'] if e["complete"] == False]}
+
     else:
         user = copy.deepcopy(init_user())
         print("initialized new")
         session['user_object'] = user
         # qc = [{"name": "Q0516", "complete":False, "expired":False,"progress":[0],"completedTasks":0}]
         session['quests'] = []
-        qc = []
 
-        session['quests'] = qc
         session['save_version'] = version
         session['original_save_version'] = version
         session['saved_on'] = datetime.now().timestamp()
-        meta = {"newPVE": 0, "QuestComponent": [e for e in qc if e["complete"] == False]}
-        new_quest_with_sequels("Q0516", qc, meta)
+        meta = {"newPVE": 0, "QuestComponent": [e for e in session['quests'] if e["complete"] == False]}
+        new_quest_with_sequels("Q0516", new_quests, meta)
 
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = "tut_step_krunsch1Battle2Speeech" #'tut_step_inviteFriendsViral'
     # session['user_object']["userInfo"]["player"]["tutorialProgress"] = 'tut_step_remindCombatUIWaitForPreBattleUI'
@@ -1292,7 +1292,6 @@ def user_response():
 
     # if ""B01": 20"
 
-    user["completedQuests"] = [e["name"] for e in qc if e["complete"] == True]
 
     item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
     if item_inventory.get("B01", 0) < 20:
@@ -1318,6 +1317,8 @@ def user_response():
     handle_quest_progress(meta, progress_neighbor_count())
     handle_quest_progress(meta, progress_upgrades_count())
 
+    activate_unlocked_quests(new_quests, meta)
+
     for neighbor in user["neighbors"]:
         if neighbor["uid"] in [-1, 123]:
             neighbor["level"] =  user["userInfo"]["player"]["level"] + 5
@@ -1331,6 +1332,10 @@ def user_response():
 
     # for e in session['user_object']["userInfo"]["world"]["objects"]:
     #     e['lastUpdated'] = 1308211628  #1 minute earlier to test
+    user["completedQuests"] = [e["name"] for e in session['quests'] if e["complete"] == True]
+
+    merge_quest_progress(new_quests, meta['QuestComponent'], "output quest")
+    merge_quest_progress(new_quests, session['quests'], "session quest")
     user_response = {"errorType": 0, "userId": get_zid(), "metadata": meta,
                      # {"name": "Q0531", "complete":False, "expired":False,"progress":[0],"completedTasks":0},{"name": "QW120", "complete":False, "expired":False,"progress":[0],"completedTasks":0}
                      "data": user}

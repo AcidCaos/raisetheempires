@@ -1,5 +1,5 @@
 from quest_engine import handle_world_state_change, roll_reward_random_float, handle_quest_progress, \
-    progress_upgrades_count, progress_resource_added_count
+    progress_upgrades_count, progress_resource_added_count, activate_unlocked_quests, merge_quest_progress
 from datetime import datetime
 from flask import session
 from game_settings import game_settings, lookup_item_by_name, lookup_state_machine, lookup_reference_item, \
@@ -249,6 +249,12 @@ def do_state_rewards(state, reference_item, meta, playback_tend=False):
     if log_rewards:
         print("State rewards:", log_rewards)
     handle_quest_progress(meta, progress_resource_added_count(state, "-"))
+    if levels:
+        new_quests = []
+        activate_unlocked_quests(new_quests, meta)
+        merge_quest_progress(new_quests, meta['QuestComponent'], "output quest")
+        merge_quest_progress(new_quests, session['quests'], "session quest")
+
         
         
 def do_costs(costs):

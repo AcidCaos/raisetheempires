@@ -1,10 +1,13 @@
-from quest_settings import quest_settings
-from game_settings import game_settings, lookup_item_by_code, lookup_state_machine, replenish_energy, lookup_yield, \
-    allies, lookup_items_by_type_and_subtype, unlock_expansion, get_sessions_friends
-from save_engine import lookup_objects_by_item_name, create_backup, get_saves
-from flask import session
-from functools import reduce
 import math
+from functools import reduce
+
+from flask import session
+
+from game_settings import game_settings, lookup_item_by_code, lookup_state_machine, replenish_energy, lookup_yield, \
+    allies, get_sessions_friends, lookup_items_by_unit_class
+from quest_settings import quest_settings, prequels
+from save_engine import lookup_objects_by_item_name, create_backup, get_saves
+
 
 def merge_quest_progress(qc, output_list, label):
     if qc:
@@ -45,7 +48,7 @@ def quest_auto_complete(param,meta):
 
 
 def prepopulate_task(task):
-    if task["_action"] == 'countPlaced':
+    if task["_action"] == 'countPlaced' and "_item" in task:
         item = lookup_item_by_code(task["_item"])
         if 'stateMachineValues' in item:
             state_machine = lookup_state_machine(item['stateMachineValues']['-stateMachineName'],
@@ -57,7 +60,14 @@ def prepopulate_task(task):
                  int(e.get('state', 0)) >= (int(state_machine['-builtState']) if state_machine else 0)]
         number_built = len(built_objects)
         return min(number_built, int(task["_total"])), number_built >= int(task["_total"])
-    if task["_action"] == 'countPlacements':
+    elif task["_action"] == 'countPlaced' and "_unitClass" in task:
+        items = lookup_items_by_unit_class(task["_unitClass"])
+        number_placed = 0
+        for item in items:
+            objects = lookup_objects_by_item_name(item['-name'])
+            number_placed += len(objects)
+        return min(number_placed, int(task["_total"])), number_placed >= int(task["_total"])
+    elif task["_action"] == 'countPlacements':
         item = lookup_item_by_code(task.get("_item", task.get('_code')))
         objects = lookup_objects_by_item_name(item['-name'])
         number_placed = len(objects)
@@ -104,6 +114,7 @@ def world_state_change(*state_args):
         any([progress_finish_building_count_placed(*state_args)(*args),
              progress_auto_complete()(*args),
              progress_place(*state_args)(*args),
+             progress_place_unit(*state_args)(*args),
              progress_build(*state_args)(*args),
              progress_harvest(*state_args)(*args),
              progress_state(*state_args)(*args),
@@ -261,6 +272,11 @@ def progress_place(state, state_machine, game_item, step, *state_args):
         task["_action"] in ["place", "countPlacements"] and task.get("_item", task.get('_code')) == game_item['-code'] and progress < int(task["_total"]) and step == "place"
 
 
+def progress_place_unit(state, state_machine, game_item, step, *state_args):
+    return lambda task, progress, i, *args: \
+        task["_action"] in ["countPlaced"] and task.get("_unitClass", "NONE") == game_item.get('-unitClass', "OTHER") and progress < int(task["_total"]) and step == "place"
+
+
 def progress_state(state, state_machine, game_item, step, *state_args):
     return lambda task, progress, i, *args: \
         task["_action"] in ["state", "countState"] and '-stateName' in state and state['-stateName'] in task["_state"].split(',')  and ("_item" not in task or task["_item"] == game_item['-code'])\
@@ -360,17 +376,58 @@ def new_quest_with_sequels(name, new_quests, meta):
     elif new_quests is not None and name in [e['name'] for e in new_quests]:
         print("sequel", name, "already in new quests")
     else:
-        print("activating sequel", name)
         q = lookup_quest(name)
-        new_sequel_quest = new_quest(q)
-        new_quests.append(new_sequel_quest)
-        if new_sequel_quest["complete"]:
-            print("Sequel quest precompleted", name)
-            do_quest_rewards(q, meta)
-            activate_sequels(new_sequel_quest, new_quests, meta)
+        if matches_requirement(q):
+            print("Activating sequel", name)
+            new_sequel_quest = new_quest(q)
+            new_quests.append(new_sequel_quest)
+            if new_sequel_quest["complete"]:
+                print("Sequel quest precompleted", name)
+                do_quest_rewards(q, meta)
+                activate_sequels(new_sequel_quest, new_quests, meta)
+                activate_unlocked_quests(new_quests, meta)
+        else:
+            print("Deferring sequel", name, "due to requirements")
 
 
+def activate_unlocked_quests(new_quests, meta):
+    open_quests = [e["name"] for e in session["quests"] if e["complete"] == False]
+    if len(open_quests) <= 20:
+        completed_quests = [e["name"] for e in session["quests"] if e["complete"] == True]
+        quests = [e["name"] for e in session["quests"]]
+        sc = 0
+        quest_selection = []
+        for s, p in prequels.items():
+            if s not in quests and (not p or any(v in completed_quests for v in p)):
+                quest = lookup_quest(s)
+                if matches_requirement(quest):
+                    print(repr(quest))
+                    quest_selection.append(quest)
 
+        quest_selection.sort(key=lambda q: (
+            int(q.get("_priority", "1000")), int(q.get("requiredDate", {}).get("_start", "0/0/0").split("/")[2]),
+            int(q.get("requiredDate", {}).get("_start", "0/0/0").split("/")[0]),
+            int(q.get("requiredDate", {}).get("_start", "0/0/0").split("/")[1])))
+        for quest in quest_selection:
+            if len(open_quests) + sc > 20:  # todo make selection?
+                print("Skipping " + quest["_name"] + " too many open quests")
+            else:
+                new_quest_with_sequels(quest["_name"], new_quests, meta)
+                sc += 1
+        print('Unlocked new quests', sc)
+    else:
+        print("No unlock quests because there are too many open quests")
+
+
+def matches_requirement(quest):
+    #return "requires" in quest and quest["requires"]['_type'] =='level'
+    return ("requires" not in quest or (quest["requires"]['_type'] =='level'
+                                        and int(quest["requires"]['_count']) <= session['user_object']["userInfo"]["player"]["level"])) and \
+           ("_activateExperimentNeeded" not in quest or (quest["_activateExperimentNeeded"] in session['user_object']["experiments"] and
+                                                         str(session['user_object']["experiments"][quest["_activateExperimentNeeded"]]) in quest["_activateExperimentVariants"].split(','))) and \
+            not quest["_name"].startswith("QFD") # no daily quests
+
+#TODO or (quest['_questTree'] =='level' and quest['_questTree'] ???
 
 
 # def autoclick_next_state(state_machine, next_click_state):
@@ -461,6 +518,11 @@ def do_rewards(label, raw_rewards, meta):
             item_inventory[k] = item_inventory.get(k, 0) + v
         print(label, "item rewards:", ", ".join([ k + ": " + str(v) for k,v in items.items()]))
     handle_quest_progress(meta, progress_resource_added_count(inc, ""))
+    if levels:
+        new_quests = []
+        activate_unlocked_quests(new_quests, meta)
+        merge_quest_progress(new_quests, meta['QuestComponent'], "output quest")
+        merge_quest_progress(new_quests, session['quests'], "session quest")
 
 
 def roll_random():

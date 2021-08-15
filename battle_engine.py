@@ -7,8 +7,9 @@ from game_settings import lookup_item_by_code, game_settings, get_zid, lookup_it
 from logger import report_battle_log
 from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_seed_z, roll_random_between, \
     handle_quest_progress, progress_action, roll_random_float, all_lambda, progress_parameter_equals, do_rewards, \
-    roll_reward_random_float, progress_battle_damage_count,progress_useAOA_consumable,progress_useGeneral_consumable
-from save_engine import get_saves, store_session
+    roll_reward_random_float, progress_battle_damage_count, progress_useAOA_consumable, progress_useGeneral_consumable, \
+    progress_parameter_implies
+from save_engine import get_saves, store_session, lookup_objects_save_by_position
 
 
 def battle_complete_response(params):
@@ -200,7 +201,8 @@ def handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths):
     if sum(baddie_strengths) == 0:
         print("Enemy defeated")
         session["battle"] = None
-        handle_quest_progress(meta, progress_action("fight"))
+        handle_quest_progress(meta, all_lambda(progress_action("fight"),
+                                               progress_parameter_implies("_fleetname", params.get("target"))))
         map_name, current_island, map_item = get_current_island(params)
         if current_island is not None:
             handle_quest_progress(meta, all_lambda(progress_action("islandWin"),
@@ -364,13 +366,29 @@ def init_battle(params):
         friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
                       session['fleets'][params['fleet']]]
     else:
-        quest = lookup_quest(params['target'])
-        tasks = get_tasks(quest)
-        [task] = [t for t in tasks if t["_action"] == "fight"]
+        open_quests = [e["name"] for e in session["quests"] if e["complete"] == False]
+        task = None
+        friendlies = None
+        for q in open_quests:
+            quest = lookup_quest(q)
+            tasks = get_tasks(quest)
+            task = [t for t in tasks if t["_action"] == "fight" and t.get("_fleetname") == params['target']]
+            if task:
+                task = task[0]
+                friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                              session['fleets'][params['fleet']]]
+                break
+
+        if not task:
+            quest = lookup_quest(params['target'])
+            tasks = get_tasks(quest)
+            [task] = [t for t in tasks if t["_action"] == "fight"]
+
         enemy_fleet = lookup_item_by_code(task["_item"])
         baddies = [lookup_item_by_code(baddie_slot["-item"]) for baddie_slot in simple_list(enemy_fleet["baddie"])]
-        friendlies = [lookup_item_by_code(friendly[1:]) for friendly, count in task["fleet"].items() for i in
-                      range(int(count))]
+        if not friendlies:
+            friendlies = [lookup_item_by_code(friendly[1:]) for friendly, count in task["fleet"].items() for i in
+                          range(int(count))]
 
     if "battle" not in session or not session["battle"]:
         baddie_strengths = [get_unit_max_strength(baddie, False, params) for baddie in baddies]
@@ -438,11 +456,26 @@ def spawn_fleet(params):
     quest = lookup_quest(params['code'])
     tasks = get_tasks(quest)
 
-    [task] = [t for t in tasks if t["_action"] == "fight"]
+    [task] = [t for t in tasks if t["_action"] == "fight" and ("_fleetname" not in t or t["_fleetname"] == params["fleet"])]
 
-   # meta["newPVE"] = {"status": 2, "pos": "58,60,0", "villain": "v18"}
-   #  meta["newPVE"] = {"status": 2, "pos": "60,63,0", "villain": "v18", "quest": "Q6016"}
-    meta["newPVE"] = {"status": 2, "pos": task["_spawnLocation"], "villain": task["_pveVillain"], "quest": params['code']}
+    # meta["newPVE"] = {"status": 2, "pos": "58,60,0", "villain": "v18"}
+    #  meta["newPVE"] = {"status": 2, "pos": "60,63,0", "villain": "v18", "quest": "Q6016"}
+    print("q", repr(quest))
+
+    location = task.get("_spawnLocation")
+    if not location:
+        print("Non PVE, fleet by fight button on quest screen")
+        register_random_fleet(None)  # reserves fleet names
+        # for i in range(10):
+        #     x = random.randrange(10, 90)
+        #     y = random.randrange(10, 90)
+        #     occupied_objects = lookup_objects_save_by_position(session, x, y, 5)
+        #     print(params['code'], "Attempt", i + 1, "placing fleet", params["fleet"], "at", x, y, "has", len(occupied_objects), "objects aroumd")
+        #     location = str(x) + "," + str(y)
+        #     if occupied_objects:
+        #         break
+    else:
+        meta["newPVE"] = {"status": 2, "pos": location, "villain": task.get("_pveVillain", task["_villain"]), "quest": params['code']}
     spawn_fleet = {"errorType": 0, "userId": 1, "metadata": meta,
                           "data": []}
     return spawn_fleet
