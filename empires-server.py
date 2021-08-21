@@ -2189,7 +2189,7 @@ def buy_quest_task_response(param):
     # world = session['user_object']["userInfo"]["world"]
 
     meta = {"newPVE": 0}
-    meta = quest_auto_complete(param, meta)
+    handle_quest_progress(meta, progress_quest_task(param["name"], param["taskIndex"]))
     buy_quest_task_response = {"errorType": 0, "userId": 1, "metadata": meta, "data": []}
     return buy_quest_task_response
 

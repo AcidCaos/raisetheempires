@@ -28,23 +28,11 @@ def new_quest(quest):
     return {"name": quest['_name'], "complete": all(completes), "expired": False, "progress": progress, "completedTasks": reduce((lambda x, y: x << 1 | y), [False] + completes[::-1])}
 
 
-def quest_auto_complete(param,meta):
-    new_quests=[]
-    quest_finished = lookup_quest(param["name"])
-    quest_in_session = [r for r in session['quests'] if r["name"] == quest_finished["_name"]]
-    quest_in_session[0]["progress"]=[]
-    for task in quest_finished["tasks"]["task"]:
-        quest_in_session[0]["progress"].append(int(task["_total"]))
-
-
-    quest_in_session[0]["completedTasks"] = int(len(quest_finished["tasks"]["task"]))
-    quest_in_session[0]["complete"] = True
-    meta['QuestComponent'] = []
-    do_quest_rewards(lookup_quest(quest_in_session[0]['name']), meta)
-    activate_sequels(quest_in_session[0], new_quests, meta)
-    merge_quest_progress([quest_in_session[0]] + new_quests, meta['QuestComponent'], "output quest")
-    merge_quest_progress(new_quests, session['quests'], "session quest")
-    return meta
+def progress_quest_task(name, index):
+    return lambda task, progress, i, extra, quest_name, *args: \
+        quest_name == name and \
+        i == index and \
+        progress_total_amount(task["_total"], task["_total"], extra, progress)
 
 
 def prepopulate_task(task):
@@ -326,8 +314,8 @@ def handle_quest_progress(meta, progress_function):
         tasks = get_tasks(lookup_quest(session_quest['name']))
         for task, progress, i in zip(tasks, session_quest['progress'], range(len(session_quest['progress']))):
             extra = {"yield": 1}
-            if progress_function(task, progress, i, extra):  #countPlaced tasks should be prepopulated with already placed items, however removed ones? precomplete autoComplete?
-                    print("Task", repr(task), "progress", repr(progress), "i", i)
+            if progress_function(task, progress, i, extra, session_quest['name']):  #countPlaced tasks should be prepopulated with already placed items, however removed ones? precomplete autoComplete?
+                    print("Task", repr(task), "progress", repr(progress), "i", i, "quest_name", session_quest['name'])
                     report_quest = True
                     if task['_action'] == 'population':
                         session_quest['progress'][i] = min(lookup_yield(), int(task["_total"]))  # session['population']
