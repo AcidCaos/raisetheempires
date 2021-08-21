@@ -4,6 +4,7 @@
     "resource": 3,
     "coins": 3015,
     "energy": -5,
+    "coins": 3015,
     "oil": -15,
     "wood": -104,
     "aluminum": 985,
@@ -37,7 +38,21 @@
   },
   "worldName": "AcidCaos Empire",
   "titanName": "AcidCaos",
-  "expansions":{"data":[4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295,4294967295]},
+  "expansions": {
+    "data": [
+      0,
+      0,
+      0,
+      0,
+      805306368,
+      6291456,
+      49152,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
   "neighbor": true,
   "recommendedFriends": true,
   "zyngaFriends": true,
