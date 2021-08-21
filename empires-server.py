@@ -47,8 +47,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.07a.2021_08_02"
-release_date = 'Monday, 2 August 2021'
+version = "0.07a.2021_08_21"
+release_date = 'Saturday, 21 August 2021'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -349,7 +349,10 @@ def save_savegame():
     create_backup(message)
     session['saved'] = str(session.get('saved', "")) + "edit"
     session['user_object'] = save_game['user_object']
-    session['profilePic'] = save_game['profilePic']
+    if 'profilePic' in session:
+        session['profilePic'] = save_game['profilePic']
+    else:
+        pass
     session['quests'] = save_game['quests']
     session['battle'] = save_game['battle']
     session['fleets'] = save_game['fleets']
