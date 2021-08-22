@@ -35,6 +35,13 @@ def progress_quest_task(name, index):
         progress_total_amount(task["_total"], task["_total"], extra, progress)
 
 
+def progress_feed(feed_name):
+    return lambda task, progress, i, extra, quest_name, *args: \
+        task["_action"] == "feedReceived" and \
+        task["_feed"] == feed_name and \
+        progress_total_amount(task["_total"], task["_total"], extra, progress)
+
+
 def prepopulate_task(task):
     if task["_action"] == 'countPlaced' and "_item" in task:
         item = lookup_item_by_code(task["_item"])

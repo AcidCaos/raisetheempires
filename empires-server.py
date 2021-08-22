@@ -548,7 +548,7 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.updateRoads':
             resps.append(update_roads_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.streamPublish':
-            resps.append(stream_publish_response())
+            resps.append(stream_publish_response(reqq.params))
         elif reqq.functionName == 'WorldService.stopMayhemEvent':
             resps.append(stop_mayhem_response())
         elif reqq.functionName == 'UserService.saveOptions':
@@ -1971,8 +1971,10 @@ def update_roads_response(roads):
     return update_roads_response
 
 
-def stream_publish_response():
-    stream_publish_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+def stream_publish_response(params):
+    meta = {"newPVE": 0}
+    handle_quest_progress(meta, progress_feed(params[0]))
+    stream_publish_response = {"errorType": 0, "userId": 1, "metadata": meta,
                                "data": []}
     return stream_publish_response
 
