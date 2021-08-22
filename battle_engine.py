@@ -475,7 +475,7 @@ def spawn_fleet(params):
         #     if occupied_objects:
         #         break
     else:
-        meta["newPVE"] = {"status": 2, "pos": location, "villain": task.get("_pveVillain", task["_villain"]), "quest": params['code']}
+        meta["newPVE"] = {"status": 2, "pos": location, "villain": task["_pveVillain"], "quest": params['code']}
     spawn_fleet = {"errorType": 0, "userId": 1, "metadata": meta,
                           "data": []}
     return spawn_fleet
