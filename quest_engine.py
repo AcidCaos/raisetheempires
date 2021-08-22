@@ -508,6 +508,8 @@ def do_rewards(label, raw_rewards, meta):
     handle_quest_progress(meta, progress_resource_added_count(inc, ""))
     if levels:
         new_quests = []
+        if "QuestComponent" not in meta:
+            meta['QuestComponent'] = []
         activate_unlocked_quests(new_quests, meta)
         merge_quest_progress(new_quests, meta['QuestComponent'], "output quest")
         merge_quest_progress(new_quests, session['quests'], "session quest")

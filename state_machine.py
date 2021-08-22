@@ -251,6 +251,8 @@ def do_state_rewards(state, reference_item, meta, playback_tend=False):
     handle_quest_progress(meta, progress_resource_added_count(state, "-"))
     if levels:
         new_quests = []
+        if "QuestComponent" not in meta:
+            meta['QuestComponent'] = []
         activate_unlocked_quests(new_quests, meta)
         merge_quest_progress(new_quests, meta['QuestComponent'], "output quest")
         merge_quest_progress(new_quests, session['quests'], "session quest")
