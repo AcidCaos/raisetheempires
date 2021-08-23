@@ -316,6 +316,7 @@ def handle_strength_upgrades(strength, unit):
 
 def init_battle(params):
     if 'target' not in params:
+        fleet_or_name = params['fleet'] if params['fleet'] else params['name']
         if params.get("name") == "AI":
             print("AI fleet")
             future_enemy_fleet = get_new_enemy_fleet_name()
@@ -333,25 +334,44 @@ def init_battle(params):
                        for baddy in enemy_fleet["units"]]
             friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
                           session['fleets'][get_previous_fleet_name(fleet_name) if get_previous_fleet_name(fleet_name) in session['fleets'] else get_previous_fleet_name(get_previous_fleet_name(fleet_name))]]
-        elif isinstance(simple_list(session['fleets'][params['fleet'] if params['fleet'] else params['name']])[0], str):
+        elif fleet_or_name in session['fleets'] and isinstance(simple_list(session['fleets'][fleet_or_name])[0], str):
             print("Ally direct target")
             friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                          session['fleets'][params['fleet'] if params['fleet'] else params['name']]]
-            if simple_list(session['fleets'][get_next_fleet_name(params['fleet'] if params['fleet'] else params['name'])])[0].get("name") == "FleetName":
+                          session['fleets'][fleet_or_name]]
+            if simple_list(session['fleets'][get_next_fleet_name(fleet_or_name)])[0].get("name") == "FleetName":
                 baddies = [lookup_item_by_code(baddy.split(',')[0]) for sub_fleet in
-                           simple_list(session['fleets'][get_next_fleet_name(params['fleet'] if params['fleet'] else params['name'])])
+                           simple_list(session['fleets'][get_next_fleet_name(fleet_or_name)])
                            for baddy in sub_fleet["units"]]
             else:
                 baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in
-                           simple_list(session['fleets'][get_next_fleet_name(params['fleet'] if params['fleet'] else params['name'])])
+                           simple_list(session['fleets'][get_next_fleet_name(fleet_or_name)])
                            for baddy, count in sub_fleet.items()
                            for i in range(int(count))]
-        else :
-            baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][params['fleet'] if params['fleet'] else params['name']])
+        elif fleet_or_name in session['fleets']:
+            baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][fleet_or_name])
                        for baddy, count in sub_fleet.items()
                        for i in range(int(count))]
             friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                          session['fleets'][get_previous_fleet_name(params['fleet'] if params['fleet'] else params['name'])]]
+                          session['fleets'][get_previous_fleet_name(fleet_or_name)]]
+        else:
+            open_quests = [e["name"] for e in session["quests"] if e["complete"] == False]
+            task = None
+            friendlies = None
+            for q in open_quests:
+                quest = lookup_quest(q)
+                tasks = get_tasks(quest)
+                task = [t for t in tasks if t["_action"] == "fight" and t.get("_fleetname") == params['fleet']]
+                if task:
+                    task = task[0]
+                    friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                                  session['fleets'][get_friendly_by_ally_fleet(params['name'])]]
+                    break
+
+            enemy_fleet = lookup_item_by_code(task["_item"])
+            baddies = [lookup_item_by_code(baddie_slot["-item"]) for baddie_slot in simple_list(enemy_fleet["baddie"])]
+            if not friendlies:
+                friendlies = [lookup_item_by_code(friendly[1:]) for friendly, count in task["fleet"].items() for i in
+                              range(int(count))]
     elif params['target'].startswith('fleet'):
         baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][params['target']])
                    for baddy, count in sub_fleet.items()
@@ -408,6 +428,11 @@ def get_previous_fleet_name(name):
 def get_next_fleet_name(name):
     print("Using next fleet as baddies for ally targeted consumables")
     return name[:5] + str(int(name[5:name.index('_')]) + 1) + name[name.index('_'):]
+
+
+def get_friendly_by_ally_fleet(name):
+    print("Using corresponding friendly fleet for ally consumable")
+    return [fleet[5:] for fleet in session["fleets"] if fleet.startswith('ally_') and name in session["fleets"][fleet]][0]
 
 
 def unit_roll(attacker_weak, defender_weak):
