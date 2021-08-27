@@ -18,7 +18,8 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 | Version | Update | Release date |  Source  | Download |
 | ------- | ------ | ------------ | ------ | -------- |
-| **alpha 0.07a**   | **Return of the Flash**       | January 13, 2021   | :label: [tag](../../releases/tag/0.07a) | :tickets: [**Installer**](../../releases/download/0.07a/empires-setup_0.07a.exe) |
+| **alpha 0.08a-preview1** | **Titan Update: Part I** | August 27, 2021 | :label: [tag](../../releases/tag/0.08a-preview1) | :tickets: [**Installer**](../../releases/download/0.08a-preview1/empires-setup_0.08a-preview1.exe) |
+| alpha 0.07a   | Return of the Flash       | January 13, 2021   | :label: [tag](../../releases/tag/0.07a) | :tickets: [Installer](../../releases/download/0.07a/empires-setup_0.07a.exe) |
 | alpha 0.06a   | Invasion Update       | July 11, 2020   | :label: [tag](../../releases/tag/0.06a) | :tickets: [Installer](../../releases/download/0.06a/empires-setup_0.06a.exe) |
 | alpha 0.05a   | Multiplayer Update       | February 3, 2020   | :label: [tag](../../releases/tag/0.05a) | :tickets: [Installer](../../releases/download/0.05a/empires-setup_0.05.exe) |
 | alpha 0.04a   | Combat Update            | November 14, 2019  | :label: [tag](../../releases/tag/0.04a) | :tickets: [Installer](../../releases/download/0.04a/empires-setup_0.04.exe) |
