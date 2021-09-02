@@ -5,8 +5,8 @@
 The Old Empires & Allies preservation project by the Raise the Empires team.
 This project is dedicated to preserving this Flash game so that it's not lost to time.
 
-[![version](https://img.shields.io/badge/version-0.07a-blue)](../../releases/tag/0.07a)
-[![size](https://img.shields.io/badge/size-249%20MB-brightgreen)](#)
+[![version](https://img.shields.io/badge/version-0.08a-blue)](../../releases/tag/0.08a-preview1)
+[![size](https://img.shields.io/badge/size-730%20MB-brightgreen)](#)
 [![downloads](https://img.shields.io/github/downloads/AcidCaos/raisetheempires/total?label=downloads%40all)](../../releases/latest)
 
 ---
