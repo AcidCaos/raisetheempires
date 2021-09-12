@@ -1,5 +1,7 @@
 import os
 
+from quest_settings import quest_titles
+
 os.environ["PBR_VERSION"] = '5.4.3'
 if not os.environ.get('EDITOR'):
     os.environ["EDITOR"] = 'notepad'  # system specific!
@@ -33,6 +35,7 @@ from game_settings import get_zid, initial_island, random_image, randomReward, g
 import threading, webbrowser
 import pyamf.amf0
 import json
+import xml.etree.ElementTree as ET
 from flask_sqlalchemy import SQLAlchemy
 from quest_engine import *
 from state_machine import *
@@ -303,6 +306,50 @@ def patch_user_list(path, i, value):
         return ("Nope! You don't have a game session yet", 403)
 
 
+@app.route("/unlock_quest/<value>", methods=['GET', 'POST'])
+def unlock_quest(value):
+    if 'user_object' in session:
+        create_backup("Unlocked quest " + value)
+        new_quests=[]
+        meta = {}
+        new_quest_with_sequels(value, new_quests, meta, force=True)
+        merge_quest_progress(new_quests, session['quests'], "session quest")
+        session['saved'] = str(session.get('saved', "")) + "unlock"
+
+        response = make_response(redirect('/home.html'))
+        return response
+    else:
+        return ("Nope! You don't have a game session yet", 403)
+
+
+@app.route("/complete_quest/<value>", methods=['GET', 'POST'])
+def complete_quest(value):
+    if 'user_object' in session:
+        create_backup("Complete quest " + value)
+        new_quests=[]
+        meta = {}
+        handle_quest_progress(meta, progress_quest(value))
+        session['saved'] = str(session.get('saved', "")) + "complete"
+
+        response = make_response(redirect('/home.html'))
+        return response
+    else:
+        return ("Nope! You don't have a game session yet", 403)
+
+
+@app.route("/remove_quest/<value>", methods=['GET', 'POST'])
+def remove_quest(value):
+    if 'user_object' in session:
+        create_backup("Remove quest " + value)
+        session['quests'] = [e for e in session['quests'] if e["name"] != value]
+        session['saved'] = str(session.get('saved', "")) + "remove"
+
+        response = make_response(redirect('/home.html'))
+        return response
+    else:
+        return ("Nope! You don't have a game session yet", 403)
+
+
 @app.route("/save-editor", methods=['GET'])
 def save_editor():
     backups = []
@@ -313,6 +360,9 @@ def save_editor():
         s = s["backup"]
         backup_count += 1
     print("Backups present", backup_count)
+
+    incomplete_quests = [e["name"] for e in session['quests'] if e["complete"] == False]
+    complete_quests = [e["name"] for e in session['quests'] if e["complete"]]
 
     return render_template("save-editor.html", savegame=json.dumps(
         {
@@ -325,7 +375,12 @@ def save_editor():
             'saved': session['saved'] if 'saved' in session else None,
             'save_version': session['save_version'] if 'save_version' in session else None,
             'original_save_version': session['original_save_version'] if 'original_save_version' in session else None,
-        }, default=lambda o: '<not serializable>', sort_keys=False, indent=2), uid=get_zid(), backups=backups, valid=validate_save(session, False))
+        }, default=lambda o: '<not serializable>', sort_keys=False, indent=2), uid=get_zid(), backups=backups,
+                           valid=validate_save(session, False),
+                           quest_names={q: v for q, v in quest_titles.items() if q not in complete_quests and q not in incomplete_quests},
+                           incomplete_quest_names={q: v for q, v in quest_titles.items() if q in incomplete_quests},
+                           complete_quest_names={q: v for q, v in quest_titles.items() if q in complete_quests}
+                           )
 
 
 @app.route("/save-editor", methods=['POST'])
@@ -2267,6 +2322,18 @@ def dummy_response():
     dummy_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
     return dummy_response
+
+
+@app.route("/language_editor")
+def language_editor():
+    tree = ET.parse("assets/29oct2012/en_US.xml")
+    root = tree.getroot()
+    for pkg in root:
+        print(pkg.tag, pkg.attrib)
+        for text in pkg:
+            print("  ",text.tag, text.attrib)
+
+    return '', 204
 
 
 

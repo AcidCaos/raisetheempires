@@ -35,6 +35,12 @@ def progress_quest_task(name, index):
         progress_total_amount(task["_total"], task["_total"], extra, progress)
 
 
+def progress_quest(name):
+    return lambda task, progress, i, extra, quest_name, *args: \
+        quest_name == name and \
+        progress_total_amount(task["_total"], task["_total"], extra, progress)
+
+
 def progress_feed(feed_name):
     return lambda task, progress, i, extra, quest_name, *args: \
         task["_action"] == "feedReceived" and \
@@ -365,14 +371,14 @@ def activate_sequels(session_quest, new_quests, meta):
         new_quest_with_sequels(sequel["_name"], new_quests, meta)
 
 
-def new_quest_with_sequels(name, new_quests, meta):
+def new_quest_with_sequels(name, new_quests, meta, force=False):
     if name in [e['name'] for e in session['quests']]:
         print("sequel", name, "already in session quests")
     elif new_quests is not None and name in [e['name'] for e in new_quests]:
         print("sequel", name, "already in new quests")
     else:
         q = lookup_quest(name)
-        if matches_requirement(q):
+        if matches_requirement(q) or force:
             print("Activating sequel", name)
             new_sequel_quest = new_quest(q)
             new_quests.append(new_sequel_quest)

@@ -76,7 +76,85 @@
 										<div class="uiHeader uiHeaderBottomBorder mhl mts uiHeaderPage interstitialHeader">
 											<div class="clearfix uiHeaderTop">
 												<div>
-													<h2 class="uiHeaderTitle" aria-hidden="true"> Raise The Empires Save Editor uid: {{uid}}</h2>
+													<h2 class="uiHeaderTitle" aria-hidden="true" style="display: inline"> Raise The Empires Save Editor uid: {{uid}}</h2>
+													<div style="display: inline">
+														<ul class="rfloat" style="color:#fff;">
+															<li>
+																<b>
+																	<div style="position:relative; display: inline-block; vertical-align: top; text-align: left;" class="uiButton uiButtonConfirm">
+																		<p style="margin-top:8px;">Cheat menu</p>
+																	</div>
+																</b>
+																<ul class="dropdownUser">
+																	<li><a href="#" onclick="return false">More Resources</a>
+																		<ul class="third-level-menu" style="width: 60px; left: -60px;">
+																			<li><a href="/gazillionaire"><img style="width:25px;" src="layouts/epoints.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/world/resources/coins/int/100000"><img style="width:25px;" src="layouts/Coins_96.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/world/resources/wood/int/100000"><img style="width:25px;" src="layouts/WoodStack_01_96.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/world/resources/oil/int/100000"><img style="width:25px;" src="layouts/Oil_96.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/world/resources/aluminum/int/100000"><img style="width:25px;" src="layouts/Aluminum_60.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/world/resources/copper/int/100000"><img style="width:25px;" src="layouts/Copper_60.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/world/resources/gold/int/100000"><img style="width:25px;" src="layouts/Gold_60.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/world/resources/iron/int/100000"><img style="width:25px;" src="layouts/Iron_60.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/world/resources/uranium/int/100000"><img style="width:25px;" src="layouts/Uranium_60.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/player/level/int/85">
+																				<div style="position:relative; text-align:center; display: inline-block;" title="Gain levels (click XP below next)">
+																					<img src="layouts/xp.png" style="width:30px;">
+																					<div style="position:absolute; top:40%; left:50%; transform: translate(-50%, -50%); color:black;">
+																						85
+																					</div>
+																				</div></a></li>
+																			<li><a href="/patch/user_object/userInfo/player/xp/int/234454">
+																				<div style="position:relative; text-align:center; display: inline-block;" title="Matching XP (after clicking levels)">
+																					<img src="layouts/xp.png" style="width:30px;">
+																					<div style="position:absolute; top:40%; left:10%; transform: translate(-25%, -40%); color:black;">
+																						<img src="layouts/xp.png" style="width:30px;">
+																					</div>
+																				</div></a></li>
+																		</ul>
+																	<li>
+
+																	<li><a href="#" onclick="return false">Change ore</a>
+																		<ul class="third-level-menu" style="width: 60px; left: -60px;">
+																			<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/3"><img style="width:25px;" src="layouts/Aluminum_60.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/4"><img style="width:25px;" src="layouts/Copper_60.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/5"><img style="width:25px;" src="layouts/Gold_60.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/6"><img style="width:25px;" src="layouts/Iron_60.png"></a></li>
+																			<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/7"><img style="width:25px;" src="layouts/Uranium_60.png"></a></li>
+																		</ul>
+																	</li>
+																	<li><a href="#" onclick="return false">Unlock quests</a>
+																		<ul class="third-level-menu" style="width: 250px; left: -250px;">
+																			{% for key, value in quest_names | dictsort  %}
+																				<li><a href="/unlock_quest/{{ key }}">{{value}} ({{ key }})</a></li>
+																			{% endfor %}
+																		</ul>
+																	</li>
+																	<li><a href="#" onclick="return false">Complete current quests</a>
+																		<ul class="third-level-menu" style="width: 250px; left: -250px;">
+																			{% for key, value in incomplete_quest_names | dictsort  %}
+																				<li><a href="/complete_quest/{{ key }}">{{value}} ({{ key }})</a></li>
+																			{% endfor %}
+																		</ul>
+																	</li>
+																	<li><a href="#" onclick="return false">Remove current quests</a>
+																		<ul class="third-level-menu" style="width: 250px; left: -250px;">
+																			{% for key, value in incomplete_quest_names | dictsort  %}
+																				<li><a href="/remove_quest/{{ key }}">{{value}} ({{ key }})</a></li>
+																			{% endfor %}
+																		</ul>
+																	</li>
+																	<li><a href="#" onclick="return false">Remove completed quests</a>
+																		<ul class="third-level-menu" style="width: 250px; left: -250px;">
+																			{% for key, value in complete_quest_names | dictsort  %}
+																				<li><a href="/remove_quest/{{ key }}">{{value}} ({{ key }})</a></li>
+																			{% endfor %}
+																		</ul>
+																	</li>
+																</ul>
+															</li>
+														</ul>
+													</div>
 													{% if not valid %}<div style="color: crimson; font-size: 40px;"><b>Your savegame is corrupt.</b></div>
 													<div style="color: crimson; font-size: 20px;">Restore a backup or fix your error. Your save game is required to have a "user object" key, beneath that a "userInfo" key and a "player" key with all needed attributes.</div>{% endif %}
 
