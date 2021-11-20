@@ -84,7 +84,6 @@ def index():
 
 @app.route("/home.html")
 def home():
-    default_empireName = os.environ['COMPUTERNAME'][:1].upper()+os.environ['COMPUTERNAME'].lower()[1:]
     print("home")
     if not validate_save(session, True):
         print("Invalid save game")
@@ -95,7 +94,7 @@ def home():
                            allies=json.dumps(get_allies_friend(saves),
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
                            app_friends=json.dumps(get_allies_id(saves)),
-                           computername=session['user_object']["userInfo"]["worldName"] if 'user_object' in session else default_empireName,
+                           computername=session['user_object']["userInfo"]["worldName"] if 'user_object' in session else "Emperor",
                            picture=get_avatar_pic(),
                            dropdown_items=get_sessions_dropdown_info(saves)
                            )
@@ -1032,8 +1031,6 @@ def init_user():
     #     "hp": None
     # }
 
-    worldName_ComputerName=os.environ['COMPUTERNAME'][:1].upper()+os.environ['COMPUTERNAME'].lower()[1:]+'\'s Empire'
-
     user = {
         "userInfo": {
             "player": {
@@ -1159,7 +1156,7 @@ def init_user():
                     "deathMatch": None
                 }
             },
-            "worldName": worldName_ComputerName,
+            "worldName": "Rising Empire",
             "titanName": "Titan",
             "isCIP": False,
             "dominanceDefaultFleets": [],
