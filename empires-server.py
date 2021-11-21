@@ -76,6 +76,9 @@ app.config['SESSION_SQLALCHEMY'] = db
 app.config['SESSION_COOKIE_HTTPONLY'] = False
 app.permanent_session_lifetime = timedelta(weeks=520)
 
+MIN_ADMIN_ID = -1
+STEELE_ID = -1
+MAX_ADMIN_ID = 123
 
 @app.route("/")
 def index():
@@ -1375,7 +1378,7 @@ def user_response():
     activate_unlocked_quests(new_quests, meta)
 
     for neighbor in user["neighbors"]:
-        if neighbor["uid"] in [-1, 123]:
+        if neighbor["uid"] in [MIN_ADMIN_ID, MAX_ADMIN_ID]:
             neighbor["level"] =  user["userInfo"]["player"]["level"] + 5
 
     if session.get('save_version') != version:
@@ -1383,7 +1386,6 @@ def user_response():
         migrate(meta, session.get('save_version'), version)
 
     sleep(0.05)  # bugfix required delay for loading entire screen
-
 
     # for e in session['user_object']["userInfo"]["world"]["objects"]:
     #     e['lastUpdated'] = 1308211628  #1 minute earlier to test
@@ -1690,7 +1692,7 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
     if step == "decoCrewBuyOnce":
         decoration = lookup_object(id)
         item = lookup_item_by_name(item_name)
-        decoration["crewInfo"] = [-1, -1 , -1]
+        decoration["crewInfo"] = [-1, -1, -1]
         print("staffing full")
 
     if step == "randomRewards":
@@ -2071,18 +2073,21 @@ def load_world_response(params):
         print("reloading user from save")
     else:
         ally = copy.deepcopy(init_user()["userInfo"])
+        if int(params[0]) == STEELE_ID:
+            ally["world"]["sizeX"] = 100
+            ally["world"]["sizeY"] = 100
         ally["player"]["uid"] = int(params[0])
         if str(params[0]) in allies:
-            if allies[str(params[0])]["objects"]:
+            if "objects" in allies[str(params[0])]:
                 ally["world"]["objects"] = allies[str(params[0])]["objects"]
-            if allies[str(params[0])]["roads"]:
+            if "roads" in allies[str(params[0])]:
                 ally["world"]["roadData"] = allies[str(params[0])]["roads"]
             ##Added
-            if allies[str(params[0])]["expansions"]:
+            if "expansions" in allies[str(params[0])]:
                 ally["expansions"] = allies[str(params[0])]["expansions"]
-            if allies[str(params[0])]["worldName"]:
+            if "worldName" in allies[str(params[0])]:
                 ally["worldName"] = allies[str(params[0])]["worldName"]
-            if allies[str(params[0])]["titanName"]:
+            if "titanName" in allies[str(params[0])]:
                 ally["titanName"] = allies[str(params[0])]["titanName"]
         else:
             [save] = [save for save in get_saves() if str(save['user_object']["userInfo"]["player"]["uid"]) == str(params[0])]
