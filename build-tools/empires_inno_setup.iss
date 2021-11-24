@@ -4,7 +4,7 @@
 #define MyAppName "RaiseTheEmpires"
 #define MyAppVersion "0.08a"
 #define MyAppPublisher "RaiseTheEmpires"
-#define MyAppURL "https://github.com/AcidCaos/empires-and-allies"
+#define MyAppURL "https://github.com/AcidCaos/raisetheempires"
 #define MyAppExeName "empires-server.exe"
 
 [Setup]
