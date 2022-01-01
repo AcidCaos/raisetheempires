@@ -1,4 +1,54 @@
 upcoming
+    Fix shield upgrade out of sync Nat 01/01/2022 18:41
+    Fix ore contract Nat 26/12/2021 17:00
+    Update MyAppURL AcidCaos* 24/11/2021 14:20
+    Steele's island: fixed shadow bug AcidCaos 21/11/2021 11:39
+    Steele's island: building states, units AcidCaos 20/11/2021 21:18
+    Minor change: Default user and empire names. AcidCaos 20/11/2021 20:13
+    Cheat menu Nat 12/09/2021 21:37
+    Readme update Willy030125* 02/09/2021 11:54
+    Readme: 0.08a-preview1 release Willy030125* 27/08/2021 14:02
+    Fix quest fights for using allies Nat 23/08/2021 02:14
+    Quests with ask for things (not parts) can be asked for and received automatically Nat 22/08/2021 16:27
+    fix invasion quests Nat 22/08/2021 12:50
+    fix quest unlocks by leveling Nat 22/08/2021 05:35
+    neighbor's expansion reverted back Willy030125* 22/08/2021 01:56
+    fix task skipping for EP only skipping the selected task Nat 21/08/2021 19:57
+    updated savespack Willy030125* 21/08/2021 16:19
+    fix error could happen because profilePic is null Willy030125* 21/08/2021 14:42
+    Added three Tier 9 Units Willy030125* 21/08/2021 04:54
+    Quests unlocking now take level requirements into account, limited time quests not part of the main questline become accessible, quest with fight tasks Nat 15/08/2021 16:59
+    fix damage quests for some units Nat 15/08/2021 00:24
+    Titanic research screens Nat 09/08/2021 19:55
+    Escaping special characters in computer/profilename Nat 09/08/2021 18:57
+    Fix quests about adding allies: include created neighbors Nat 09/08/2021 18:08
+    Increase loading performance Nat 09/08/2021 17:02
+    new webpages icon Willy030125* 09/08/2021 16:21
+    fully working avatar selection Willy030125* 09/08/2021 16:13
+    Storing chromium profile in the my games dir and unblocking flash on install Nat 09/08/2021 11:26
+    Using app mode for chromium (as safety) Nat 08/08/2021 23:19
+    Suppressing chromium flash warnings Nat 08/08/2021 22:08
+    Fix secret weapon quest Nat 08/08/2021 22:07
+    Fix chromium launch with keeping working directory intact (and with linux support) Nat 08/08/2021 16:39
+    Fix collateral damage when dead units were in between Nat 08/08/2021 16:21
+    chromium x86 support on setup installation Willy030125* 04/08/2021 11:52
+    new installation setup and app icon Willy030125* 03/08/2021 07:31
+    Caching system for mods for increased performance Nat 02/08/2021 22:41
+    fix notepad showing blank because of chromium path Willy030125* 02/08/2021 17:37
+    relocate Titan savespack into separate folder Willy030125* 02/08/2021 07:48
+    fixed 'Meet the Neighbors' quest, no more stuck Willy030125* 01/08/2021 18:09
+    return more images on avatar selection Willy030125* 01/08/2021 17:42
+    Added Titan by accessing savegame(just alpha test) Willy030125* 01/08/2021 15:22
+    Quest can be skipped + chromium launch by default Willy030125* 01/08/2021 12:47
+    Added new flash installer (32.0.0.371) Willy030125* 01/08/2021 12:41
+    Delete old flash installer Willy030125* 01/08/2021 12:39
+    Fix: disable buggy mod AcidCaos 23/04/2021 19:58
+    Readme: added Chromium instruction Willy030125* 29/01/2021 13:35
+    Readme: renamed nightly-releases link Willy030125* 29/01/2021 12:37
+    Readme: added PPAPI archive installer link AcidCaos* 28/01/2021 17:15
+    Readme: added Chromium AcidCaos* 28/01/2021 15:28
+    Readme: Firefox Updates AcidCaos* 27/01/2021 17:57
+    Update README: Flash Continuation AcidCaos* 27/01/2021 13:50
 alpha v0.07a
     0.07a release Nat 13/01/2021 04:31
     update mods md AcidCaos* 13/01/2021 02:04

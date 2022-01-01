@@ -314,6 +314,17 @@ def handle_strength_upgrades(strength, unit):
     return strength
 
 
+def handle_shield_upgrades(friendlies, player_unit_id):
+    research = session['user_object']["userInfo"]["world"]["research"]
+    upgrades = research.get(friendlies[player_unit_id]["-code"], [])
+    for upgrade in upgrades:
+        upgrade_item = lookup_item_by_code(upgrade)
+        mod_shield = upgrade_item["modifier"].get("-shields")
+        if mod_shield:
+            return True
+    return False
+
+
 def init_battle(params):
     if 'target' not in params:
         fleet_or_name = params['fleet'] if params['fleet'] else params['name']
@@ -414,6 +425,7 @@ def init_battle(params):
         baddie_strengths = [get_unit_max_strength(baddie, False, params) for baddie in baddies]
         friendly_strengths = [get_unit_max_strength(friendly, True) for friendly in friendlies]
         active_consumables = []
+        defenseshield_upgrade_activate(friendlies, active_consumables)
         session["battle"] = (friendly_strengths, baddie_strengths, active_consumables)
     else:
         (friendly_strengths, baddie_strengths, active_consumables) = session["battle"]
@@ -1052,6 +1064,14 @@ def defenseshield_activate(friendlies, active_consumables, selected_consumable):
     for i in range(len(friendlies)):
         active_consumables.append((selected_consumable, ('ally',i), 9999999))
         print('ally: ' , i)
+
+
+def defenseshield_upgrade_activate(friendlies, active_consumables):
+    for i in range(len(friendlies)):
+        if handle_shield_upgrades(friendlies, i):
+            selected_consumable = lookup_item_by_code('N75')
+            active_consumables.append((selected_consumable, ('ally',i), 9999999))
+            print('ally shielded: ' , i)
 
 
 
