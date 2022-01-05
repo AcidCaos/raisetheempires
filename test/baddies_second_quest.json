@@ -1,0 +1,76 @@
+[
+  {
+    "-name": "pirateTank01",
+    "-type": "npc",
+    "-subtype": "army",
+    "-unitClass": "tank",
+    "-placeable": "true",
+    "-storable": "true",
+    "-buyable": "true",
+    "-code": "PU3",
+    "unit": {
+      "-type": "tank,land",
+      "-strength": "50",
+      "-weak": "1",
+      "FX": {
+        "-death": "Land_Death_Tank"
+      }
+    },
+    "components": "WorldUnitComponent,TutorialArrowComponent",
+    "tooltip": {
+      "-type": "unit",
+      "-key": "vehicle01_Tooltip"
+    },
+    "requiredLevel": "10",
+    "cost": {
+      "-coins": "1250",
+      "-workers": "8",
+      "-oil": "130",
+      "-nrare3": "7"
+    },
+    "researchTemplate": "T02",
+    "canBuildOn": "P",
+    "sizeX": "1",
+    "sizeY": "1",
+    "sizeZ": "0.25",
+    "stateMachineValues": {
+      "-stateMachineName": "DumbAIStateMachine"
+    },
+    "referenceImage": {
+      "define": [
+        {
+          "-name": "$Icon",
+          "-value": "assets/game/units/Units_Land_Icons.swf/Unit_Land_Tank_Lvl01_SW_icon.png"
+        },
+        {
+          "-name": "$IconOffset",
+          "-value": "4,1"
+        }
+      ]
+    },
+    "image": [
+      {
+        "-name": "ne_run",
+        "-offset": "4,-14",
+        "-url": "assets/game/units/Units_Land_Start.swf/Unit_Land_Tank_Lvl01_NE.png",
+        "weapon": {
+          "-id": "Cannon_NE",
+          "-anchorPoint": "50.0,2.0"
+        }
+      },
+      {
+        "-name": "sw_run",
+        "-offset": "6,-14",
+        "-url": "assets/game/units/Units_Land_Start.swf/Unit_Land_Tank_Lvl01_SW.png",
+        "weapon": {
+          "-id": "Cannon_SW",
+          "-anchorPoint": "24.0,16.0"
+        }
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/units/Units_Land_Icons.swf/Unit_Land_Tank_Lvl01_SW_icon.png"
+      }
+    ]
+  }
+]

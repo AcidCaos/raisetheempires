@@ -1,0 +1,241 @@
+[
+  {
+    "-name": "infantry01",
+    "-type": "Buildable",
+    "-subtype": "army",
+    "-unitClass": "antitank",
+    "-placeable": "true",
+    "-storable": "true",
+    "-buyable": "true",
+    "-code": "U01",
+    "-unlockOverrideName": "Barracks 01",
+    "unit": {
+      "-type": "antitank,land",
+      "-strength": "30",
+      "-energy": "-1",
+      "-tier": "1",
+      "FX": {
+        "-death": "Land_Death_Infantry",
+        "-sel": "Sel_Infantry_Heavy"
+      }
+    },
+    "components": "WorldUnitComponent",
+    "tooltip": {
+      "-type": "unit",
+      "-key": "infantry01_Tooltip"
+    },
+    "researchTemplate": "T01",
+    "canBuildOn": "LPRM",
+    "sizeX": "1",
+    "sizeY": "1",
+    "sizeZ": "1",
+    "loc": {
+      "-sentenceName": "true",
+      "-sentenceNameOverride": "true"
+    },
+    "referenceValues": {
+      "-stateMachineName": "DefaultContractStateMachine",
+      "-referenceName": "Barracks 01",
+      "define": [
+        {
+          "-name": "$ProducesBuildable",
+          "-value": "1",
+          "-produces": "1"
+        },
+        {
+          "-name": "$HarvestTooltip",
+          "-value": "unit_harvesting"
+        },
+        {
+          "-name": "$HarvestableTooltip",
+          "-value": "unit_harvestable"
+        },
+        {
+          "-name": "$MaturingDuration",
+          "-value": "3m",
+          "-maturingDuration": "1"
+        },
+        {
+          "-name": "$HarvestXp",
+          "-value": "0"
+        }
+      ]
+    },
+    "referenceImage": {
+      "define": [
+        {
+          "-name": "$Icon",
+          "-value": "assets/game/units/Units_Land_Icons.swf/Unit_Land_AntiTank_Infantry_Lvl01_SW_Icon.png"
+        },
+        {
+          "-name": "$IconOffset",
+          "-value": "3,0"
+        }
+      ]
+    },
+    "image": [
+      {
+        "-name": "sw",
+        "-offset": "0,-31",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": [
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_IDLA_SW",
+            "-anchorPoint": "42.0,82.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_IDLA_SW",
+            "-anchorPoint": "52.0,62.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_IDLA_SW",
+            "-anchorPoint": "12.0,72.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_IDLA_SW",
+            "-anchorPoint": "22.0,52.0"
+          }
+        ]
+      },
+      {
+        "-name": "sw_run",
+        "-offset": "0,-31",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": [
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_SW",
+            "-anchorPoint": "60.0,107.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_SW",
+            "-anchorPoint": "40.0,87.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_SW",
+            "-anchorPoint": "50.0,67.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_SW",
+            "-anchorPoint": "10.0,77.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_SW",
+            "-anchorPoint": "20.0,57.0"
+          }
+        ],
+        "weapon": [
+          {
+            "-id": "Grenade_SW",
+            "-anchorPoint": "41.0,86.0",
+            "-delay": "0.35s"
+          },
+          {
+            "-id": "Grenade_SW",
+            "-anchorPoint": "21.0,66.0",
+            "-delay": "0.1s"
+          },
+          {
+            "-id": "Grenade_SW",
+            "-anchorPoint": "31.0,46.0",
+            "-delay": "0.2s"
+          },
+          {
+            "-id": "Grenade_SW",
+            "-anchorPoint": "-9.0,56.0",
+            "-delay": "0.5s"
+          },
+          {
+            "-id": "Grenade_SW",
+            "-anchorPoint": "1.0,36.0"
+          }
+        ]
+      },
+      {
+        "-name": "ne_run",
+        "-offset": "0,-31",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": [
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_NE",
+            "-anchorPoint": "56.0,107.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_NE",
+            "-anchorPoint": "36.0,87.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_NE",
+            "-anchorPoint": "46.0,67.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_NE",
+            "-anchorPoint": "6.0,77.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_NE",
+            "-anchorPoint": "16.0,57.0"
+          }
+        ],
+        "weapon": [
+          {
+            "-id": "Grenade_NE",
+            "-anchorPoint": "71.0,75.0",
+            "-delay": "0.35s"
+          },
+          {
+            "-id": "Grenade_NE",
+            "-anchorPoint": "51.0,55.0",
+            "-delay": "0.1s"
+          },
+          {
+            "-id": "Grenade_NE",
+            "-anchorPoint": "61.0,35.0",
+            "-delay": "0.2s"
+          },
+          {
+            "-id": "Grenade_NE",
+            "-anchorPoint": "21.0,45.0",
+            "-delay": "0.5s"
+          },
+          {
+            "-id": "Grenade_NE",
+            "-anchorPoint": "31.0,25.0"
+          }
+        ]
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/units/Units_Land_Icons.swf/Unit_Land_AntiTank_Infantry_Lvl01_SW_Icon.png"
+      }
+    ],
+    "part": [
+      {
+        "-code": "B01",
+        "-countv1": "2",
+        "-countv2": "4",
+        "-countv3": "1"
+      },
+      {
+        "-code": "B02",
+        "-countv1": "2",
+        "-countv2": "4",
+        "-countv3": "1"
+      },
+      {
+        "-code": "B09",
+        "-countv1": "2",
+        "-countv2": "4",
+        "-countv3": "1"
+      }
+    ],
+    "requiredLevel": "1",
+    "cost": {
+      "-coins": "100",
+      "-cash": "2"
+    },
+    "marketPrice": "125",
+    "defenseRangeX": "3",
+    "defenseRangeY": "3",
+    "masteryTokenCost": "0"
+  }
+]

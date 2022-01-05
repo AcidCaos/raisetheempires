@@ -1,0 +1,177 @@
+[
+  {
+    "-name": "pirateinfantry01",
+    "-type": "npc",
+    "-subtype": "army",
+    "-unitClass": "antitank",
+    "-placeable": "true",
+    "-buyable": "true",
+    "-code": "PU1",
+    "unit": {
+      "-type": "antitank,land",
+      "-strength": "25",
+      "-weak": "1",
+      "-goodAgainst": "vehicle04,plane16,ship05",
+      "against": [
+        {
+          "-type": "tank",
+          "-mod": "3"
+        },
+        {
+          "-type": "antiairland",
+          "-mod": "2"
+        }
+      ],
+      "FX": {
+        "-death": "Land_Death_Infantry"
+      }
+    },
+    "components": "WorldUnitComponent,TutorialArrowComponent,tutorialStencil",
+    "requiredLevel": "4",
+    "sizeX": "1",
+    "sizeY": "1",
+    "sizeZ": "0.25",
+    "stateMachineValues": {
+      "-stateMachineName": "DumbAIStateMachine"
+    },
+    "image": [
+      {
+        "-name": "sw",
+        "-offset": "0,-31",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": [
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_IDLA_SW",
+            "-anchorPoint": "62.0,102.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_IDLA_SW",
+            "-anchorPoint": "42.0,82.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_IDLA_SW",
+            "-anchorPoint": "52.0,62.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_IDLA_SW",
+            "-anchorPoint": "12.0,72.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_IDLA_SW",
+            "-anchorPoint": "22.0,52.0"
+          }
+        ]
+      },
+      {
+        "-name": "sw_run",
+        "-offset": "0,-31",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": [
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_SW",
+            "-anchorPoint": "60.0,107.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_SW",
+            "-anchorPoint": "40.0,87.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_SW",
+            "-anchorPoint": "50.0,67.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_SW",
+            "-anchorPoint": "10.0,77.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_SW",
+            "-anchorPoint": "20.0,57.0"
+          }
+        ],
+        "weapon": [
+          {
+            "-id": "Cannon_SW",
+            "-anchorPoint": "41.0,86.0",
+            "-delay": "0.35s"
+          },
+          {
+            "-id": "Cannon_SW",
+            "-anchorPoint": "21.0,66.0",
+            "-delay": "0.1s"
+          },
+          {
+            "-id": "Cannon_SW",
+            "-anchorPoint": "31.0,46.0",
+            "-delay": "0.2s"
+          },
+          {
+            "-id": "Cannon_SW",
+            "-anchorPoint": "-9.0,56.0",
+            "-delay": "0.5s"
+          },
+          {
+            "-id": "Cannon_SW",
+            "-anchorPoint": "1.0,36.0"
+          }
+        ]
+      },
+      {
+        "-name": "ne_run",
+        "-offset": "0,-31",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": [
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_NE",
+            "-anchorPoint": "56.0,107.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_NE",
+            "-anchorPoint": "36.0,87.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_NE",
+            "-anchorPoint": "46.0,67.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_NE",
+            "-anchorPoint": "6.0,77.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl01_RUNA_NE",
+            "-anchorPoint": "16.0,57.0"
+          }
+        ],
+        "weapon": [
+          {
+            "-id": "Cannon_NE",
+            "-anchorPoint": "71.0,75.0",
+            "-delay": "0.35s"
+          },
+          {
+            "-id": "Cannon_NE",
+            "-anchorPoint": "51.0,55.0",
+            "-delay": "0.1s"
+          },
+          {
+            "-id": "Cannon_NE",
+            "-anchorPoint": "61.0,35.0",
+            "-delay": "0.2s"
+          },
+          {
+            "-id": "Cannon_NE",
+            "-anchorPoint": "21.0,45.0",
+            "-delay": "0.5s"
+          },
+          {
+            "-id": "Cannon_NE",
+            "-anchorPoint": "31.0,25.0"
+          }
+        ]
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/units/Units_Land_Icons.swf/Unit_Land_AntiTank_Infantry_Lvl01_SW_Icon.png"
+      }
+    ]
+  }
+]

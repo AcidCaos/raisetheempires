@@ -50,8 +50,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.07a.2022_01_01"
-release_date = 'Saturday, 1 January 2022'
+version = "0.07a.2022_01_05"
+release_date = 'Wednesday, 5 January 2022'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']

@@ -1,6 +1,8 @@
 import json
+
 import pytest
 from flask import Flask, session
+
 import battle_engine
 
 app = Flask(__name__)
@@ -49,6 +51,79 @@ def test_init_battle_invade_self_consumable():
     run_init_battle_invade({'id': 3, 'ch': 2985, 'level': 0, 'name': 'fleet14_2341959767162880', 'fleet': None, 'map': None, 'code': 'N02'})
 
 
+def test_init_battle_first_quest():
+    run_init_battle_dynamic(
+        {'id': [0, 0], 'fleet': 'fleet1_2341959767162880', 'target': 'Q6016', 'ch': 3027, 'map': None},
+        [lambda s: s.setdefault('quests', default=[
+            {'name': 'Q6016', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+            {'name': 'Q0531', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q0516', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1}]),
+         lambda s: s.setdefault('user_object', default={'userInfo': {'world': {'research': {}}}})],
+        'friendlies_first_quest.json', [30], 'baddies_first_quest.json', [25], []
+    )
+
+
+def test_init_battle_ai_first_quest():
+    run_init_battle_dynamic(
+        {'fleet': 'fleet1_2341959767162880', 'target': 'Q6016', 'ch': 3028, 'map': None},
+        [lambda s: s.setdefault('quests', default=[
+            {'name': 'Q6016', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+            {'name': 'Q0531', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q0516', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1}]),
+         lambda s: s.setdefault('user_object', default={'userInfo': {'world': {'research': {}}}})],
+        'friendlies_first_quest.json', [30], 'baddies_first_quest.json', [25], []
+    )
+
+
+def test_init_battle_second_quest():
+    run_init_battle_dynamic(
+        {'id': [1, 0], 'fleet': 'fleet3_2341959767162880', 'target': 'Q6019', 'ch': 3069, 'map': None},
+        [lambda s: s.setdefault('quests', default=[
+            {'name': 'Q6019', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+            {'name': 'Q0633', 'complete': True, 'expired': False, 'progress': [1, 2, 1], 'completedTasks': 7},
+            {'name': 'Q0676', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+            {'name': 'Q0521', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+            {'name': 'Q0691', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q0671', 'complete': True, 'expired': False, 'progress': [2, 2], 'completedTasks': 3},
+            {'name': 'Q0571', 'complete': True, 'expired': False, 'progress': [1, 1], 'completedTasks': 3},
+            {'name': 'Q0591', 'complete': True, 'expired': False, 'progress': [4], 'completedTasks': 1},
+            {'name': 'Q1098', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q6011', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q0611', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q6016', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q0531', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q0516', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1}]),
+         lambda s: s.setdefault('user_object', default={'userInfo': {'world': {'research': {}}}})],
+        'friendlies_second_quest.json', [30, 40], 'baddies_second_quest.json', [50], []
+    )
+
+
+def test_init_battle_ai_second_quest():
+    run_init_battle_dynamic(
+        {'fleet': 'fleet3_2341959767162880', 'target': 'Q6019', 'ch': 3070, 'map': None},
+        [lambda s: s.setdefault('quests', default=[
+            {'name': 'Q6019', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+            {'name': 'Q0633', 'complete': True, 'expired': False, 'progress': [1, 2, 1], 'completedTasks': 7},
+            {'name': 'Q0676', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+            {'name': 'Q0521', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+            {'name': 'Q0691', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q0671', 'complete': True, 'expired': False, 'progress': [2, 2], 'completedTasks': 3},
+            {'name': 'Q0571', 'complete': True, 'expired': False, 'progress': [1, 1], 'completedTasks': 3},
+            {'name': 'Q0591', 'complete': True, 'expired': False, 'progress': [4], 'completedTasks': 1},
+            {'name': 'Q1098', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q6011', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q0611', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q6016', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q0531', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+            {'name': 'Q0516', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1}]),
+         lambda s: s.setdefault('user_object', default={'userInfo': {'world': {'research': {}}}})],
+        'friendlies_second_quest.json', [30, 40], 'baddies_second_quest.json', [50], []
+    )
+
+
+
+
+
 def run_init_battle(params):
     with app.test_request_context():
         setup_session()
@@ -71,6 +146,21 @@ def run_init_battle_invade(params):
         log_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths)
 
 
+def run_init_battle_dynamic(params, setup_session_funcs, expected_friendlies_json, expected_friendly_strengths, expected_baddies_json,
+                          expected_baddie_strengths, expected_active_consumables):
+    with app.test_request_context():
+        for setup_session_func in setup_session_funcs:
+            setup_session_func(session)
+
+        friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables = \
+            battle_engine.init_battle(params)
+
+        assert_dynamic_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths, expected_friendlies_json, expected_friendly_strengths, expected_baddies_json,
+                          expected_baddie_strengths, expected_active_consumables)
+        log_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths)
+
+
+
 def log_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths):
     print("friendlies", repr(friendlies))
     print("friendly_strengths", repr(friendly_strengths))
@@ -80,46 +170,52 @@ def log_result(active_consumables, baddie_strengths, baddies, friendlies, friend
 
 
 def assert_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths):
-    with open('friendlies.json', 'r') as f:
+    assert_dynamic_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths,
+                          'friendlies.json', [300, 300], 'baddies.json', [120, 200, 150], [])
+
+
+def assert_dynamic_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths,
+                          expected_friendlies_json, expected_friendly_strengths, expected_baddies_json,
+                          expected_baddie_strengths, expected_active_consumables):
+    with open(expected_friendlies_json, 'r') as f:
         assert friendlies == json.load(f)
-    assert friendly_strengths == [300, 300]
-    with open('baddies.json', 'r') as f:
+    assert friendly_strengths == expected_friendly_strengths
+    with open(expected_baddies_json, 'r') as f:
         assert baddies == json.load(f)
-    assert baddie_strengths == [120, 200, 150]
-    assert active_consumables == []
+    assert baddie_strengths == expected_baddie_strengths
+    assert active_consumables == expected_active_consumables
 
 
 def assert_result_invade(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths):
-    with open('friendlies_invade.json', 'r') as f:
-        assert friendlies == json.load(f)
-    assert friendly_strengths == [180.0, 180.0, 780, 780, 340]
-    with open('baddies_invade.json', 'r') as f:
-        assert baddies == json.load(f)
-    assert baddie_strengths == [40, 40, 30, 30, 30]
-    assert active_consumables == [({'-name': 'consumable75', '-type': 'consumable', '-subtype': 'consumable',
-                                    '-storable': 'true', '-buyable': 'true', '-code': 'N75', '-version': '2',
-                                    'requiredLevel': '10', 'cost': {'-cash': '30'}, 'tooltip': {'-type': 'consumable'},
-                                    'consumable': {'-duration': '0', '-energy': '0', '-type': 'all',
-                                                   '-diweapon': 'DefenseShield', '-postWait': '1s',
-                                                   '-givesAbility': 'shield'}, 'image': [
-            {'-name': 'icon', '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_96.png'},
-            {'-name': 'cursor', '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_49.png'}],
-                                    'loc': {'-sentenceName': 'true'},
-                                    'requiredExperiment': {'-name': 'empires_consumable_2', '-variants': '3'}},
-                                   ('ally', 0), 9999999),
-                                  ({'-name': 'consumable75', '-type': 'consumable', '-subtype': 'consumable',
-                                    '-storable': 'true', '-buyable': 'true', '-code': 'N75', '-version': '2',
-                                    'requiredLevel': '10', 'cost': {'-cash': '30'}, 'tooltip': {'-type': 'consumable'},
-                                    'consumable': {'-duration': '0', '-energy': '0', '-type': 'all',
-                                                   '-diweapon': 'DefenseShield', '-postWait': '1s',
-                                                   '-givesAbility': 'shield'}, 'image': [
-                                          {'-name': 'icon',
-                                           '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_96.png'},
-                                          {'-name': 'cursor',
-                                           '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_49.png'}],
-                                    'loc': {'-sentenceName': 'true'},
-                                    'requiredExperiment': {'-name': 'empires_consumable_2', '-variants': '3'}},
-                                   ('ally', 1), 9999999)]
+    assert_dynamic_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths,
+                          'friendlies_invade.json', [180.0, 180.0, 780, 780, 340], 'baddies_invade.json',
+                          [40, 40, 30, 30, 30],
+                          [({'-name': 'consumable75', '-type': 'consumable', '-subtype': 'consumable',
+                             '-storable': 'true', '-buyable': 'true', '-code': 'N75', '-version': '2',
+                             'requiredLevel': '10', 'cost': {'-cash': '30'}, 'tooltip': {'-type': 'consumable'},
+                             'consumable': {'-duration': '0', '-energy': '0', '-type': 'all',
+                                            '-diweapon': 'DefenseShield', '-postWait': '1s',
+                                            '-givesAbility': 'shield'}, 'image': [
+                                  {'-name': 'icon',
+                                   '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_96.png'},
+                                  {'-name': 'cursor',
+                                   '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_49.png'}],
+                             'loc': {'-sentenceName': 'true'},
+                             'requiredExperiment': {'-name': 'empires_consumable_2', '-variants': '3'}},
+                            ('ally', 0), 9999999),
+                           ({'-name': 'consumable75', '-type': 'consumable', '-subtype': 'consumable',
+                             '-storable': 'true', '-buyable': 'true', '-code': 'N75', '-version': '2',
+                             'requiredLevel': '10', 'cost': {'-cash': '30'}, 'tooltip': {'-type': 'consumable'},
+                             'consumable': {'-duration': '0', '-energy': '0', '-type': 'all',
+                                            '-diweapon': 'DefenseShield', '-postWait': '1s',
+                                            '-givesAbility': 'shield'}, 'image': [
+                                   {'-name': 'icon',
+                                    '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_96.png'},
+                                   {'-name': 'cursor',
+                                    '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_49.png'}],
+                             'loc': {'-sentenceName': 'true'},
+                             'requiredExperiment': {'-name': 'empires_consumable_2', '-variants': '3'}},
+                            ('ally', 1), 9999999)])
 
 
 def setup_session():

@@ -1,4 +1,6 @@
 upcoming
+    More testing Nat 05/01/2022 23:20
+    Add testing to prevent bugs Nat 05/01/2022 17:46
     Fix shield upgrade out of sync Nat 01/01/2022 18:41
     Fix ore contract Nat 26/12/2021 17:00
     Update MyAppURL AcidCaos* 24/11/2021 14:20
