@@ -13,3 +13,4 @@ xmldiff
 jsonpatch
 tqdm
 setuptools
+pytest

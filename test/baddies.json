@@ -1,0 +1,707 @@
+[
+  {
+    "-name": "ship18",
+    "-type": "Buildable",
+    "-subtype": "navy",
+    "-unitClass": "attackship",
+    "-placeable": "true",
+    "-storable": "true",
+    "-buyable": "true",
+    "-code": "U58",
+    "unit": {
+      "-type": "attackship,ship",
+      "-broadside": "1",
+      "-strength": "120",
+      "-energy": "-1",
+      "-tier": "4",
+      "FX": {
+        "-death": "Sea_Death"
+      }
+    },
+    "tooltip": {
+      "-type": "unit",
+      "-key": "Ship18_tooltip"
+    },
+    "components": "WorldUnitComponent",
+    "researchTemplate": "T04",
+    "sizeX": "2",
+    "sizeY": "3",
+    "sizeZ": "1",
+    "loc": {
+      "-sentenceName": "true"
+    },
+    "canBuildOn": "WV",
+    "referenceValues": {
+      "-stateMachineName": "DefaultContractStateMachine",
+      "-referenceName": "Drydocks 02",
+      "define": [
+        {
+          "-name": "$ProducesBuildable",
+          "-value": "1",
+          "-produces": "1"
+        },
+        {
+          "-name": "$HarvestTooltip",
+          "-value": "unit_harvesting"
+        },
+        {
+          "-name": "$HarvestableTooltip",
+          "-value": "unit_harvestable"
+        },
+        {
+          "-name": "$MaturingDuration",
+          "-value": "4h",
+          "-maturingDuration": "1"
+        },
+        {
+          "-name": "$HarvestXp",
+          "-value": "0"
+        }
+      ]
+    },
+    "referenceImage": {
+      "define": [
+        {
+          "-name": "$Icon",
+          "-value": "assets/game/units/Units_Sea_Icons.swf/Unit_Sea_AntiShip_Lvl04_SW_icon.png"
+        },
+        {
+          "-name": "$IconOffset",
+          "-value": "4,1"
+        }
+      ]
+    },
+    "image": [
+      {
+        "-name": "sw",
+        "-offset": "-24,-58",
+        "-url": "assets/game/units/Units_Sea.swf/Unit_Sea_AntiShip_Lvl04_Map_SW.png"
+      },
+      {
+        "-name": "se",
+        "-offset": "-5,-6",
+        "-url": "assets/game/units/Units_Sea.swf/Unit_Sea_AntiShip_Lvl04_SE.png",
+        "weapon": [
+          {
+            "-id": "Torpedo_SW",
+            "-target": "navy",
+            "-anchorPoint": "107.0,51.0",
+            "-background": "1"
+          },
+          {
+            "-id": "Torpedo_SW",
+            "-target": "navy",
+            "-anchorPoint": "88.0,60.0",
+            "-background": "1",
+            "-delay": "0.25s"
+          },
+          {
+            "-id": "Torpedo_SW",
+            "-target": "navy",
+            "-anchorPoint": "107.0,51.0",
+            "-background": "1",
+            "-delay": "0.50s"
+          },
+          {
+            "-id": "Torpedo_SW",
+            "-target": "navy",
+            "-anchorPoint": "88.0,60.0",
+            "-background": "1",
+            "-delay": "0.75s"
+          },
+          {
+            "-id": "VMachineGun01_SW",
+            "-anchorPoint": "46.0,23.0"
+          },
+          {
+            "-id": "VMachineGun01_SW",
+            "-anchorPoint": "46.0,23.0",
+            "-delay": "0.25s"
+          },
+          {
+            "-id": "VMachineGun01_SW",
+            "-anchorPoint": "46.0,23.0",
+            "-delay": "0.50s"
+          },
+          {
+            "-id": "VMachineGun01_SW",
+            "-anchorPoint": "46.0,23.0",
+            "-delay": "0.75s"
+          }
+        ],
+        "wake": {
+          "-name": "Wake_SE",
+          "-anchorPoint": "97.0,50.0"
+        }
+      },
+      {
+        "-name": "nw",
+        "-offset": "6,0",
+        "-url": "assets/game/units/Units_Sea.swf/Unit_Sea_AntiShip_Lvl04_NW.png",
+        "weapon": [
+          {
+            "-id": "Torpedo_NE",
+            "-target": "navy",
+            "-anchorPoint": "7.0,30.0",
+            "-background": "1"
+          },
+          {
+            "-id": "Torpedo_NE",
+            "-target": "navy",
+            "-anchorPoint": "26.0,21.0",
+            "-background": "1",
+            "-delay": "0.25s"
+          },
+          {
+            "-id": "Torpedo_NE",
+            "-target": "navy",
+            "-anchorPoint": "7.0,30.0",
+            "-background": "1",
+            "-delay": "0.50s"
+          },
+          {
+            "-id": "Torpedo_NE",
+            "-target": "navy",
+            "-anchorPoint": "26.0,21.0",
+            "-background": "1",
+            "-delay": "0.75s"
+          },
+          {
+            "-id": "VMachineGun01_NE",
+            "-anchorPoint": "68.0,29.0"
+          },
+          {
+            "-id": "VMachineGun01_NE",
+            "-anchorPoint": "68.0,29.0",
+            "-delay": "0.25s"
+          },
+          {
+            "-id": "VMachineGun01_NE",
+            "-anchorPoint": "68.0,29.0",
+            "-delay": "0.50s"
+          },
+          {
+            "-id": "VMachineGun01_NE",
+            "-anchorPoint": "68.0,29.0",
+            "-delay": "0.75s"
+          }
+        ],
+        "wake": {
+          "-name": "Wake_NW",
+          "-anchorPoint": "18.0,37.0"
+        }
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/units/Units_Sea_Icons.swf/Unit_Sea_AntiShip_Lvl04_SW_icon.png"
+      }
+    ],
+    "part": [
+      {
+        "-code": "B01",
+        "-countv1": "6",
+        "-countv2": "8",
+        "-countv3": "5"
+      },
+      {
+        "-code": "B04",
+        "-countv1": "6",
+        "-countv2": "8",
+        "-countv3": "5"
+      },
+      {
+        "-code": "B20",
+        "-countv1": "6",
+        "-countv2": "8",
+        "-countv3": "5"
+      },
+      {
+        "-code": "B21",
+        "-countv1": "5",
+        "-countv2": "7",
+        "-countv3": "4"
+      }
+    ],
+    "requiredLevel": "35",
+    "cost": {
+      "-coins": "3500",
+      "-oil": "175",
+      "-nrare3": "14",
+      "-cash": "43"
+    },
+    "marketPrice": "12250",
+    "defenseRangeX": "8",
+    "defenseRangeY": "9",
+    "masteryTokenCost": "0"
+  },
+  {
+    "-name": "ship27",
+    "-type": "Buildable",
+    "-subtype": "navy",
+    "-unitClass": "navy_support",
+    "-placeable": "true",
+    "-storable": "true",
+    "-buyable": "true",
+    "-code": "SU02",
+    "unit": {
+      "-type": "navy_support,ship",
+      "-broadside": "1",
+      "-secondary": "N61",
+      "-strength": "200",
+      "-energy": "-1",
+      "-tier": "3",
+      "FX": {
+        "-death": "Sea_Death"
+      }
+    },
+    "tooltip": {
+      "-type": "support_unit",
+      "-key": "Ship27_tooltip"
+    },
+    "components": "WorldUnitComponent",
+    "canBuildOn": "WV",
+    "requiredExperiment": {
+      "-name": "empires_support_units",
+      "-variants": "3,4,5"
+    },
+    "sizeX": "2",
+    "sizeY": "3",
+    "sizeZ": "1",
+    "loc": {
+      "-sentenceName": "true"
+    },
+    "referenceValues": {
+      "-stateMachineName": "SupportContractStateMachine",
+      "-referenceName": "support docks 01",
+      "define": [
+        {
+          "-name": "$ProducesBuildable",
+          "-value": "1",
+          "-produces": "1"
+        },
+        {
+          "-name": "$HarvestTooltip",
+          "-value": "unit_harvesting"
+        },
+        {
+          "-name": "$HarvestableTooltip",
+          "-value": "unit_harvestable"
+        },
+        {
+          "-name": "$MaturingDuration",
+          "-value": "4h",
+          "-maturingDuration": "1"
+        },
+        {
+          "-name": "$HarvestXp",
+          "-value": "0"
+        }
+      ]
+    },
+    "referenceImage": {
+      "define": [
+        {
+          "-name": "$Icon",
+          "-value": "assets/game/units/Units_Sea_Icons.swf/Unit_Sea_04_SW_icon.png"
+        },
+        {
+          "-name": "$IconOffset",
+          "-value": "5,1"
+        }
+      ]
+    },
+    "image": [
+      {
+        "-name": "sw",
+        "-offset": "-27,-62",
+        "-url": "assets/game/units/Units_Sea.swf/Unit_Sea_04_Map_SW.png"
+      },
+      {
+        "-name": "se",
+        "-offset": "-2,-8",
+        "-url": "assets/game/units/Units_Sea.swf/Unit_Sea_04_SE.png",
+        "weapon": [
+          {
+            "-id": "Cannon_Large_SW",
+            "-anchorPoint": "39.0,32.0"
+          },
+          {
+            "-id": "Cannon_Large_SW",
+            "-anchorPoint": "21.0,23.0",
+            "-delay": ".15s"
+          },
+          {
+            "-id": "ElementZ_Cannon_Land_SW",
+            "-target": "sa",
+            "-delay": ".15s",
+            "-anchorPoint": "39.0,32.0"
+          },
+          {
+            "-id": "ElementZ_Cannon_Land_SW",
+            "-target": "sa",
+            "-delay": ".30s",
+            "-anchorPoint": "21.0,23.0"
+          },
+          {
+            "-id": "ElementZ_Cannon_Land_SW",
+            "-target": "sa",
+            "-delay": ".45s",
+            "-anchorPoint": "39.0,32.0"
+          },
+          {
+            "-id": "ElementZ_Cannon_Land_SW",
+            "-target": "sa",
+            "-delay": ".60s",
+            "-anchorPoint": "21.0,23.0"
+          }
+        ],
+        "wake": {
+          "-name": "Wake_SE",
+          "-anchorPoint": "72.0,51.0"
+        }
+      },
+      {
+        "-name": "nw",
+        "-offset": "3,-6",
+        "-url": "assets/game/units/Units_Sea.swf/Unit_Sea_04_NW.png",
+        "weapon": [
+          {
+            "-id": "Cannon_Large_NE",
+            "-anchorPoint": "61.0,5.0"
+          },
+          {
+            "-id": "Cannon_Large_NE",
+            "-anchorPoint": "79.0,14.0",
+            "-delay": ".15s"
+          },
+          {
+            "-id": "ElementZ_Cannon_Land_NE",
+            "-target": "sa",
+            "-delay": ".15s",
+            "-anchorPoint": "79.0,14.0"
+          },
+          {
+            "-id": "ElementZ_Cannon_Land_NE",
+            "-target": "sa",
+            "-delay": ".30s",
+            "-anchorPoint": "61.0,5.0"
+          },
+          {
+            "-id": "ElementZ_Cannon_Land_NE",
+            "-target": "sa",
+            "-delay": ".45s",
+            "-anchorPoint": "79.0,14.0"
+          },
+          {
+            "-id": "ElementZ_Cannon_Land_NE",
+            "-target": "sa",
+            "-delay": ".60s",
+            "-anchorPoint": "61.0,5.0"
+          }
+        ],
+        "wake": {
+          "-name": "Wake_NW",
+          "-anchorPoint": "28.0,31.0"
+        }
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/units/Units_Sea_Icons.swf/Unit_Sea_04_SW_icon.png"
+      }
+    ],
+    "requiredLevel": "35",
+    "cost": {
+      "-coins": "15000",
+      "-oil": "400",
+      "-cash": "198"
+    },
+    "marketPrice": "28750",
+    "defenseRangeX": "8",
+    "defenseRangeY": "9",
+    "masteryTokenCost": "0"
+  },
+  {
+    "-name": "ship19",
+    "-type": "Buildable",
+    "-subtype": "navy",
+    "-unitClass": "attackship",
+    "-placeable": "true",
+    "-storable": "true",
+    "-buyable": "true",
+    "-code": "U63",
+    "-unlockOverrideName": "Drydocks 03",
+    "unit": {
+      "-type": "attackship,ship",
+      "-broadside": "1",
+      "-strength": "150",
+      "-energy": "-1",
+      "-tier": "5",
+      "FX": {
+        "-death": "Sea_Death"
+      }
+    },
+    "tooltip": {
+      "-type": "unit",
+      "-key": "Ship19_tooltip"
+    },
+    "components": "WorldUnitComponent",
+    "canBuildOn": "WV",
+    "researchTemplate": "T05",
+    "sizeX": "2",
+    "sizeY": "3",
+    "sizeZ": "1",
+    "loc": {
+      "-sentenceName": "true"
+    },
+    "referenceValues": {
+      "-stateMachineName": "DefaultContractStateMachine",
+      "-referenceName": "Drydocks 03",
+      "define": [
+        {
+          "-name": "$ProducesBuildable",
+          "-value": "1",
+          "-produces": "1"
+        },
+        {
+          "-name": "$HarvestTooltip",
+          "-value": "unit_harvesting"
+        },
+        {
+          "-name": "$HarvestableTooltip",
+          "-value": "unit_harvestable"
+        },
+        {
+          "-name": "$MaturingDuration",
+          "-value": "8h",
+          "-maturingDuration": "1"
+        },
+        {
+          "-name": "$HarvestXp",
+          "-value": "0"
+        }
+      ]
+    },
+    "referenceImage": {
+      "define": [
+        {
+          "-name": "$Icon",
+          "-value": "assets/game/units/Units_Sea_Icons.swf/Unit_Sea_AntiShip_Lvl05_SW_icon.png"
+        },
+        {
+          "-name": "$IconOffset",
+          "-value": "4,0"
+        }
+      ]
+    },
+    "image": [
+      {
+        "-name": "sw",
+        "-offset": "-27,-57",
+        "-url": "assets/game/units/Units_Sea.swf/Unit_Sea_AntiShip_Lvl05_Map_SW.png"
+      },
+      {
+        "-name": "se",
+        "-offset": "-2,-5",
+        "-url": "assets/game/units/Units_Sea.swf/Unit_Sea_AntiShip_Lvl05_SE.png",
+        "wake": {
+          "-name": "Wake_SE",
+          "-anchorPoint": "93.0,53.0"
+        },
+        "weapon": [
+          {
+            "-id": "Torpedo_SW",
+            "-target": "navy",
+            "-anchorPoint": "100.0,55.0",
+            "-background": "1"
+          },
+          {
+            "-id": "Torpedo_SW",
+            "-target": "navy",
+            "-anchorPoint": "82.0,64.0",
+            "-background": "1",
+            "-delay": "0.25s"
+          },
+          {
+            "-id": "Torpedo_SW",
+            "-target": "navy",
+            "-anchorPoint": "100.0,55.0",
+            "-background": "1",
+            "-delay": "0.50s"
+          },
+          {
+            "-id": "Torpedo_SW",
+            "-target": "navy",
+            "-anchorPoint": "82.0,64.0",
+            "-background": "1",
+            "-delay": "0.75s"
+          },
+          {
+            "-id": "Torpedo_SW",
+            "-target": "navy",
+            "-anchorPoint": "100.0,55.0",
+            "-background": "1",
+            "-delay": "1.00s"
+          },
+          {
+            "-id": "Torpedo_SW",
+            "-target": "navy",
+            "-anchorPoint": "82.0,64.0",
+            "-background": "1",
+            "-delay": "1.25s"
+          },
+          {
+            "-id": "VMachineGun01_SW",
+            "-anchorPoint": "42.0,24.0"
+          },
+          {
+            "-id": "VMachineGun01_SW",
+            "-anchorPoint": "42.0,24.0",
+            "-delay": "0.15s"
+          },
+          {
+            "-id": "VMachineGun01_SW",
+            "-anchorPoint": "42.0,24.0",
+            "-delay": "0.30s"
+          },
+          {
+            "-id": "VMachineGun01_SW",
+            "-anchorPoint": "42.0,24.0",
+            "-delay": "0.45s"
+          },
+          {
+            "-id": "VMachineGun01_SW",
+            "-anchorPoint": "42.0,24.0",
+            "-delay": "0.60s"
+          },
+          {
+            "-id": "VMachineGun01_SW",
+            "-anchorPoint": "42.0,24.0",
+            "-delay": "0.75s"
+          }
+        ]
+      },
+      {
+        "-name": "nw",
+        "-offset": "3,-2",
+        "-url": "assets/game/units/Units_Sea.swf/Unit_Sea_AntiShip_Lvl05_NW.png",
+        "wake": {
+          "-name": "Wake_NW",
+          "-anchorPoint": "19.0,29.0"
+        },
+        "weapon": [
+          {
+            "-id": "Torpedo_NE",
+            "-target": "navy",
+            "-anchorPoint": "12.0,27.0",
+            "-background": "1"
+          },
+          {
+            "-id": "Torpedo_NE",
+            "-target": "navy",
+            "-anchorPoint": "30.0,18.0",
+            "-background": "1",
+            "-delay": "0.25s"
+          },
+          {
+            "-id": "Torpedo_NE",
+            "-target": "navy",
+            "-anchorPoint": "12.0,27.0",
+            "-background": "1",
+            "-delay": "0.50s"
+          },
+          {
+            "-id": "Torpedo_NE",
+            "-target": "navy",
+            "-anchorPoint": "30.0,18.0",
+            "-background": "1",
+            "-delay": "0.75s"
+          },
+          {
+            "-id": "Torpedo_NE",
+            "-target": "navy",
+            "-anchorPoint": "12.0,27.0",
+            "-background": "1",
+            "-delay": "1.00s"
+          },
+          {
+            "-id": "Torpedo_NE",
+            "-target": "navy",
+            "-anchorPoint": "30.0,18.0",
+            "-background": "1",
+            "-delay": "1.25s"
+          },
+          {
+            "-id": "VMachineGun01_NE",
+            "-anchorPoint": "70.0,19.0"
+          },
+          {
+            "-id": "VMachineGun01_NE",
+            "-anchorPoint": "70.0,19.0",
+            "-delay": "0.15s"
+          },
+          {
+            "-id": "VMachineGun01_NE",
+            "-anchorPoint": "70.0,19.0",
+            "-delay": "0.30s"
+          },
+          {
+            "-id": "VMachineGun01_NE",
+            "-anchorPoint": "70.0,19.0",
+            "-delay": "0.45s"
+          },
+          {
+            "-id": "VMachineGun01_NE",
+            "-anchorPoint": "70.0,19.0",
+            "-delay": "0.60s"
+          },
+          {
+            "-id": "VMachineGun01_NE",
+            "-anchorPoint": "70.0,19.0",
+            "-delay": "0.75s"
+          }
+        ]
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/units/Units_Sea_Icons.swf/Unit_Sea_AntiShip_Lvl05_SW_icon.png"
+      }
+    ],
+    "part": [
+      {
+        "-code": "B01",
+        "-countv1": "7",
+        "-countv2": "9",
+        "-countv3": "6"
+      },
+      {
+        "-code": "B05",
+        "-countv1": "7",
+        "-countv2": "9",
+        "-countv3": "6"
+      },
+      {
+        "-code": "B20",
+        "-countv1": "7",
+        "-countv2": "9",
+        "-countv3": "6"
+      },
+      {
+        "-code": "B15",
+        "-countv1": "5",
+        "-countv2": "7",
+        "-countv3": "4"
+      }
+    ],
+    "requiredLevel": "48",
+    "cost": {
+      "-coins": "6000",
+      "-oil": "300",
+      "-nrare4": "30",
+      "-cash": "69"
+    },
+    "marketPrice": "22500",
+    "defenseRangeX": "8",
+    "defenseRangeY": "9",
+    "masteryTokenCost": "0"
+  }
+]

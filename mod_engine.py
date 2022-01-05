@@ -49,7 +49,7 @@ def get_cache_filename(original_path):
 
 
 mod = {}
-mod_folders = ['mods']
+mod_folders = [os.path.join(install_path(), 'mods')]
 mod_stats = []
 
 if my_games_path() != install_path():

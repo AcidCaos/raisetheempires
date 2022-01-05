@@ -15,7 +15,7 @@ if not debug:
 
 
 from save_engine import save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
-    get_saves, store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path
+    get_saves, store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path
 from save_migration import migrate
 from builtins import print
 from time import sleep
@@ -183,7 +183,7 @@ def get_sessions_info(saves):
             "socialLevelGood": save['user_object']["userInfo"]["player"]["socialLevelGood"],
             "socialXpBad": save['user_object']["userInfo"]["player"]["socialXpBad"],
             "socialLevelBad": save['user_object']["userInfo"]["player"]["socialLevelBad"],
-            "profilePic": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save else random_image(),
+            "profilePic": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save and save['profilePic'] is not None  else random_image(),
             "dominanceRank": 1,
             "pvpNumOccupiers": len([k for k, v in save['user_object']["pvp"]["invaders"].items() if k != "pve"]),
             "pvpNumOccupiersNotDefended": len([k for k, v in save['user_object']["pvp"]["invaders"].items() if k != "pve"]),
@@ -507,7 +507,7 @@ def choose_avatar(path):
     return response
 
 def get_avatar_pic():
-    avatar_pic = "layouts/avatars/" + session['profilePic'] if 'profilePic' in session else random_image()
+    avatar_pic = "layouts/avatars/" + session['profilePic'] if 'profilePic' in session and session['profilePic'] is not None else random_image()
     return avatar_pic
 
 @app.route("/changelog.txt")
@@ -528,10 +528,11 @@ def send_sol_assets_alternate(path):
 
 
 def send_from_directory_mod(directory, filename, **options):
-    path = safe_join(os.fspath(directory), os.fspath(filename))
+    absolute_directory = os.path.join(install_path(), directory)
+    path = safe_join(os.fspath(absolute_directory), os.fspath(filename))
     print(path)
 
-    return mod_engine.mod.get(path)() if path in mod_engine.mod else send_from_directory(directory, filename, **options)
+    return mod_engine.mod.get(path)() if path in mod_engine.mod else send_from_directory(absolute_directory, filename, **options)
 
 
 @app.route('/files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php', methods=['POST'])

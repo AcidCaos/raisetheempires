@@ -1,0 +1,926 @@
+[
+  {
+    "-name": "infantry05",
+    "-type": "Buildable",
+    "-subtype": "army",
+    "-unitClass": "antitank",
+    "-placeable": "true",
+    "-storable": "true",
+    "-buyable": "true",
+    "-code": "V06",
+    "-unlockOverrideName": "Barracks 03",
+    "unit": {
+      "-type": "antitank,land",
+      "-strength": "150",
+      "-energy": "-1",
+      "-tier": "5",
+      "FX": {
+        "-death": "Air_Death",
+        "-sel": "Sel_Vehicle"
+      }
+    },
+    "components": "WorldUnitComponent",
+    "tooltip": {
+      "-type": "unit",
+      "-key": "infantry05_Tooltip"
+    },
+    "researchTemplate": "T05",
+    "canBuildOn": "LPRM",
+    "sizeX": "1",
+    "sizeY": "1",
+    "sizeZ": "1",
+    "loc": {
+      "-sentenceName": "true",
+      "-sentenceNameOverride": "true"
+    },
+    "referenceValues": {
+      "-stateMachineName": "DefaultContractStateMachine",
+      "-referenceName": "Barracks 03",
+      "define": [
+        {
+          "-name": "$HarvestTooltip",
+          "-value": "unit_harvesting"
+        },
+        {
+          "-name": "$HarvestableTooltip",
+          "-value": "unit_harvestable"
+        },
+        {
+          "-name": "$ProducesBuildable",
+          "-value": "1",
+          "-produces": "1"
+        },
+        {
+          "-name": "$MaturingDuration",
+          "-value": "8h",
+          "-maturingDuration": "1"
+        },
+        {
+          "-name": "$HarvestXp",
+          "-value": "0"
+        }
+      ]
+    },
+    "referenceImage": {
+      "define": [
+        {
+          "-name": "$Icon",
+          "-value": "assets/game/units/Units_Land_Icons.swf/Unit_Land_AntiTank_Infantry_Lvl05_SW_Icon.png"
+        },
+        {
+          "-name": "$IconOffset",
+          "-value": "4,1"
+        }
+      ]
+    },
+    "image": [
+      {
+        "-name": "sw",
+        "-offset": "0,-31",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": [
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl05_IDLA_SW",
+            "-anchorPoint": "51.0,79.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl05_IDLA_SW",
+            "-anchorPoint": "21.0,59.0"
+          }
+        ]
+      },
+      {
+        "-name": "sw_run",
+        "-offset": "0,-31",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": [
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl05_RUNA_SW",
+            "-anchorPoint": "46.0,88.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl05_RUNA_SW",
+            "-anchorPoint": "16.0,68.0"
+          }
+        ],
+        "weapon": [
+          {
+            "-id": "Missile_Land_SW",
+            "-anchorPoint": "36.0,46.0",
+            "-delay": "0.1s"
+          },
+          {
+            "-id": "Missile_Land_SW",
+            "-anchorPoint": "6.0,36.0"
+          }
+        ]
+      },
+      {
+        "-name": "ne_run",
+        "-offset": "0,-31",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": [
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl05_RUNA_NE",
+            "-anchorPoint": "57.0,76.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl05_RUNA_NE",
+            "-anchorPoint": "27.0,56.0"
+          }
+        ],
+        "weapon": [
+          {
+            "-id": "Missile_Land_NE",
+            "-anchorPoint": "66.0,33.0",
+            "-delay": "0.5s"
+          },
+          {
+            "-id": "Missile_Land_NE",
+            "-anchorPoint": "36.0,23.0"
+          }
+        ]
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/units/Units_Land_Icons.swf/Unit_Land_AntiTank_Infantry_Lvl05_SW_Icon.png"
+      }
+    ],
+    "part": [
+      {
+        "-code": "B01",
+        "-countv1": "7",
+        "-countv2": "9",
+        "-countv3": "6"
+      },
+      {
+        "-code": "B02",
+        "-countv1": "7",
+        "-countv2": "9",
+        "-countv3": "6"
+      },
+      {
+        "-code": "B10",
+        "-countv1": "7",
+        "-countv2": "9",
+        "-countv3": "6"
+      },
+      {
+        "-code": "B12",
+        "-countv1": "5",
+        "-countv2": "7",
+        "-countv3": "4"
+      }
+    ],
+    "requiredLevel": "42",
+    "cost": {
+      "-coins": "6000",
+      "-oil": "300",
+      "-nrare1": "30",
+      "-cash": "69"
+    },
+    "marketPrice": "22500",
+    "defenseRangeX": "3",
+    "defenseRangeY": "3",
+    "masteryTokenCost": "0"
+  },
+  {
+    "-name": "infantry05",
+    "-type": "Buildable",
+    "-subtype": "army",
+    "-unitClass": "antitank",
+    "-placeable": "true",
+    "-storable": "true",
+    "-buyable": "true",
+    "-code": "V06",
+    "-unlockOverrideName": "Barracks 03",
+    "unit": {
+      "-type": "antitank,land",
+      "-strength": "150",
+      "-energy": "-1",
+      "-tier": "5",
+      "FX": {
+        "-death": "Air_Death",
+        "-sel": "Sel_Vehicle"
+      }
+    },
+    "components": "WorldUnitComponent",
+    "tooltip": {
+      "-type": "unit",
+      "-key": "infantry05_Tooltip"
+    },
+    "researchTemplate": "T05",
+    "canBuildOn": "LPRM",
+    "sizeX": "1",
+    "sizeY": "1",
+    "sizeZ": "1",
+    "loc": {
+      "-sentenceName": "true",
+      "-sentenceNameOverride": "true"
+    },
+    "referenceValues": {
+      "-stateMachineName": "DefaultContractStateMachine",
+      "-referenceName": "Barracks 03",
+      "define": [
+        {
+          "-name": "$HarvestTooltip",
+          "-value": "unit_harvesting"
+        },
+        {
+          "-name": "$HarvestableTooltip",
+          "-value": "unit_harvestable"
+        },
+        {
+          "-name": "$ProducesBuildable",
+          "-value": "1",
+          "-produces": "1"
+        },
+        {
+          "-name": "$MaturingDuration",
+          "-value": "8h",
+          "-maturingDuration": "1"
+        },
+        {
+          "-name": "$HarvestXp",
+          "-value": "0"
+        }
+      ]
+    },
+    "referenceImage": {
+      "define": [
+        {
+          "-name": "$Icon",
+          "-value": "assets/game/units/Units_Land_Icons.swf/Unit_Land_AntiTank_Infantry_Lvl05_SW_Icon.png"
+        },
+        {
+          "-name": "$IconOffset",
+          "-value": "4,1"
+        }
+      ]
+    },
+    "image": [
+      {
+        "-name": "sw",
+        "-offset": "0,-31",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": [
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl05_IDLA_SW",
+            "-anchorPoint": "51.0,79.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl05_IDLA_SW",
+            "-anchorPoint": "21.0,59.0"
+          }
+        ]
+      },
+      {
+        "-name": "sw_run",
+        "-offset": "0,-31",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": [
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl05_RUNA_SW",
+            "-anchorPoint": "46.0,88.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl05_RUNA_SW",
+            "-anchorPoint": "16.0,68.0"
+          }
+        ],
+        "weapon": [
+          {
+            "-id": "Missile_Land_SW",
+            "-anchorPoint": "36.0,46.0",
+            "-delay": "0.1s"
+          },
+          {
+            "-id": "Missile_Land_SW",
+            "-anchorPoint": "6.0,36.0"
+          }
+        ]
+      },
+      {
+        "-name": "ne_run",
+        "-offset": "0,-31",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": [
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl05_RUNA_NE",
+            "-anchorPoint": "57.0,76.0"
+          },
+          {
+            "-name": "Unit_Land_AntiTank_Infantry_Lvl05_RUNA_NE",
+            "-anchorPoint": "27.0,56.0"
+          }
+        ],
+        "weapon": [
+          {
+            "-id": "Missile_Land_NE",
+            "-anchorPoint": "66.0,33.0",
+            "-delay": "0.5s"
+          },
+          {
+            "-id": "Missile_Land_NE",
+            "-anchorPoint": "36.0,23.0"
+          }
+        ]
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/units/Units_Land_Icons.swf/Unit_Land_AntiTank_Infantry_Lvl05_SW_Icon.png"
+      }
+    ],
+    "part": [
+      {
+        "-code": "B01",
+        "-countv1": "7",
+        "-countv2": "9",
+        "-countv3": "6"
+      },
+      {
+        "-code": "B02",
+        "-countv1": "7",
+        "-countv2": "9",
+        "-countv3": "6"
+      },
+      {
+        "-code": "B10",
+        "-countv1": "7",
+        "-countv2": "9",
+        "-countv3": "6"
+      },
+      {
+        "-code": "B12",
+        "-countv1": "5",
+        "-countv2": "7",
+        "-countv3": "4"
+      }
+    ],
+    "requiredLevel": "42",
+    "cost": {
+      "-coins": "6000",
+      "-oil": "300",
+      "-nrare1": "30",
+      "-cash": "69"
+    },
+    "marketPrice": "22500",
+    "defenseRangeX": "3",
+    "defenseRangeY": "3",
+    "masteryTokenCost": "0"
+  },
+  {
+    "-name": "LE_BadgerX02_Tank",
+    "-setName": "SovereignSentinels02",
+    "-type": "Buildable",
+    "-subtype": "army",
+    "-unitClass": "tank",
+    "-placeable": "true",
+    "-storable": "true",
+    "-buyable": "true",
+    "-contractLocked": "true",
+    "-newItem": "true",
+    "-code": "UN33",
+    "unit": {
+      "-type": "tank,land",
+      "-strength": "780",
+      "-energy": "-1",
+      "-tier": "6",
+      "FX": {
+        "-death": "Land_Death_Tank",
+        "-sel": "Sel_Tank"
+      }
+    },
+    "components": "WorldUnitComponent",
+    "tooltip": {
+      "-type": "unit",
+      "-key": "vehicle05_Tooltip",
+      "-properties": "Season_August"
+    },
+    "requiredDate": {
+      "-start": "8/20/2012",
+      "-end": "9/06/2012"
+    },
+    "canBuildOn": "LPRM",
+    "sizeX": "1",
+    "sizeY": "1",
+    "sizeZ": "1",
+    "loc": {
+      "-sentenceName": "true"
+    },
+    "researchTemplate": "T06",
+    "referenceValues": {
+      "-stateMachineName": "DefaultContractStateMachine",
+      "-referenceName": "Barracks 03",
+      "define": [
+        {
+          "-name": "$ProducesBuildable",
+          "-value": "1",
+          "-produces": "1"
+        },
+        {
+          "-name": "$HarvestTooltip",
+          "-value": "unit_harvesting"
+        },
+        {
+          "-name": "$HarvestableTooltip",
+          "-value": "unit_harvestable"
+        },
+        {
+          "-name": "$MaturingDuration",
+          "-value": "18h",
+          "-maturingDuration": "1"
+        },
+        {
+          "-name": "$HarvestXp",
+          "-value": "0"
+        }
+      ]
+    },
+    "referenceImage": {
+      "define": [
+        {
+          "-name": "$Icon",
+          "-value": "assets/game/season/Seasons_August_2012.swf/Unit_Land_T8_BadgerX02_Tnk_01_SW_icon.png"
+        },
+        {
+          "-name": "$IconOffset",
+          "-value": "6,-1"
+        }
+      ]
+    },
+    "image": [
+      {
+        "-name": "sw",
+        "-offset": "7,-8",
+        "-url": "assets/game/season/Seasons_August_2012.swf/Unit_Land_T8_BadgerX02_Tnk_01_SW.png"
+      },
+      {
+        "-name": "ne_run",
+        "-offset": "-12,-25",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": {
+          "-name": "Unit_Land_T8_BadgerX02_Tnk_01_Anim_NE",
+          "-anchorPoint": "46.0,60.0"
+        },
+        "weapon": [
+          {
+            "-id": "Cannon_Large_NE",
+            "-anchorPoint": "59.0,9.0",
+            "-delay": "0.0s"
+          },
+          {
+            "-id": "Cannon_Large_NE",
+            "-anchorPoint": "74.0,16.0",
+            "-delay": "0.2s"
+          }
+        ]
+      },
+      {
+        "-name": "sw_run",
+        "-offset": "0,-19",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": {
+          "-name": "Unit_Land_T8_BadgerX02_Tnk_01_Anim_SW",
+          "-anchorPoint": "46.0,47.0"
+        },
+        "weapon": [
+          {
+            "-id": "Cannon_Large_SW",
+            "-anchorPoint": "32.0,26.0",
+            "-delay": "0.0s"
+          },
+          {
+            "-id": "Cannon_Large_SW",
+            "-anchorPoint": "17.0,18.0",
+            "-delay": "0.2s"
+          }
+        ]
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/season/Seasons_August_2012.swf/Unit_Land_T8_BadgerX02_Tnk_01_SW_icon.png"
+      }
+    ],
+    "partsExperiment": "empire_research_le_parts",
+    "part": [
+      {
+        "-code": "B01",
+        "-countv1": "13",
+        "-countv2": "13",
+        "-countv3": "12",
+        "-countv4": "11",
+        "-countv5": "14",
+        "-countv6": "15",
+        "-countv7": "16",
+        "-countv8": "18"
+      },
+      {
+        "-code": "B15",
+        "-countv1": "13",
+        "-countv2": "13",
+        "-countv3": "12",
+        "-countv4": "11",
+        "-countv5": "14",
+        "-countv6": "15",
+        "-countv7": "16",
+        "-countv8": "18"
+      },
+      {
+        "-code": "B16",
+        "-countv1": "13",
+        "-countv2": "13",
+        "-countv3": "12",
+        "-countv4": "11",
+        "-countv5": "14",
+        "-countv6": "15",
+        "-countv7": "16",
+        "-countv8": "18"
+      },
+      {
+        "-code": "L174",
+        "-countv1": "13",
+        "-countv2": "13",
+        "-countv3": "12",
+        "-countv4": "11",
+        "-countv5": "14",
+        "-countv6": "15",
+        "-countv7": "16",
+        "-countv8": "18"
+      }
+    ],
+    "requiredLevel": "50",
+    "cost": {
+      "-coins": "46800",
+      "-oil": "2340",
+      "-rare": "234",
+      "-cash": "40"
+    },
+    "marketPrice": "175500",
+    "defenseRangeX": "3",
+    "defenseRangeY": "3",
+    "masteryTokenCost": "0"
+  },
+  {
+    "-name": "LE_BadgerX02_Tank",
+    "-setName": "SovereignSentinels02",
+    "-type": "Buildable",
+    "-subtype": "army",
+    "-unitClass": "tank",
+    "-placeable": "true",
+    "-storable": "true",
+    "-buyable": "true",
+    "-contractLocked": "true",
+    "-newItem": "true",
+    "-code": "UN33",
+    "unit": {
+      "-type": "tank,land",
+      "-strength": "780",
+      "-energy": "-1",
+      "-tier": "6",
+      "FX": {
+        "-death": "Land_Death_Tank",
+        "-sel": "Sel_Tank"
+      }
+    },
+    "components": "WorldUnitComponent",
+    "tooltip": {
+      "-type": "unit",
+      "-key": "vehicle05_Tooltip",
+      "-properties": "Season_August"
+    },
+    "requiredDate": {
+      "-start": "8/20/2012",
+      "-end": "9/06/2012"
+    },
+    "canBuildOn": "LPRM",
+    "sizeX": "1",
+    "sizeY": "1",
+    "sizeZ": "1",
+    "loc": {
+      "-sentenceName": "true"
+    },
+    "researchTemplate": "T06",
+    "referenceValues": {
+      "-stateMachineName": "DefaultContractStateMachine",
+      "-referenceName": "Barracks 03",
+      "define": [
+        {
+          "-name": "$ProducesBuildable",
+          "-value": "1",
+          "-produces": "1"
+        },
+        {
+          "-name": "$HarvestTooltip",
+          "-value": "unit_harvesting"
+        },
+        {
+          "-name": "$HarvestableTooltip",
+          "-value": "unit_harvestable"
+        },
+        {
+          "-name": "$MaturingDuration",
+          "-value": "18h",
+          "-maturingDuration": "1"
+        },
+        {
+          "-name": "$HarvestXp",
+          "-value": "0"
+        }
+      ]
+    },
+    "referenceImage": {
+      "define": [
+        {
+          "-name": "$Icon",
+          "-value": "assets/game/season/Seasons_August_2012.swf/Unit_Land_T8_BadgerX02_Tnk_01_SW_icon.png"
+        },
+        {
+          "-name": "$IconOffset",
+          "-value": "6,-1"
+        }
+      ]
+    },
+    "image": [
+      {
+        "-name": "sw",
+        "-offset": "7,-8",
+        "-url": "assets/game/season/Seasons_August_2012.swf/Unit_Land_T8_BadgerX02_Tnk_01_SW.png"
+      },
+      {
+        "-name": "ne_run",
+        "-offset": "-12,-25",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": {
+          "-name": "Unit_Land_T8_BadgerX02_Tnk_01_Anim_NE",
+          "-anchorPoint": "46.0,60.0"
+        },
+        "weapon": [
+          {
+            "-id": "Cannon_Large_NE",
+            "-anchorPoint": "59.0,9.0",
+            "-delay": "0.0s"
+          },
+          {
+            "-id": "Cannon_Large_NE",
+            "-anchorPoint": "74.0,16.0",
+            "-delay": "0.2s"
+          }
+        ]
+      },
+      {
+        "-name": "sw_run",
+        "-offset": "0,-19",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": {
+          "-name": "Unit_Land_T8_BadgerX02_Tnk_01_Anim_SW",
+          "-anchorPoint": "46.0,47.0"
+        },
+        "weapon": [
+          {
+            "-id": "Cannon_Large_SW",
+            "-anchorPoint": "32.0,26.0",
+            "-delay": "0.0s"
+          },
+          {
+            "-id": "Cannon_Large_SW",
+            "-anchorPoint": "17.0,18.0",
+            "-delay": "0.2s"
+          }
+        ]
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/season/Seasons_August_2012.swf/Unit_Land_T8_BadgerX02_Tnk_01_SW_icon.png"
+      }
+    ],
+    "partsExperiment": "empire_research_le_parts",
+    "part": [
+      {
+        "-code": "B01",
+        "-countv1": "13",
+        "-countv2": "13",
+        "-countv3": "12",
+        "-countv4": "11",
+        "-countv5": "14",
+        "-countv6": "15",
+        "-countv7": "16",
+        "-countv8": "18"
+      },
+      {
+        "-code": "B15",
+        "-countv1": "13",
+        "-countv2": "13",
+        "-countv3": "12",
+        "-countv4": "11",
+        "-countv5": "14",
+        "-countv6": "15",
+        "-countv7": "16",
+        "-countv8": "18"
+      },
+      {
+        "-code": "B16",
+        "-countv1": "13",
+        "-countv2": "13",
+        "-countv3": "12",
+        "-countv4": "11",
+        "-countv5": "14",
+        "-countv6": "15",
+        "-countv7": "16",
+        "-countv8": "18"
+      },
+      {
+        "-code": "L174",
+        "-countv1": "13",
+        "-countv2": "13",
+        "-countv3": "12",
+        "-countv4": "11",
+        "-countv5": "14",
+        "-countv6": "15",
+        "-countv7": "16",
+        "-countv8": "18"
+      }
+    ],
+    "requiredLevel": "50",
+    "cost": {
+      "-coins": "46800",
+      "-oil": "2340",
+      "-rare": "234",
+      "-cash": "40"
+    },
+    "marketPrice": "175500",
+    "defenseRangeX": "3",
+    "defenseRangeY": "3",
+    "masteryTokenCost": "0"
+  },
+  {
+    "-name": "LE_Altay_Main_Battle_Tank",
+    "-setName": "InvasionIstanbul",
+    "-type": "Buildable",
+    "-subtype": "army",
+    "-unitClass": "tank",
+    "-placeable": "true",
+    "-storable": "true",
+    "-buyable": "true",
+    "-newItem": "true",
+    "-contractLocked": "true",
+    "-code": "UL61",
+    "unit": {
+      "-type": "tank,land",
+      "-strength": "340",
+      "-energy": "-1",
+      "-tier": "5",
+      "FX": {
+        "-death": "Land_Death_Tank",
+        "-sel": "Sel_Truck"
+      }
+    },
+    "components": "WorldUnitComponent",
+    "tooltip": {
+      "-type": "unit",
+      "-key": "vehicle15_Tooltip",
+      "-properties": "Season_December"
+    },
+    "requiredDate": {
+      "-start": "3/8/2012",
+      "-end": "3/22/2012"
+    },
+    "canBuildOn": "LPRM",
+    "sizeX": "1",
+    "sizeY": "1",
+    "sizeZ": "1",
+    "loc": {
+      "-sentenceName": "true"
+    },
+    "referenceValues": {
+      "-stateMachineName": "DefaultContractStateMachine",
+      "-referenceName": "Barracks 02",
+      "define": [
+        {
+          "-name": "$ProducesBuildable",
+          "-value": "1",
+          "-produces": "1"
+        },
+        {
+          "-name": "$HarvestTooltip",
+          "-value": "unit_harvesting"
+        },
+        {
+          "-name": "$HarvestableTooltip",
+          "-value": "unit_harvestable"
+        },
+        {
+          "-name": "$MaturingDuration",
+          "-value": "13.5h",
+          "-maturingDuration": "1"
+        },
+        {
+          "-name": "$HarvestXp",
+          "-value": "0"
+        }
+      ]
+    },
+    "referenceImage": {
+      "define": [
+        {
+          "-name": "$Icon",
+          "-value": "assets/game/season/Seasons_December.swf/Unit_Land_Tank_Altay_SW_icon.png"
+        },
+        {
+          "-name": "$IconOffset",
+          "-value": "5,2"
+        }
+      ]
+    },
+    "image": [
+      {
+        "-name": "sw",
+        "-offset": "7,-10",
+        "-url": "assets/game/season/Seasons_December.swf/Unit_Land_Tank_Altay_SW.png"
+      },
+      {
+        "-name": "ne_run",
+        "-offset": "11,-25",
+        "-url": "assets/game/season/Seasons_December.swf/Unit_Land_Tank_Altay_NE.png",
+        "weapon": {
+          "-id": "Cannon_NE",
+          "-anchorPoint": "91.0,3.0",
+          "-delay": "0.0s"
+        }
+      },
+      {
+        "-name": "sw_run",
+        "-offset": "7,-26",
+        "-url": "assets/game/season/Seasons_December.swf/Unit_Land_Tank_Altay_SW.png",
+        "weapon": {
+          "-id": "Cannon_SW",
+          "-anchorPoint": "4.0,36.0",
+          "-delay": "0.0s"
+        }
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/season/Seasons_December.swf/Unit_Land_Tank_Altay_SW_icon.png"
+      }
+    ],
+    "researchTemplate": "T05",
+    "partsExperiment": "empire_research_le_parts",
+    "part": [
+      {
+        "-code": "B01",
+        "-countv1": "13",
+        "-countv2": "13",
+        "-countv3": "12",
+        "-countv4": "11",
+        "-countv5": "14",
+        "-countv6": "15",
+        "-countv7": "16",
+        "-countv8": "18"
+      },
+      {
+        "-code": "B02",
+        "-countv1": "13",
+        "-countv2": "13",
+        "-countv3": "12",
+        "-countv4": "11",
+        "-countv5": "14",
+        "-countv6": "15",
+        "-countv7": "16",
+        "-countv8": "18"
+      },
+      {
+        "-code": "B14",
+        "-countv1": "13",
+        "-countv2": "13",
+        "-countv3": "12",
+        "-countv4": "11",
+        "-countv5": "14",
+        "-countv6": "15",
+        "-countv7": "16",
+        "-countv8": "18"
+      },
+      {
+        "-code": "L010",
+        "-countv1": "13",
+        "-countv2": "13",
+        "-countv3": "12",
+        "-countv4": "11",
+        "-countv5": "14",
+        "-countv6": "15",
+        "-countv7": "16",
+        "-countv8": "18"
+      }
+    ],
+    "requiredLevel": "15",
+    "cost": {
+      "-coins": "13600",
+      "-oil": "680",
+      "-rare": "68",
+      "-cash": "9"
+    },
+    "marketPrice": "51000",
+    "defenseRangeX": "3",
+    "defenseRangeY": "3",
+    "masteryTokenCost": "0"
+  }
+]

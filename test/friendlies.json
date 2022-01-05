@@ -1,0 +1,406 @@
+[
+  {
+    "-name": "LE_Seal6000_Copter",
+    "-setName": "MenacingMarines03",
+    "-type": "Buildable",
+    "-subtype": "air",
+    "-unitClass": "airsupport",
+    "-storable": "true",
+    "-placeable": "true",
+    "-buyable": "true",
+    "-newItem": "true",
+    "-contractLocked": "true",
+    "-code": "UB96",
+    "components": "WorldUnitComponent",
+    "unit": {
+      "-type": "airsupport,aircraft",
+      "-strength": "300",
+      "-energy": "-1",
+      "-tier": "4",
+      "FX": {
+        "-death": "Air_Death",
+        "-sel": "Sel_HeliSmall"
+      }
+    },
+    "tooltip": {
+      "-type": "unit",
+      "-key": "plane19_Tooltip",
+      "-properties": "Season_August"
+    },
+    "requiredDate": {
+      "-start": "8/06/2012",
+      "-end": "8/23/2012"
+    },
+    "canBuildOn": "LPRA",
+    "sizeX": "2",
+    "sizeY": "2",
+    "sizeZ": "1",
+    "loc": {
+      "-sentenceName": "true"
+    },
+    "referenceValues": {
+      "-stateMachineName": "DefaultContractStateMachine",
+      "-referenceName": "Hangar 02",
+      "define": [
+        {
+          "-name": "$ProducesBuildable",
+          "-value": "1",
+          "-produces": "1"
+        },
+        {
+          "-name": "$HarvestTooltip",
+          "-value": "unit_harvesting"
+        },
+        {
+          "-name": "$HarvestableTooltip",
+          "-value": "unit_harvestable"
+        },
+        {
+          "-name": "$MaturingDuration",
+          "-value": "8h",
+          "-maturingDuration": "1"
+        },
+        {
+          "-name": "$HarvestXp",
+          "-value": "0"
+        }
+      ]
+    },
+    "referenceImage": {
+      "define": [
+        {
+          "-name": "$Icon",
+          "-value": "assets/game/season/Seasons_August_2012.swf/Unit_Air_T8_Seal6000_Copt_01_Ground_SW_icon.png"
+        },
+        {
+          "-name": "$IconOffset",
+          "-value": "3,2"
+        }
+      ]
+    },
+    "image": [
+      {
+        "-name": "sw",
+        "-offset": "15,-21",
+        "-url": "assets/game/season/Seasons_August_2012.swf/Unit_Air_T8_Seal6000_Copt_01_Ground_SW.png"
+      },
+      {
+        "-name": "ne_run",
+        "-offset": "-58,-39",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": {
+          "-name": "Unit_Air_T8_Seal6000_Copt_01_Anim_NE",
+          "-anchorPoint": "82.0,91.0"
+        },
+        "weapon": [
+          {
+            "-id": "VMachineGun02_Air_NE",
+            "-anchorPoint": "149.0,48.0",
+            "-delay": "0.0s"
+          },
+          {
+            "-id": "VMachineGun02_Air_NE",
+            "-anchorPoint": "149.0,48.0",
+            "-delay": "0.3s"
+          },
+          {
+            "-id": "VMachineGun02_Air_NE",
+            "-anchorPoint": "149.0,48.0",
+            "-delay": "0.6s"
+          }
+        ]
+      },
+      {
+        "-name": "sw_run",
+        "-offset": "-5,-42",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": {
+          "-name": "Unit_Air_T8_Seal6000_Copt_01_Anim_SW",
+          "-anchorPoint": "69.0,99.0"
+        },
+        "weapon": [
+          {
+            "-id": "VMachineGun02_Air_SW",
+            "-anchorPoint": "1.0,124.0",
+            "-delay": "0.0s"
+          },
+          {
+            "-id": "VMachineGun02_Air_SW",
+            "-anchorPoint": "1.0,124.0",
+            "-delay": "0.3s"
+          },
+          {
+            "-id": "VMachineGun02_Air_SW",
+            "-anchorPoint": "1.0,124.0",
+            "-delay": "0.6s"
+          }
+        ]
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/season/Seasons_August_2012.swf/Unit_Air_T8_Seal6000_Copt_01_Ground_SW_icon.png"
+      }
+    ],
+    "researchTemplate": "T04",
+    "partsExperiment": "empire_research_le_parts",
+    "part": [
+      {
+        "-code": "B01",
+        "-countv1": "6",
+        "-countv2": "6",
+        "-countv3": "5",
+        "-countv4": "4",
+        "-countv5": "7",
+        "-countv6": "8",
+        "-countv7": "9",
+        "-countv8": "11"
+      },
+      {
+        "-code": "B29",
+        "-countv1": "6",
+        "-countv2": "6",
+        "-countv3": "5",
+        "-countv4": "4",
+        "-countv5": "7",
+        "-countv6": "8",
+        "-countv7": "9",
+        "-countv8": "11"
+      },
+      {
+        "-code": "B07",
+        "-countv1": "6",
+        "-countv2": "6",
+        "-countv3": "5",
+        "-countv4": "4",
+        "-countv5": "7",
+        "-countv6": "8",
+        "-countv7": "9",
+        "-countv8": "11"
+      },
+      {
+        "-code": "L168",
+        "-countv1": "6",
+        "-countv2": "6",
+        "-countv3": "5",
+        "-countv4": "4",
+        "-countv5": "7",
+        "-countv6": "8",
+        "-countv7": "9",
+        "-countv8": "11"
+      }
+    ],
+    "requiredLevel": "15",
+    "cost": {
+      "-coins": "9000",
+      "-oil": "450",
+      "-rare": "45",
+      "-cash": "15"
+    },
+    "marketPrice": "33750",
+    "defenseRangeX": "4",
+    "defenseRangeY": "4",
+    "masteryTokenCost": "0"
+  },
+  {
+    "-name": "LE_Seal6000_Copter",
+    "-setName": "MenacingMarines03",
+    "-type": "Buildable",
+    "-subtype": "air",
+    "-unitClass": "airsupport",
+    "-storable": "true",
+    "-placeable": "true",
+    "-buyable": "true",
+    "-newItem": "true",
+    "-contractLocked": "true",
+    "-code": "UB96",
+    "components": "WorldUnitComponent",
+    "unit": {
+      "-type": "airsupport,aircraft",
+      "-strength": "300",
+      "-energy": "-1",
+      "-tier": "4",
+      "FX": {
+        "-death": "Air_Death",
+        "-sel": "Sel_HeliSmall"
+      }
+    },
+    "tooltip": {
+      "-type": "unit",
+      "-key": "plane19_Tooltip",
+      "-properties": "Season_August"
+    },
+    "requiredDate": {
+      "-start": "8/06/2012",
+      "-end": "8/23/2012"
+    },
+    "canBuildOn": "LPRA",
+    "sizeX": "2",
+    "sizeY": "2",
+    "sizeZ": "1",
+    "loc": {
+      "-sentenceName": "true"
+    },
+    "referenceValues": {
+      "-stateMachineName": "DefaultContractStateMachine",
+      "-referenceName": "Hangar 02",
+      "define": [
+        {
+          "-name": "$ProducesBuildable",
+          "-value": "1",
+          "-produces": "1"
+        },
+        {
+          "-name": "$HarvestTooltip",
+          "-value": "unit_harvesting"
+        },
+        {
+          "-name": "$HarvestableTooltip",
+          "-value": "unit_harvestable"
+        },
+        {
+          "-name": "$MaturingDuration",
+          "-value": "8h",
+          "-maturingDuration": "1"
+        },
+        {
+          "-name": "$HarvestXp",
+          "-value": "0"
+        }
+      ]
+    },
+    "referenceImage": {
+      "define": [
+        {
+          "-name": "$Icon",
+          "-value": "assets/game/season/Seasons_August_2012.swf/Unit_Air_T8_Seal6000_Copt_01_Ground_SW_icon.png"
+        },
+        {
+          "-name": "$IconOffset",
+          "-value": "3,2"
+        }
+      ]
+    },
+    "image": [
+      {
+        "-name": "sw",
+        "-offset": "15,-21",
+        "-url": "assets/game/season/Seasons_August_2012.swf/Unit_Air_T8_Seal6000_Copt_01_Ground_SW.png"
+      },
+      {
+        "-name": "ne_run",
+        "-offset": "-58,-39",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": {
+          "-name": "Unit_Air_T8_Seal6000_Copt_01_Anim_NE",
+          "-anchorPoint": "82.0,91.0"
+        },
+        "weapon": [
+          {
+            "-id": "VMachineGun02_Air_NE",
+            "-anchorPoint": "149.0,48.0",
+            "-delay": "0.0s"
+          },
+          {
+            "-id": "VMachineGun02_Air_NE",
+            "-anchorPoint": "149.0,48.0",
+            "-delay": "0.3s"
+          },
+          {
+            "-id": "VMachineGun02_Air_NE",
+            "-anchorPoint": "149.0,48.0",
+            "-delay": "0.6s"
+          }
+        ]
+      },
+      {
+        "-name": "sw_run",
+        "-offset": "-5,-42",
+        "-url": "assets/game/characters/CombatRootCharacter_SW.png",
+        "animation": {
+          "-name": "Unit_Air_T8_Seal6000_Copt_01_Anim_SW",
+          "-anchorPoint": "69.0,99.0"
+        },
+        "weapon": [
+          {
+            "-id": "VMachineGun02_Air_SW",
+            "-anchorPoint": "1.0,124.0",
+            "-delay": "0.0s"
+          },
+          {
+            "-id": "VMachineGun02_Air_SW",
+            "-anchorPoint": "1.0,124.0",
+            "-delay": "0.3s"
+          },
+          {
+            "-id": "VMachineGun02_Air_SW",
+            "-anchorPoint": "1.0,124.0",
+            "-delay": "0.6s"
+          }
+        ]
+      },
+      {
+        "-name": "icon",
+        "-url": "assets/game/season/Seasons_August_2012.swf/Unit_Air_T8_Seal6000_Copt_01_Ground_SW_icon.png"
+      }
+    ],
+    "researchTemplate": "T04",
+    "partsExperiment": "empire_research_le_parts",
+    "part": [
+      {
+        "-code": "B01",
+        "-countv1": "6",
+        "-countv2": "6",
+        "-countv3": "5",
+        "-countv4": "4",
+        "-countv5": "7",
+        "-countv6": "8",
+        "-countv7": "9",
+        "-countv8": "11"
+      },
+      {
+        "-code": "B29",
+        "-countv1": "6",
+        "-countv2": "6",
+        "-countv3": "5",
+        "-countv4": "4",
+        "-countv5": "7",
+        "-countv6": "8",
+        "-countv7": "9",
+        "-countv8": "11"
+      },
+      {
+        "-code": "B07",
+        "-countv1": "6",
+        "-countv2": "6",
+        "-countv3": "5",
+        "-countv4": "4",
+        "-countv5": "7",
+        "-countv6": "8",
+        "-countv7": "9",
+        "-countv8": "11"
+      },
+      {
+        "-code": "L168",
+        "-countv1": "6",
+        "-countv2": "6",
+        "-countv3": "5",
+        "-countv4": "4",
+        "-countv5": "7",
+        "-countv6": "8",
+        "-countv7": "9",
+        "-countv8": "11"
+      }
+    ],
+    "requiredLevel": "15",
+    "cost": {
+      "-coins": "9000",
+      "-oil": "450",
+      "-rare": "45",
+      "-cash": "15"
+    },
+    "marketPrice": "33750",
+    "defenseRangeX": "4",
+    "defenseRangeY": "4",
+    "masteryTokenCost": "0"
+  }
+]
