@@ -1,4 +1,5 @@
 upcoming
+    Fix collateral damage bug when unit died (Shrapnel Blast, Lunar Strike), more testing Nat 06/01/2022 23:43
     More testing Nat 05/01/2022 23:20
     Add testing to prevent bugs Nat 05/01/2022 17:46
     Fix shield upgrade out of sync Nat 01/01/2022 18:41

@@ -742,6 +742,7 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
     direct_impact = int(selected_consumable["consumable"].get("-di", 0))
     damage = direct_impact
     against = simple_list(selected_consumable["consumable"].get("against", ''))
+    live_index = get_alive_unit_index(units_strengths)
     # TODO: also units have against mod damage: Man_O_War_Battleship, Spec_Ops_Man_O_War_Battleship, LE_Elite_ManOWar_Battleship,
     # pirateship04(npc), pirateship03(npc), pirateinfantry02 PU2(npc), pirateInfantry02 PU4(npc), pirateAntiAir02(npc), pirateAntiAir03(npc),
     # pirateBalloon01(npc), pirateFighter01, pirateBomber01, pirateFighter02, pirateBomber02, pirateFighter03,pirateBomber03, pirateFighter05, pirateBomber05,
@@ -781,10 +782,9 @@ def apply_consumable_direct_impact(meta, selected_consumable, targeted_unit, uni
     if "-chipFactor" in selected_consumable["consumable"]:
         # dead units are removed from battle side so units adjacent to the dead unit are now counted as adjacent to
         # each other for collateral damage
-        live_index = get_alive_unit_index(units_strengths)
         for i in range(len(live_index)):
             collateral_unit_current_strength = units_strengths[live_index[i]]
-            colateral_damage = math.ceil(get_adjacent_factor(targeted_unit, i, len(live_index)) *
+            colateral_damage = math.ceil(get_adjacent_factor(live_index.index(targeted_unit), i, len(live_index)) *
                                          int(selected_consumable["consumable"]["-chipFactor"]) *
                                          int(selected_consumable["consumable"].get("-di", 0)) / 100)
             for a in against:

@@ -121,9 +121,6 @@ def test_init_battle_ai_second_quest():
     )
 
 
-
-
-
 def run_init_battle(params):
     with app.test_request_context():
         setup_session()
@@ -167,6 +164,15 @@ def log_result(active_consumables, baddie_strengths, baddies, friendlies, friend
     print("baddies", repr(baddies))
     print("baddie_strengths", repr(baddie_strengths))
     print("active_consumables", repr(active_consumables))
+
+
+def log_result_battle(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths, player_turn):
+    print("friendly unit id", repr(friendlies))
+    print("friendly_strengths", repr(friendly_strengths))
+    print("baddy unit id", repr(baddies))
+    print("baddie_strengths", repr(baddie_strengths))
+    print("active_consumables", repr(active_consumables))
+    print("player turn", repr(player_turn))
 
 
 def assert_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths):
@@ -284,6 +290,74 @@ def setup_user_object():
                                                                        'XS05'],
                                                                'U60': ['XD04', 'XT04', 'XA04', 'XC04', 'XS04',
                                                                        'XR04']}
+
+
+def test_assign_consumable_response_consumable(monkeypatch):
+    run_assign_consumable_response(monkeypatch,
+                                   {'id': 1, 'ch': 3207, 'level': 0, 'name': 'fleet15_2341959767162880', 'fleet': None,
+                                    'map': 'C037', 'code': 'N04'}, None, [300, 300], None, [120, 170, 150], [], True)
+
+
+def test_assign_consumable_response_shrapnel(monkeypatch):
+    run_assign_consumable_response(monkeypatch,
+                                   {'id': 1, 'ch': 3207, 'level': 0, 'name': 'fleet15_2341959767162880',
+                                    'fleet': None,
+                                    'map': 'C037', 'code': 'N80'}, None, [300, 300], None, [116, 170, 147], [],
+                                   True)
+
+
+def test_assign_consumable_response_shrapnel_removed_dead(monkeypatch):
+    run_assign_consumable_response(monkeypatch,
+                                   {'id': 2, 'ch': 3207, 'level': 0, 'name': 'fleet15_2341959767162880',
+                                    'fleet': None,
+                                    'map': 'C037', 'code': 'N80'}, None, [300, 300], None, [116, 0, 120], [],
+                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=([300, 300], [120, 0, 150], []))])
+
+
+def test_assign_consumable_response_shrapnel_unit_dead(monkeypatch):
+    run_assign_consumable_response(monkeypatch,
+                                   {'id': 1, 'ch': 3207, 'level': 0, 'name': 'fleet15_2341959767162880',
+                                    'fleet': None,
+                                    'map': 'C037', 'code': 'N80'}, None, [300, 300], None, [116, 0, 147], [],
+                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=([300, 300], [120, 30, 150], []))])
+
+
+def run_assign_consumable_response(monkeypatch, params, expected_player_unit_id, expected_friendly_strengths, expected_enemy_unit_id,
+                          expected_baddie_strengths, expected_active_consumables, expected_player_turn, setup_session_funcs=[]):
+    friendly_strengths = None
+    baddie_strengths = None
+    player_turn = None
+    player_unit_id = None
+    enemy_unit_id = None
+    active_consumables = None
+
+    def report_battle_log_mock(a, b, c, d, e, f):
+        nonlocal friendly_strengths, baddie_strengths, player_turn, player_unit_id, enemy_unit_id, active_consumables
+        (friendly_strengths, baddie_strengths, player_turn, player_unit_id, enemy_unit_id, active_consumables) = (a, b, c, d, e, f);
+
+    monkeypatch.setattr(battle_engine, "report_battle_log", report_battle_log_mock)
+    with app.test_request_context():
+        setup_session()
+        session['user_object']["userInfo"]["player"] = {"inventory": {"items" : {}}, "tutorialProgress": "tut_step_powerUpPowerUsed", "energy" : 35, "energyMax": 35, "lastEnergyCheck": 0} # free powerup
+        session["quests"] = []
+        for setup_session_func in setup_session_funcs:
+            setup_session_func(session)
+        battle_engine.assign_consumable_response(params)
+
+        assert_battle_result(active_consumables, baddie_strengths, enemy_unit_id, player_unit_id, friendly_strengths, player_turn, expected_friendly_strengths, expected_enemy_unit_id, expected_player_unit_id,
+                          expected_baddie_strengths, expected_active_consumables, expected_player_turn)
+        log_result_battle(active_consumables, baddie_strengths, enemy_unit_id, player_unit_id, friendly_strengths, player_turn)
+
+
+def assert_battle_result(active_consumables, baddie_strengths, enemy_unit_id, player_unit_id, friendly_strengths, player_turn,
+                          expected_friendly_strengths, expected_enemy_unit_id, expected_player_unit_id,
+                          expected_baddie_strengths, expected_active_consumables, expected_player_turn):
+    assert player_unit_id == expected_player_unit_id
+    assert friendly_strengths == expected_friendly_strengths
+    assert enemy_unit_id == expected_enemy_unit_id
+    assert baddie_strengths == expected_baddie_strengths
+    assert active_consumables == expected_active_consumables
+    assert player_turn == expected_player_turn
 
 
 pytest.main(['-rP'])
