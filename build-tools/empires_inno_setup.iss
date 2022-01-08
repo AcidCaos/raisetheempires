@@ -25,7 +25,7 @@ UsedUserAreasWarning=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 PrivilegesRequired=lowest
 ; License file
-LicenseFile=C:\empires\License.txt
+LicenseFile=C:\empires\build-tools\License.txt
 ;PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=C:\empires-installer
 OutputBaseFilename=empires-setup
