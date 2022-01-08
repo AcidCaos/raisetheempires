@@ -5,16 +5,13 @@
 The Old Empires & Allies preservation project by the Raise the Empires team.
 This project is dedicated to preserving this Flash game so that it's not lost to time.
 
-[![version](https://img.shields.io/badge/version-0.08a-blue)](../../releases/tag/0.08a-preview1)
+[![version](https://img.shields.io/badge/version-0.08a--preview1-blue)](#)
 [![size](https://img.shields.io/badge/size-730%20MB-brightgreen)](#)
 [![downloads](https://img.shields.io/github/downloads/AcidCaos/raisetheempires/total?label=downloads%40all)](../../releases/latest)
 
 ---
 
 ## Releases
-
-| :exclamation: Check the [Flash Continuation](#flash-continuation) documentation |
-| :---: |
 
 | Version | Update | Release date |  Source  | Download |
 | ------- | ------ | ------------ | ------ | -------- |
@@ -27,29 +24,8 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 | alpha 0.02a   | Campaign Update          | September 14, 2019 | :label: [tag](../../releases/tag/0.02a) | :ticket: [Launcher](../../releases/download/0.02a/raise_the_empires_0.02a.zip) |
 | pre-alpha 0.01a   | The Empires Strikes Back | July 21, 2019      | :label: [tag](../../releases/tag/0.01a) | :ticket: [Launcher](../../releases/download/0.01a/RaiseTheEmpires-prealpa_0.01a.zip) |
 
-## Flash Continuation
-To play Empires & Allies you'll need the *Adobe Flash Player* and a *browser with Flash support*:
-
-:flashlight: **Adobe Flash Player**
-> 
->
-> [Download Flash Player](https://archive.org/download/flashplayerarchive/pub/flashplayer/installers/archive/fp_32.0.0.371_archive.zip/32_0_r0_371%2Fflashplayer32_0r0_371_win.exe) for **Firefox** and **Basilisk** – NPAPI
-> 
-> [Download Flash Player](https://archive.org/download/flashplayerarchive/pub/flashplayer/installers/archive/fp_32.0.0.371_archive.zip/32_0_r0_371%2Fflashplayer32_0r0_371_winpep.exe) for Opera and **Chromium** based applications – PPAPI
->
-> *Note:* All downloads are for Flash Player [32.0.0.371](https://archive.org/download/flashplayerarchive/pub/flashplayer/installers/archive/fp_32.0.0.371_archive.zip/), the last version without [End-of-Life](https://www.adobe.com/products/flashplayer/end-of-life.html) kill switch, from the Adobe Inc. [Flash Player Archive](https://archive.org/download/flashplayerarchive/).
-
-:mag: **Browsers with Flash support**
-
-> [Firefox 84.0 64-bit](https://download-installer.cdn.mozilla.net/pub/firefox/releases/84.0/win64/en-US/Firefox%20Setup%2084.0.exe) or [32-bit](https://download-installer.cdn.mozilla.net/pub/firefox/releases/84.0/win32/en-US/Firefox%20Setup%2084.0.exe) (14 Dec 2020), the final version to support Flash.
-> 
-> **Important:** By default, Firefox is set for automatic updates. To prevent Firefox from automatically updating itself after you install an older version, you'll need to change your Firefox update settings: Click the menu button (三) and select *Options*. In the *General* panel, go to the *Firefox Updates* section.
-> 
-> [Chromium 82.0](https://chromium.en.uptodown.com/windows/download/2181158), the open-source projects behind the Google Chrome browser.
-> 
-> **Important:** By default, Flash is disabled in Chromium. You need to enable Flash in Chromium settings.
-> 
-> [Basilisk Browser](https://www.basilisk-browser.org/), which fully supports all NPAPI plugins (i.e. Flash). It's a fork of the Mozilla/Firefox code.
+| :exclamation: For *0.07a* and older versions, check the [Flash Continuation](FLASH.md) documentation |
+| :---: |
 
 ## Reporting Bugs and Contacting
 :speech_balloon: Check our [Discord group](https://discord.gg/xrNE6Hg)  [![Discord Channel](https://img.shields.io/discord/536575691563466772?label=)](https://discord.gg/xrNE6Hg)
@@ -86,7 +62,8 @@ To play Empires & Allies you'll need the *Adobe Flash Player* and a *browser wit
 
 ## License [![GPL v3](https://img.shields.io/badge/GPL%20v3-blue)](http://www.gnu.org/licenses/gpl-3.0)
 ```
-Old Empires and Allies preservation project Copyright (C) 2019-2021 by the Raise the Empires team.
+Old Empires and Allies preservation project.
+Copyright (C) 2019  The Raise the Empires team
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -100,4 +77,13 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
+```
+### Related
+```
+Chromium 82.0, Copyright 2020-2021 The Chromium Authors. All rights reserved.
+Chromium is made possible by the Chromium open source project and other open source software.
+```
+
+```
+Adobe Flash Player License Terms <http://aka.ms/adobeflash/>.
 ```
