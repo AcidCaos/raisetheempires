@@ -72,6 +72,7 @@ app: Flask = Flask(__name__)
 
 app.config['SESSION_TYPE'] = 'sqlalchemy'
 app.config['SQLALCHEMY_DATABASE_URI'] = save_database_uri()
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Flask-SQLAlchemy has its own event notification system that gets layered on top of SQLAlchemy. To do this, it tracks modifications to the SQLAlchemy session. This option disables the modification tracking system.
 app.config['SESSION_SQLALCHEMY'] = db
 app.config['SESSION_COOKIE_HTTPONLY'] = False
 app.permanent_session_lifetime = timedelta(weeks=520)
