@@ -29,7 +29,7 @@ import pyamf
 import mod_engine
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
     get_active_island_by_map, set_active_island_by_map, register_random_fleet, format_player_fleet, \
-    cancel_unstarted_invasions
+    cancel_unstarted_invasions, register_fleetname_fleet
 from game_settings import get_zid, initial_island, random_image, randomReward, get_sessions_friends, \
     get_sessions_id, unlock_expansion
 import threading, webbrowser
@@ -50,8 +50,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.07a.2022_01_06"
-release_date = 'Thursday, 6 January 2022'
+version = "0.07a.2022_01_09"
+release_date = 'Sunday, 9 January 2022'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -1833,7 +1833,7 @@ def random_fleet_challenge_response(host_uid):
         "invader": False
     }
 
-    register_random_fleet(fleet)
+    register_fleetname_fleet(fleet)
 
     random_fleet_challenge_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                                        "data": {
@@ -1917,7 +1917,7 @@ def random_enemy_fleet_challenge_response(enemy_fleet_id):
         "invader": True
     }
 
-    register_random_fleet(fleet)
+    register_fleetname_fleet(fleet)
 
     random_enemy_fleet_challenge_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                                        "data": {

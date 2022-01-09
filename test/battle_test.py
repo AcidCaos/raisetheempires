@@ -1,3 +1,5 @@
+#TO RUN TESTS RUN empires_test.py
+
 import json
 
 import pytest
@@ -243,7 +245,7 @@ def setup_session_invade():
                          'fleet7_2341959767162880': None, 'fleet9_2341959767162880': None,
                          'fleet11_2341959767162880': None,
                          'fleet13_2341959767162880': None,
-                         'fleet15_2341959767162880': {'type': 'army', 'uid': '6709797546928099', 'name': 'FleetName',
+                         'FleetName': {'type': 'army', 'uid': '6709797546928099', 'name': 'FleetName',
                                                       'status': 0, 'target': '',
                                                       'consumables': [], 'inventory': [], 'playerLevel': 1,
                                                       'specialBits': None, 'lost': None,
@@ -360,6 +362,36 @@ def assert_battle_result(active_consumables, baddie_strengths, enemy_unit_id, pl
     assert player_turn == expected_player_turn
 
 
-pytest.main(['-rP'])
+def test_spawn_fleet_initial_attack():
+    with app.test_request_context():
+        session["fleets"] = {}
+
+        res = battle_engine.spawn_fleet({'fleet': 'Q6019', 'code': 'Q6019'})
+
+        assert res == {'errorType': 0, 'userId': 1,
+         'metadata': {'newPVE': {'status': 2, 'pos': '52,49', 'villain': 'v18', 'quest': 'Q6019'}}, 'data': []}
+        assert session["fleets"] == {}
+
+
+def test_spawn_fleet_quest_based():
+    with app.test_request_context():
+        session["fleets"] = {}
+        session.sid = "0"
+
+        res = battle_engine.spawn_fleet({'fleet': 'quest_W228_1_3', 'code': 'QW228'})
+
+        assert res == {'errorType': 0, 'userId': 1, 'metadata': {}, 'data': []}
+        assert session["fleets"] == {'fleet1_2341959767162880': None}
+        
+        
+def test_spawn_fleet_quest_odd_fleets():
+    with app.test_request_context():
+        session["fleets"] = {'fleet1_2341959767162880': None}
+        session.sid = "0"
+
+        res = battle_engine.spawn_fleet({'fleet': 'BD_QW246_01_3', 'code': 'QW246'})
+
+        assert res == {'errorType': 0, 'userId': 1, 'metadata': {}, 'data': []}
+        assert session["fleets"] == {'fleet1_2341959767162880': None, 'fleet3_2341959767162880': None}
 
 

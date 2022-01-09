@@ -1,4 +1,8 @@
 upcoming
+    Fix invasion bug after invading twice without refresh, testing Nat 09/01/2022 03:24
+    Disable Flask-SQLAlchemy's SQLAlchemy session tracker. AcidCaos 08/01/2022 13:58
+    Update installer licenses AcidCaos 08/01/2022 13:38
+    Update Readme, Licenses and Flash documentation. AcidCaos 08/01/2022 12:30
     Fix collateral damage bug when unit died (Shrapnel Blast, Lunar Strike), more testing Nat 06/01/2022 23:43
     More testing Nat 05/01/2022 23:20
     Add testing to prevent bugs Nat 05/01/2022 17:46

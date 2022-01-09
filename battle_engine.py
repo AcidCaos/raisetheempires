@@ -221,13 +221,12 @@ def handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths):
             print("challenge won")
             invasion_complete(params["attackHostId"], params, friendlies, friendly_strengths)
         elif params.get('target') == "FleetName":
-            if get_next_fleet(params["fleet"]).get("invaded_uid"):
+            if session["fleets"]["FleetName"].get("invaded_uid"):
                 print("neighbor repel won")
-                neighbor_repelled(get_next_fleet(params["fleet"]))
+                neighbor_repelled(session["fleets"]["FleetName"])
             else:
                 print("repel won")
-                fleet_name = params["fleet"]
-                del session['user_object']["pvp"]["invaders"]["u" + get_next_fleet(fleet_name)["uid"]]
+                del session['user_object']["pvp"]["invaders"]["u" + session["fleets"]["FleetName"]["uid"]]
         elif params.get('name') == "FleetName":
             [(fleet_name, enemy_fleet)] = [(k, v) for k, v in session['fleets'].items() if isinstance(v, dict) and v.get('name') == "FleetName"]
             if enemy_fleet["invader"]:
@@ -344,14 +343,14 @@ def init_battle(params):
             baddies = [lookup_item_by_code(baddy.split(',')[0])
                        for baddy in enemy_fleet["units"]]
             friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                          session['fleets'][get_previous_fleet_name(fleet_name) if get_previous_fleet_name(fleet_name) in session['fleets'] else get_previous_fleet_name(get_previous_fleet_name(fleet_name))]]
+                          session['fleets'][get_last_fleet_name()]]
         elif fleet_or_name in session['fleets'] and isinstance(simple_list(session['fleets'][fleet_or_name])[0], str):
             print("Ally direct target")
             friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
                           session['fleets'][fleet_or_name]]
-            if simple_list(session['fleets'][get_next_fleet_name(fleet_or_name)])[0].get("name") == "FleetName":
+            if get_next_fleet_name(fleet_or_name) not in session['fleets']:
                 baddies = [lookup_item_by_code(baddy.split(',')[0]) for sub_fleet in
-                           simple_list(session['fleets'][get_next_fleet_name(fleet_or_name)])
+                           simple_list(session['fleets']['FleetName'])
                            for baddy in sub_fleet["units"]]
             else:
                 baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in
@@ -392,7 +391,7 @@ def init_battle(params):
     elif params['target'] == "FleetName":
         print("Invader target")
         baddies = [lookup_item_by_code(baddy.split(',')[0]) for sub_fleet in
-                   simple_list(session['fleets'][get_next_fleet_name(params['fleet'])])
+                   simple_list(session['fleets']['FleetName'])
                    for baddy in sub_fleet["units"]]
         friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
                       session['fleets'][params['fleet']]]
@@ -440,6 +439,15 @@ def get_previous_fleet_name(name):
 def get_next_fleet_name(name):
     print("Using next fleet as baddies for ally targeted consumables")
     return name[:5] + str(int(name[5:name.index('_')]) + 1) + name[name.index('_'):]
+
+
+def get_last_fleet_name():
+    i = 0
+    fleet_name = "fleet1_" + str(get_zid())
+    while fleet_name in session["fleets"] or "fleet" + str(i+1) + "_" + str(get_zid()) in session["fleets"]:
+        i += 1
+        fleet_name = "fleet" + str(i) + "_" + str(get_zid())
+    return "fleet" + str(i-1) + "_" + str(get_zid())
 
 
 def get_friendly_by_ally_fleet(name):
@@ -551,6 +559,10 @@ def next_campaign_response(params):
 
     return next_campaign_response
 
+
+def register_fleetname_fleet(enemy_fleet):
+    session["fleets"]["FleetName"] = enemy_fleet
+    print("FleetName Enemy fleet:", enemy_fleet)
 
 
 def register_random_fleet(fleet):
