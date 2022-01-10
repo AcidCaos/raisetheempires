@@ -50,8 +50,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.07a.2022_01_09"
-release_date = 'Sunday, 9 January 2022'
+version = "0.07a.2022_01_10"
+release_date = 'Monday, 10 January 2022'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -107,6 +107,11 @@ def home():
 def get_allies_friend(saves):
     return [ally["friend"] for ally in allies.values()
             if "friend" in ally and ally["friend"] and ally["neighbor"]] + get_sessions_friends(saves)
+
+
+def get_suggested_friends():
+    return [ally["friend"] for ally in allies.values()
+            if "friend" in ally and ally["friend"] and not ally["neighbor"]]
 
 
 def get_allies_id(saves):
@@ -1574,6 +1579,9 @@ def tutorial_response(step, sequence, endpoint):
     #     meta['QuestComponent'] = [flag_Q0591_done, farm_Q0571_start]
     # if step == 'tut_step_placeFarmEnd':  #after cadets placed?
     #     meta['QuestComponent'] = [farm_Q0571_done, corn_Q0521_start, parliament_Q0691_start, sergeant_Q0671_start]
+    #
+    if step == 'tut_step_inviteFriendsEndPauseTutorial':
+        handle_quest_progress(meta, progress_neighbor_count())
 
     merge_quest_progress(meta['QuestComponent'] if 'QuestComponent' in meta else [], session['quests'], "session quest")
     session['user_object']["userInfo"]["player"]["tutorialProgress"] = step  # TODO: revert step when loading if needed
@@ -1601,7 +1609,7 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
         })
 
     # cur_object = lookup_object(id)
-    # print("cur_object used:", repr(cur_object))
+    # print("cur_object used:"`, repr(cur_object))
     #
     #
     # game_item = lookup_item(item_name)
@@ -1754,7 +1762,7 @@ def place_market_order(market, order, meta):
 
 def neighbor_suggestion_response():
     neighbor_suggestion_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
-                                    "data": []}
+                                    "data": get_suggested_friends()}
     return neighbor_suggestion_response
 
 

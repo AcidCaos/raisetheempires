@@ -79,8 +79,11 @@ def prepopulate_task(task):
     elif task["_action"] == 'population':
         return min(session['population'], int(task["_total"])), session['population'] >= int(task["_total"])
     elif task["_action"] == 'neighborsAdded':
-        neighbor_count = len([ally for ally in allies.values() if ally.get("friend") and ally.get("neighbor")])
-        return min(neighbor_count, int(task["_total"])), neighbor_count >= int(task["_total"])
+        if task["_desc"] == "quest_1140_task_01":
+            return 0, False
+        else:
+            neighbor_count = len([ally for ally in allies.values() if ally.get("friend") and ally.get("neighbor")])
+            return min(neighbor_count, int(task["_total"])), neighbor_count >= int(task["_total"])
     elif task["_action"] == 'countUpgrades':
         research = session['user_object']["userInfo"]["world"]["research"]
         total = 0

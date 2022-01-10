@@ -5,6 +5,7 @@ from flask import Flask, session, request
 from pyamf import remoting
 
 empires_server = __import__('empires-server')
+import quest_engine
 
 app = Flask(__name__)
 app.secret_key = 'test'
@@ -150,6 +151,57 @@ def test_load_challenge_response():
                                              'fleets': [], 'upgrades': None, 'hp': None, 'invader': True},
                 'fleet14_2341959767162880': ['UN06,740,0,0,0', 'V06,180,1,1,0', 'V06,180,1,2,0', 'UN33,780,0,3,0',
                                              'UN33,780,0,4,0']}
+
+
+def test_tutorial_response(monkeypatch):
+    step = None
+    reported_quests = None
+    pve = None
+    sequence = None
+    reported_endpoint = None
+    def report_tutorial_step(a, b, c, d, e):
+        nonlocal step, reported_quests, pve, sequence, reported_endpoint
+        (step, reported_quests, pve, sequence, reported_endpoint) = (a, b, c, d, e)
+
+
+    def get_saves_mock():
+        return []
+
+    monkeypatch.setattr(quest_engine, "get_saves", get_saves_mock)
+    monkeypatch.setattr(empires_server, "report_tutorial_step", report_tutorial_step)
+
+    with app.test_request_context():
+        session["quests"] = [{'name': 'Q1140', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0},
+                             {'name': 'Q0516', 'complete': False, 'expired': False, 'progress': [0],
+                              'completedTasks': 0}]
+
+        session['user_object'] = {}
+        session['user_object']["userInfo"] = {}
+        session['user_object']["userInfo"]["player"] = {"inventory": {"items": {}},
+                                                        "tutorialProgress": "tut_step_inviteFriendsViral",
+                                                        "xp": 0, "energy": 0, "cash": 0, "socialXpGood": 0,
+                                                        "socialXpBad": 0, "level": 0, "energyMax": 0,
+                                                        "playerResourceType": 3, "lastEnergyCheck": 0}
+        session['user_object']["userInfo"]["world"] = {}
+        session['user_object']["userInfo"]["world"]["resources"] = {"coins": 0, "energy": 0, "oil": 0, "wood": 0,
+                                                                    "aluminum": 0, "copper": 0, "gold": 0, "iron": 0,
+                                                                    "uranium": 0}
+        session['user_object']["userInfo"]["world"]["resourceOrder"] = ["aluminum", "copper", "gold", "iron", "uranium"]
+        session['user_object']["experiments"] = {}
+
+
+        resp = empires_server.tutorial_response('tut_step_inviteFriendsEndPauseTutorial', 18, '/14')
+
+        assert resp == {'errorType': 0, 'userId': 1, 'metadata': {'newPVE': 0, 'QuestComponent': [
+            {'name': 'Q1140', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1}]}, 'data': []}
+        assert session['user_object']["userInfo"]["player"]["tutorialProgress"] == 'tut_step_inviteFriendsEndPauseTutorial'
+        assert session["quests"] == [{'name': 'Q1140', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1},
+                                     {'name': 'Q0516', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0}]
+        assert step == 'tut_step_inviteFriendsEndPauseTutorial'
+        assert reported_quests == [{'name': 'Q1140', 'complete': True, 'expired': False, 'progress': [1], 'completedTasks': 1}]
+        assert pve == 0
+        assert sequence == 18
+        assert reported_endpoint == '/14'
 
 
 def test_init_user(monkeypatch):
