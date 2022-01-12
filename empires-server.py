@@ -758,7 +758,7 @@ def post_gateway():
         elif reqq.functionName == 'PVPService.setEspionageHQData':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.exitBattle':
-            resps.append(dummy_response())
+            resps.append(exit_battle_response())
         elif reqq.functionName == 'WorldService.expireAQuest':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.getFightList':
@@ -2347,6 +2347,15 @@ def part_request_response(params):
     part_request_response = {"errorType": 0, "userId": 1, "metadata": meta,
                       "data": []}
     return part_request_response
+
+
+def exit_battle_response():
+    exit_battle_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                      "data": []}
+
+    session["battle"] = None
+
+    return exit_battle_response
 
 
 def dummy_response():

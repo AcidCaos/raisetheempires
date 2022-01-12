@@ -277,6 +277,17 @@ def test_streak_bonus_response():
              'completedTasks': 0}]
 
 
+def test_streak_bonus_response():
+    with app.test_request_context():
+        session['battle'] = ([40, 30], [50, 50], [])
+
+        res = empires_server.exit_battle_response()
+
+        assert res == {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+             "data": []}
+        assert session['battle'] is None
+
+
 def test_init_user(monkeypatch):
     def get_saves_mock():
         return []

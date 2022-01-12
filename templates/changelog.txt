@@ -1,5 +1,6 @@
 upcoming
-    Bonus Streak Bar  Nat 12/01/2022 23:39
+    Fix exiting battle cleans up fight Nat 13/01/2022 00:07
+    Bonus Streak Bar Nat 12/01/2022 23:39
     Added refresh on error Nat 12/01/2022 02:35
     Fix quests to be able to request parts from neighbors Nat 12/01/2022 01:25
     Fix meet the neighbors(steele) quest, added suggested neighbors, fix first victory & invite screens, testing Nat 10/01/2022 03:35
