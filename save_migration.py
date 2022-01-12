@@ -47,11 +47,20 @@ def migrate(meta, version, target_version):
         create_backup("Update to 0.07a")
         version = "0.07a"
         session['save_version'] = version
-    if version and version.startswith("0.07a") and version != target_version: # 0.08
-        create_backup("Update to 0.08a")
-        version = "0.08a"
+    if version and ((version.startswith("0.07a") and version != target_version) or is_0_08a_preview(version)): # 0.08 and
+        # includes from preview 0.08a with same version number
+        create_backup("Update to 0.08a full")
+        # version = "0.08a"
+        version = target_version  # remove before release
+        session['user_object']["experiments"]["empire_request2_master"] = 2
+        session['user_object']["experiments"]["empire_mfs_uili"] = 4
         session['save_version'] = version
+    if version and version.startswith("0.08a") and version != target_version:  # upcoming
+        pass
 
+
+def is_0_08a_preview(version):
+    return version == "0.08a" and "empire_request2_master" not in session['user_object']["experiments"]
 
 
 def zero_yield(extra):

@@ -597,6 +597,15 @@ def progress_buy_consumable(item):
         progress_parameter_implies_contains("_item", item["-code"])(task, progress, i, *args)
 
 
+def progress_gifted_parts(item, count):
+    return lambda task, progress, i, extra, *args: \
+        task["_action"] == "inventoryAdded" and item is not None and \
+        progress_parameter_implies("_type", item.get("-type", ""))(task, progress, i, *args) and \
+        progress_parameter_implies("_subtype", item.get("-subtype", ""))(task, progress, i, *args) and \
+        progress_parameter_implies_contains("_item", item["-code"])(task, progress, i, *args) and \
+        progress_yield_amount(count, task["_total"], extra, progress)
+
+
 def progress_useAOA_consumable(item):
     return lambda task, progress, i, *args: \
         task["_action"] == "useConsumable" and task.get("_neighbor") == "true" and item is not None and \

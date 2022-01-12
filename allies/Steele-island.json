@@ -18,6 +18,8 @@
   "friend": {
     "zid": -1,
     "uid": -1,
+    "first_name": "Steele",
+    "name": "Steele",
     "portrait": "assets/game/GeneralAssetGroup_UI.swf/NeighborOneCP.png",
     "pic": "assets/game/GeneralAssetGroup_UI.swf/NeighborOneCP.png",
     "pic_square": "assets/game/GeneralAssetGroup_UI.swf/NeighborOneCP.png"

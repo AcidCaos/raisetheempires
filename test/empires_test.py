@@ -204,6 +204,48 @@ def test_tutorial_response(monkeypatch):
         assert reported_endpoint == '/14'
 
 
+def test_part_request_response():
+    with app.test_request_context():
+        session["quests"] = [
+            {'name': 'QW240', 'complete': False, 'expired': False, 'progress': [0, 5, 0], 'completedTasks': 0},
+            {'name': 'Q0516', 'complete': False, 'expired': False, 'progress': [0],
+             'completedTasks': 0}]
+        session['user_object'] = {}
+        session['user_object']["userInfo"] = {}
+        session['user_object']["userInfo"]["player"] = {"inventory": {"items": {}}, "energy": 0, "energyMax": 0,
+                                                        "lastEnergyCheck": 0}
+
+        res = empires_server.part_request_response(['BuildingPart166', '', 'gift_request', [111, 124, 123, -1], {'source': 'quest', 'quest': 'QW240', 'task': 0}])
+
+        assert res == {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0, 'QuestComponent': [{'name': 'QW240', 'complete': False, 'expired': False, 'progress': [4, 5, 0], 'completedTasks': 0}]},
+                      "data": []}
+        assert session["quests"] == [
+            {'name': 'QW240', 'complete': False, 'expired': False, 'progress': [4, 5, 0], 'completedTasks': 0},
+            {'name': 'Q0516', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0}]
+        assert session['user_object']["userInfo"]["player"]["inventory"]["items"] == {'B166': 4}
+
+
+def test_part_request_response_inventory_count():
+    with app.test_request_context():
+        session["quests"] = [
+            {'name': 'QW228', 'complete': False, 'expired': False, 'progress': [0, 0, 1], 'completedTasks': 4},
+            {'name': 'Q0516', 'complete': False, 'expired': False, 'progress': [0],
+             'completedTasks': 0}]
+        session['user_object'] = {}
+        session['user_object']["userInfo"] = {}
+        session['user_object']["userInfo"]["player"] = {"inventory": {"items": {}}, "energy": 0, "energyMax": 0,
+                                                        "lastEnergyCheck": 0}
+
+        res = empires_server.part_request_response(['BuildingPart134', '', 'gift_request', [111, 123], {'source': 'quest', 'quest': 'QW228', 'task': 0}])
+
+        assert res == {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0, 'QuestComponent': [{'name': 'QW228', 'complete': False, 'expired': False, 'progress': [2, 0, 1], 'completedTasks': 4}]},
+                      "data": []}
+        assert session["quests"] == [
+            {'name': 'QW228', 'complete': False, 'expired': False, 'progress': [2, 0, 1], 'completedTasks': 4},
+            {'name': 'Q0516', 'complete': False, 'expired': False, 'progress': [0], 'completedTasks': 0}]
+        assert session['user_object']["userInfo"]["player"]["inventory"]["items"] == {'B134': 2}
+
+
 def test_init_user(monkeypatch):
     def get_saves_mock():
         return []

@@ -16,7 +16,7 @@ if not debug:
 
 from save_engine import save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
     get_saves, store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path
-from save_migration import migrate
+from save_migration import migrate, is_0_08a_preview
 from builtins import print
 from time import sleep
 from datetime import timedelta
@@ -50,8 +50,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.07a.2022_01_10"
-release_date = 'Monday, 10 January 2022'
+version = "0.07a.2022_01_12"
+release_date = 'Wednesday, 12 January 2022'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -698,7 +698,7 @@ def post_gateway():
         elif reqq.functionName == 'ClansService.completeQuest':
             resps.append(dummy_response())
         elif reqq.functionName == 'RequestService.partRequest':
-            resps.append(dummy_response())
+            resps.append(part_request_response(reqq.params))
         elif reqq.functionName == 'WorldService.beginQuestBattle':
             resps.append(dummy_response())
         elif reqq.functionName == 'BlackMarketHelperService.tradeForPart':
@@ -1219,7 +1219,7 @@ def init_user():
         "DEATHMATCH_DURATION": None,
         "clansInfo": None,
         "immunityTimeVariant": 0,
-        "experiments": {"empire_combataicancritical": 2, "empire_decorations_master": 2, "empire_doober_pickup": 3, "empires_consumable_2": 3, "empire_research_shield_upgrade": 2, "empires_support_units" : 5, "empire_buildable_zrig_master" : 3},
+        "experiments": {"empire_combataicancritical": 2, "empire_decorations_master": 2, "empire_doober_pickup": 3, "empires_consumable_2": 3, "empire_research_shield_upgrade": 2, "empires_support_units" : 5, "empire_buildable_zrig_master" : 3, "empire_request2_master": 2, "empire_mfs_uili": 4},
         "completedQuests": [],
         "decorationsInfo": None,
         "treasureVaultHighlights": None,
@@ -1388,7 +1388,7 @@ def user_response():
         if neighbor["uid"] in [MIN_ADMIN_ID, MAX_ADMIN_ID]:
             neighbor["level"] =  user["userInfo"]["player"]["level"] + 5
 
-    if session.get('save_version') != version:
+    if session.get('save_version') != version or is_0_08a_preview(version):
         print("Trying migration")
         migrate(meta, session.get('save_version'), version)
 
@@ -2328,6 +2328,21 @@ def select_response(param):
     select_response = {"errorType": 0, "userId": 1, "metadata": meta,
                           "data": []}
     return select_response
+
+
+def part_request_response(params):
+    item = lookup_item_by_name(params[0])
+    item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
+
+    item_inventory[item["-code"]] = item_inventory.get(item["-code"], 0) + len(params[3])
+
+    meta = {"newPVE": 0}
+    handle_quest_progress(meta, progress_gifted_parts(item, len(params[3])))
+    handle_quest_progress(meta, progress_inventory_count())
+
+    part_request_response = {"errorType": 0, "userId": 1, "metadata": meta,
+                      "data": []}
+    return part_request_response
 
 
 def dummy_response():
