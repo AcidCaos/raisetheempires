@@ -606,7 +606,7 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.genericString':
             resps.append(generic_string_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.streakBonus':
-            resps.append(streak_bonus_response())
+            resps.append(streak_bonus_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.setWorldName':
             resps.append(world_name_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.updateRoads':
@@ -2014,8 +2014,12 @@ def generic_string_response(param):
     return generic_string_response
 
 
-def streak_bonus_response():
-    streak_bonus_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+def streak_bonus_response(param):
+    meta = {"newPVE": 0}
+
+    do_rewards("Streak", {"_type": "coins", "_count": param["amount"]}, meta)
+
+    streak_bonus_response = {"errorType": 0, "userId": 1, "metadata": meta,
                              "data": []}
     return streak_bonus_response
 

@@ -246,6 +246,37 @@ def test_part_request_response_inventory_count():
         assert session['user_object']["userInfo"]["player"]["inventory"]["items"] == {'B134': 2}
 
 
+def test_streak_bonus_response():
+    with app.test_request_context():
+        session['user_object'] = {}
+        session['user_object']["userInfo"] = {}
+        session['user_object']["userInfo"]["player"] = {"xp": 0, "energy": 0, "cash": 0, "socialXpGood": 0,
+                                                        "socialXpBad": 0, "level": 1, "energyMax": 0,
+                                                        "playerResourceType": 3, "lastEnergyCheck": 0}
+        session['user_object']["userInfo"]["world"] = {}
+        session['user_object']["userInfo"]["world"]["resources"] = {"coins": 1, "energy": 0, "oil": 0, "wood": 0,
+                                                                    "aluminum": 0, "copper": 0, "gold": 0, "iron": 0,
+                                                                    "uranium": 0}
+        session['user_object']["userInfo"]["world"]["resourceOrder"] = ["aluminum", "copper", "gold", "iron", "uranium"]
+        session['user_object']["experiments"] = {}
+        session["quests"] = [
+            {'name': 'Q3010', 'complete': False, 'expired': False, 'progress': [0, 3, 0], 'completedTasks': 0},
+            {'name': 'Q0516', 'complete': False, 'expired': False, 'progress': [0],
+             'completedTasks': 0}]
+
+        res = empires_server.streak_bonus_response({"amount": 110, "maxesReached": 3})
+
+        assert res == {"errorType": 0, "userId": 1,
+                       "metadata": {"newPVE": 0, 'QuestComponent':
+                           [{'name': 'Q3010', 'complete': False, 'expired': False, 'progress': [0, 113, 0], 'completedTasks': 0}]},
+                             "data": []}
+        assert session['user_object']["userInfo"]["world"]["resources"]["coins"] == 111
+        assert session["quests"] == [
+            {'name': 'Q3010', 'complete': False, 'expired': False, 'progress': [0, 113, 0], 'completedTasks': 0},
+            {'name': 'Q0516', 'complete': False, 'expired': False, 'progress': [0],
+             'completedTasks': 0}]
+
+
 def test_init_user(monkeypatch):
     def get_saves_mock():
         return []
