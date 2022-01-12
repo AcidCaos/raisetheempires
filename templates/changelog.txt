@@ -1,4 +1,5 @@
 upcoming
+    Added refresh on error Nat 12/01/2022 02:35
     Fix quests to be able to request parts from neighbors Nat 12/01/2022 01:25
     Fix meet the neighbors(steele) quest, added suggested neighbors, fix first victory & invite screens, testing Nat 10/01/2022 03:35
     Fix invasion bug after invading twice without refresh, testing Nat 09/01/2022 03:24

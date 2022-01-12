@@ -66,6 +66,27 @@
                     }
 	}
 
+	ZYFrameManager = {
+		"reloadApp":function () {
+                        console.log("Reload App");
+                        window.location.reload();
+          				return;
+                    },
+		"navigateTo":function (a, b, c) {
+                        console.log("Navigate To" + a  + " - " + b + " - " + c);
+          				return;
+                    },
+		"openTab":function (a, b, c) {
+                        console.log("Open Tab" + a  + " - " + b + " - " + c);
+          				return;
+                    },
+		"switchToTab":function (a) {
+                        console.log("Switch To Tab" + a);
+          				return;
+                    }
+
+	}
+
 </script>
 
 <!-- debug websocket connection -->
