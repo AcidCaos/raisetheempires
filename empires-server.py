@@ -31,7 +31,7 @@ from battle_engine import battle_complete_response, spawn_fleet, next_campaign_r
     get_active_island_by_map, set_active_island_by_map, format_player_fleet, \
     cancel_unstarted_invasions, register_fleetname_fleet, get_last_fleet_name, is_shielded
 from game_settings import get_zid, initial_island, random_image, randomReward, get_sessions_id, unlock_expansion, \
-    lookup_wave
+    lookup_wave, lookup_crew_template
 import threading, webbrowser
 import pyamf.amf0
 import json
@@ -578,15 +578,17 @@ def post_gateway():
             # for reqq2 in resp_msg.bodies[0][1].body[1]:
             #     if reqq2.functionName == 'WorldService.performAction' and reqq2.params[1] and reqq2.params[1].id:
             #         lastId=reqq2.params[1].id
-            wr = perform_world_response(step=reqq.params[0],
-                                        supplied_id=reqq.params[1].id,
-                                        position=reqq.params[1].position,
-                                        item_name=reqq.params[1].itemName,
-                                        reference_item=reqq.params[2][0].get('referenceItem') if len(reqq.params[2]) > 0 else None,
-                                        from_inventory=reqq.params[2][0].get('isGift') if len(reqq.params[2]) > 0 else None,
-                                        elapsed=reqq.params[2][0].get('elapsed') if len(reqq.params[2]) > 0 else None,
-                                        cancel=reqq.params[2][0].get('cancel') if len(reqq.params[2]) > 0 else None,
-                                        req2=reqq.params[2][0] if len(reqq.params[2]) > 0 else None)
+            # 
+            #wr = perform_world_response(step=reqq.params[0],
+            #                            supplied_id=reqq.params[1].id,
+            #                            position=reqq.params[1].position,
+            #                            item_name=reqq.params[1].itemName,
+            #                            reference_item=reqq.params[2][0].get('referenceItem') if len(reqq.params[2]) > 0 else None,
+            #                            from_inventory=reqq.params[2][0].get('isGift') if len(reqq.params[2]) > 0 else None,
+            #                            elapsed=reqq.params[2][0].get('elapsed') if len(reqq.params[2]) > 0 else None,
+            #                            cancel=reqq.params[2][0].get('cancel') if len(reqq.params[2]) > 0 else None,
+            #                            req2=reqq.params[2][0] if len(reqq.params[2]) > 0 else None)
+            wr = perform_world_response(reqq.params)
             resps.append(wr)
             report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position,
                              wr["data"], reqq.params, reqq.sequence, resp_msg.bodies[0][0],
@@ -878,7 +880,7 @@ def post_gateway():
         elif reqq.functionName == 'RequestService.allianceJoinRequest':
             resps.append(dummy_response())
         elif reqq.functionName == 'RequestService.crewRequest':
-            resps.append(dummy_response())
+            resps.append(crew_request_response(reqq.params))
         elif reqq.functionName == 'RequestService.invasionHelpRequest':
             resps.append(dummy_response())
         elif reqq.functionName == 'RequestService.neighborRequest':
@@ -1597,7 +1599,21 @@ def tutorial_response(step, sequence, endpoint):
     return tutorial_response
 
 
-def perform_world_response(step, supplied_id, position, item_name, reference_item, from_inventory, elapsed, cancel, req2):
+#def perform_world_response(step, supplied_id, position, item_name, reference_item, from_inventory, elapsed, cancel, req2):
+def perform_world_response(params):
+
+    step=params[0]
+    supplied_id=params[1].id
+    position=params[1].position
+    item_name=params[1].itemName
+
+    reference_item=params[2][0].get('referenceItem') if len(params[2]) > 0 else None
+    from_inventory=params[2][0].get('isGift') if len(params[2]) > 0 else None
+    elapsed=params[2][0].get('elapsed') if len(params[2]) > 0 else None
+    cancel=params[2][0].get('cancel') if len(params[2]) > 0 else None
+    req2=params[2][0] if len(params[2]) > 0 else None
+    index_ref=params[2][0] if len(params[2]) > 0 else None
+
     print("this is step",step, supplied_id, position)
 
     id = supplied_id
@@ -1696,11 +1712,18 @@ def perform_world_response(step, supplied_id, position, item_name, reference_ite
         # list1 = session['user_object']["userInfo"]["world"]["objects"]
         # session['user_object']["userInfo"]["world"]["objects"] = list(filter(lambda i: i['position'] != position), list1)
 
-
     if step == "staffPosition":
+        crewTemplate = lookup_crew_template(item_name)
+        num_slots = len(crewTemplate["position"])
         decoration = lookup_object(id)
-        item = lookup_item_by_name(item_name)
-        decoration["crewInfo"] = decoration.get("crewInfo", []) + [-1]
+
+         # TODO Crew index position is given, but not used.
+        position_index = index_ref['index']
+
+        current_crew = decoration.get("crewInfo", [])
+        new_crew = current_crew + ["-1"]
+        decoration["crewInfo"] = new_crew[:num_slots]
+
         print("staffing")
 
     if step == "decoCrewBuyOnce":
@@ -2351,6 +2374,34 @@ def part_request_response(params):
     part_request_response = {"errorType": 0, "userId": 1, "metadata": meta,
                       "data": []}
     return part_request_response
+
+def crew_request_response(params):
+    # 'params': [[124], 10003, 'Parliament', 'crew']
+    friends = params[0]
+    building_id = params[1]
+    building_name = params[2]
+    action = params[3]
+    
+    building = lookup_object(building_id)
+    
+    if action == 'crew':
+        
+        current_crew = building.get("crewInfo", [])
+
+        crewTemplate = lookup_crew_template(building_name)
+        max_buyable_slots = int(crewTemplate["-numUnbuyableSlots"])
+        num_slots = len(crewTemplate["position"])
+
+        # Empty slots are automatically filled.
+        avail_slots = max(min(num_slots - len(current_crew), num_slots), 0)
+        new_crew = current_crew + friends[:avail_slots]
+        building["crewInfo"] = [str(x) for x in new_crew] # string needed, so that no friend is 'deleted' on display
+        
+        print(building_name, "new crew (max", num_slots, "slots):", building.get("crewInfo", []))
+    
+    meta = {"newPVE": 0}
+    crew_request_response = {"errorType": 0, "userId": 1, "metadata": meta, 'data': []}
+    return crew_request_response
 
 
 def exit_battle_response():

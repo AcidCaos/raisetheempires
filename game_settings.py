@@ -161,6 +161,10 @@ def lookup_raw_state_machine(state_machine_name):
         print("ERROR: Could not look up state machine by name", state_machine_name)
         raise e
 
+def lookup_crew_template(building_name):
+    item = lookup_item_by_name(building_name)
+    crew_template_name = item["-crewTemplate"]
+    return [x for x in game_settings['settings']['crewTemplates']['crewTemplate'] if x['-crew'] == crew_template_name][0]
 
 def repl_dict(d, replacements):
     for k, v in d.items():
