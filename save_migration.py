@@ -52,6 +52,7 @@ def migrate(meta, version, target_version):
         create_backup("Update to 0.08a full")
         # version = "0.08a"
         version = target_version  # remove before release
+        crew_fixer()
         session['user_object']["experiments"]["empire_request2_master"] = 2
         session['user_object']["experiments"]["empire_mfs_uili"] = 4
         session['user_object']["experiments"]["empire_survivalmode3_master"] = 3
@@ -95,4 +96,9 @@ def govt_fixer():
             for reapet_number in range(govt_staff.get(decoration["itemName"])):
                 decoration["crewInfo"] = decoration.get("crewInfo", []) + [-1]
 
+def crew_fixer():
+    for decoration in session['user_object']["userInfo"]["world"]["objects"]:
+        if "crewInfo" in decoration:
+            old_crew = decoration.get("crewInfo", [])
+            decoration["crewInfo"] = [str(x) for x in old_crew]
 

@@ -1717,7 +1717,7 @@ def perform_world_response(params):
         num_slots = len(crewTemplate["position"])
         decoration = lookup_object(id)
 
-         # TODO Crew index position is given, but not used.
+        # TODO Crew index position is given, but not used.
         position_index = index_ref['index']
 
         current_crew = decoration.get("crewInfo", [])
@@ -1727,9 +1727,11 @@ def perform_world_response(params):
         print("staffing")
 
     if step == "decoCrewBuyOnce":
+        crewTemplate = lookup_crew_template(item_name)
+        num_slots = len(crewTemplate["position"])
         decoration = lookup_object(id)
-        item = lookup_item_by_name(item_name)
-        decoration["crewInfo"] = [-1, -1, -1]
+
+        decoration["crewInfo"] = ["-1"] * num_slots
         print("staffing full")
 
     if step == "randomRewards":
