@@ -54,6 +54,9 @@ def migrate(meta, version, target_version):
         version = target_version  # remove before release
         session['user_object']["experiments"]["empire_request2_master"] = 2
         session['user_object']["experiments"]["empire_mfs_uili"] = 4
+        session['user_object']["experiments"]["empire_survivalmode3_master"] = 3
+        session['user_object']["experiments"]["empire_survivalMode_master"] = 2
+        session['user_object']["experiments"]["empire_survivalmode_enhancements"] = 2
         session['save_version'] = version
     if version and version.startswith("0.08a") and version != target_version:  # upcoming
         pass

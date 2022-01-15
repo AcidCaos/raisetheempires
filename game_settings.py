@@ -180,6 +180,12 @@ def repl_dict(d, replacements):
                     # print('r3', d[k])
 
 
+def lookup_wave(set_name, wave_index):
+    [wave_set] = [e for e in game_settings['settings']['survivalModeSets']['set'] if e.get('-name') == set_name]
+    [wave] = [e for e in wave_set["wave"] if e.get('-index') == str(wave_index)]
+    return wave
+
+
 def replenish_energy():
     player = session['user_object']["userInfo"]["player"]
     current_energy_max = max(player["energy"], player["energyMax"])  # overfill possible

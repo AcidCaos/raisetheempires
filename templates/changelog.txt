@@ -1,4 +1,5 @@
 upcoming
+    Added Survival Mode part 1 Nat 15/01/2022 03:58
     Fix exiting battle cleans up fight Nat 13/01/2022 00:07
     Bonus Streak Bar Nat 12/01/2022 23:39
     Added refresh on error Nat 12/01/2022 02:35

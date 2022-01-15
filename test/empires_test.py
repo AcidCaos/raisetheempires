@@ -277,7 +277,7 @@ def test_streak_bonus_response():
              'completedTasks': 0}]
 
 
-def test_streak_bonus_response():
+def test_exit_battle_response():
     with app.test_request_context():
         session['battle'] = ([40, 30], [50, 50], [])
 
@@ -286,6 +286,18 @@ def test_streak_bonus_response():
         assert res == {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
              "data": []}
         assert session['battle'] is None
+
+
+def test_load_survival_mode_response():
+    with app.test_request_context():
+
+        res = empires_server.load_survival_mode_response({'set': 'set3', 'eliteMode': False})
+
+        assert res == {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                       "data": {'state': 2, 'storage': {"curSet": "set3", "curWave": 1, "curLoop": 0, "curPlayerFleet": None,
+                                                        "curEnemyFleet": None, "lastPlayedTime": 0,
+                                                        "rewardRefreshCount": 0, "rewards": None,
+                                                        "rewardChanged": False}}}
 
 
 def test_init_user(monkeypatch):

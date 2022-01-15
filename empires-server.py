@@ -15,7 +15,7 @@ if not debug:
 
 
 from save_engine import save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
-    get_saves, store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path
+    store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path
 from save_migration import migrate, is_0_08a_preview
 from builtins import print
 from time import sleep
@@ -28,10 +28,10 @@ import pyamf
 
 import mod_engine
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
-    get_active_island_by_map, set_active_island_by_map, register_random_fleet, format_player_fleet, \
-    cancel_unstarted_invasions, register_fleetname_fleet
-from game_settings import get_zid, initial_island, random_image, randomReward, get_sessions_friends, \
-    get_sessions_id, unlock_expansion
+    get_active_island_by_map, set_active_island_by_map, format_player_fleet, \
+    cancel_unstarted_invasions, register_fleetname_fleet, get_last_fleet_name, is_shielded
+from game_settings import get_zid, initial_island, random_image, randomReward, get_sessions_id, unlock_expansion, \
+    lookup_wave
 import threading, webbrowser
 import pyamf.amf0
 import json
@@ -50,8 +50,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.07a.2022_01_12"
-release_date = 'Wednesday, 12 January 2022'
+version = "0.07a.2022_01_15"
+release_date = 'Saturday, 15 January 2022'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -798,7 +798,7 @@ def post_gateway():
         elif reqq.functionName == 'QuestSurvivalModeService.loadQuestSurvivalMode':
             resps.append(dummy_response())
         elif reqq.functionName == 'SurvivalModeService.loadSurvivalMode':
-            resps.append(dummy_response())
+            resps.append(load_survival_mode_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.lcs':
             resps.append(dummy_response())
         elif reqq.functionName == 'DataServicesService.getMatchmakingUsersData':
@@ -1219,7 +1219,11 @@ def init_user():
         "DEATHMATCH_DURATION": None,
         "clansInfo": None,
         "immunityTimeVariant": 0,
-        "experiments": {"empire_combataicancritical": 2, "empire_decorations_master": 2, "empire_doober_pickup": 3, "empires_consumable_2": 3, "empire_research_shield_upgrade": 2, "empires_support_units" : 5, "empire_buildable_zrig_master" : 3, "empire_request2_master": 2, "empire_mfs_uili": 4},
+        "experiments": {"empire_combataicancritical": 2, "empire_decorations_master": 2, "empire_doober_pickup": 3,
+                        "empires_consumable_2": 3, "empire_research_shield_upgrade": 2, "empires_support_units": 5,
+                        "empire_buildable_zrig_master": 3, "empire_request2_master": 2, "empire_mfs_uili": 4,
+                        "empire_survivalmode3_master": 3, "empire_survivalMode_master": 2,
+                        "empire_survivalmode_enhancements": 2},
         "completedQuests": [],
         "decorationsInfo": None,
         "treasureVaultHighlights": None,
@@ -2352,10 +2356,114 @@ def part_request_response(params):
 def exit_battle_response():
     exit_battle_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
-
     session["battle"] = None
 
     return exit_battle_response
+
+
+def load_survival_mode_response(param):
+    wave_index = session["fleets"]["FleetName"]["playerLevel"] + 1 if "FleetName" in session["fleets"] and session["fleets"]["FleetName"]["status"] == 4096 and param["set"] is None else 1
+    if param.get("continueGame") or "playerFleet" in param:
+        wave_index = wave_index - 1
+    wave = lookup_wave("set3", wave_index)
+
+    baddies = ['%s,,,,' % baddy[1:] for sub_fleet in
+               simple_list(wave['fleet'])
+               for baddy, count in sub_fleet.items()
+               for i in range(int(count))]
+
+    fleet = {
+        "type": wave["-unitType"],
+        "uid": 1,
+        "name": "FleetName",
+        "status": 4096, #survival enemy
+        "target": "",
+        "consumables": [],
+        "inventory": [],
+        "playerLevel": wave_index,
+        "specialBits": None,
+        "lost": None,
+        "lastUnitLost": None,
+        "lastIndexLost": None,
+        "allies": None,
+        "battleTarget": None,
+        "battleTimestamp": None,
+        "ransomRandom": None,
+        "ransomResource": None,
+        "ransomAmount": None,
+        "units": baddies,
+        "store": [0],  # [0, 0, 0],
+        "fleets": [],
+        "upgrades": None,
+        "hp": None,
+        "invader": True
+    }
+
+    if "playerFleet" in param:
+        load_survival_mode_resp = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                                   "data": {'state': 1, 'storage': {"curSet": "set3", "curWave": wave_index, "curLoop": 0,
+                                                                    "curPlayerFleet": None,
+                                                                    "curEnemyFleet": None, "lastPlayedTime": 0,
+                                                                    "rewardRefreshCount": 0, "rewards": {},
+                                                                    "rewardChanged": False}}}
+        session["fleets"][param['playerFleetName']] = param["playerFleet"]["units"]
+    elif param["set"] is None and not param.get("continueGame"):
+        # load_survival_mode_resp = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+        #                            "data": {}}
+        load_survival_mode_resp = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                                   "data": {'state': 3, 'storage': {"curSet": "set3", "curWave": wave_index, "curLoop": 0,
+                                                                    "curPlayerFleet": get_survival_player_fleet(),
+                                                                    "curEnemyFleet": fleet, "lastPlayedTime": 0,
+                                                                    "rewardRefreshCount": 0, "rewards": {},
+                                                                    "rewardChanged": False}, "enemyWaveFleet": fleet, "playerFleet":get_survival_player_fleet()}}
+        session["battle"] = session["last_battle"]
+        session["battle"] = ([e for e in session["battle"][0] if e != 0], None, session["battle"][2])
+        register_fleetname_fleet(fleet)
+    else:
+        load_survival_mode_resp = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                                   "data": {'state': 2, 'storage': {"curSet": "set3", "curWave": wave_index, "curLoop": 0,
+                                                                    "curPlayerFleet": None,
+                                                                    "curEnemyFleet": None, "lastPlayedTime": 0,
+                                                                    "rewardRefreshCount": 0, "rewards": {},
+                                                                    "rewardChanged": False}, "enemyWaveFleet": fleet}}
+        register_fleetname_fleet(fleet)
+        session["last_battle"] = None
+    return load_survival_mode_resp
+
+
+def get_survival_player_fleet():
+    player_units = session["fleets"][get_last_fleet_name()]
+    subtype = lookup_item_by_code(player_units[0].split(',')[0])["-subtype"]
+
+    fleet = {
+    "type": subtype,
+    "uid": get_zid(),
+    "name": get_last_fleet_name(),
+    "status": 2048,  # survival player
+    "target": "",
+    "consumables": [],
+    "inventory": [],
+    "playerLevel": 1,
+    "specialBits": None,
+    "lost": None,
+    "lastUnitLost": None,
+    "lastIndexLost": None,
+    "allies": None,
+    "battleTarget": None,
+    "battleTimestamp": None,
+    "ransomRandom": None,
+    "ransomResource": None,
+    "ransomAmount": None,
+    "units": ["%s,%d,%d,," % (p.split(',')[0], session["last_battle"][0][i], is_shielded(("ally", i), session["last_battle"][2])) for i, p in enumerate(player_units) if session["last_battle"][0][i] != 0],
+    "store": [0],  # [0, 0, 0],
+    "fleets": [],
+    "upgrades": None,
+    "hp": None,
+    "invader": False
+    }
+    return fleet
+
+# def unit_encode
 
 
 def dummy_response():

@@ -200,6 +200,7 @@ def handle_loss(friendly_strengths):
 def handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths):
     if sum(baddie_strengths) == 0:
         print("Enemy defeated")
+        session["last_battle"] = session["battle"]
         session["battle"] = None
         handle_quest_progress(meta, all_lambda(progress_action("fight"),
                                                progress_parameter_implies("_fleetname", params.get("target"))))
@@ -224,6 +225,8 @@ def handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths):
             if session["fleets"]["FleetName"].get("invaded_uid"):
                 print("neighbor repel won")
                 neighbor_repelled(session["fleets"]["FleetName"])
+            elif session["fleets"]["FleetName"]["status"] == 4096:
+                print("survival won")
             else:
                 print("repel won")
                 del session['user_object']["pvp"]["invaders"]["u" + session["fleets"]["FleetName"]["uid"]]
@@ -233,6 +236,8 @@ def handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths):
                 if enemy_fleet.get("invaded_uid"):
                     print("neighbor repel with consumable won")
                     neighbor_repelled(enemy_fleet)
+                elif session["fleets"]["FleetName"]["status"] == 4096:
+                    print("survival with consumable won")
                 else:
                     print("repel with consumable won")
                     del session['user_object']["pvp"]["invaders"]["u" + enemy_fleet['uid']]
@@ -428,6 +433,11 @@ def init_battle(params):
         session["battle"] = (friendly_strengths, baddie_strengths, active_consumables)
     else:
         (friendly_strengths, baddie_strengths, active_consumables) = session["battle"]
+        if baddie_strengths is None:  # survival mode
+            baddie_strengths = [get_unit_max_strength(baddie, False, params) for baddie in baddies]
+            active_consumables[:] = [(consumable, target, tries) for consumable, target, tries
+                                     in active_consumables if target[0] == "ally"]
+            session["battle"] = (friendly_strengths, baddie_strengths, active_consumables)
     return friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables
 
 
