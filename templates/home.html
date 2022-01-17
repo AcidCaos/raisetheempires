@@ -10,13 +10,17 @@
 <script>
 	function getUserInfo() {
 	    console.log("getUserInfo called")
+		document.getElementById("loading_message").innerHTML= "Loading User info...";
 	    return {'zid': {{ zid | default(-1000) }}, 'uid': {{ zid | default(-1000) }}, 'first_name': {{ computername | tojson }}, 'name':{{ computername | tojson }}, "sex":'F', 'pic_square': '{{ picture }}'};
 	}
+
 	function getFriendData() {
 	    console.log("getFriendData called")
+		document.getElementById("loading_message").innerHTML= "Loading Friends data...";
 		return {{ allies | safe | default([]) }};
 		// return  [{'zid':123, 'uid':123, 'first_name': 'Natalie', 'name':'Portman', "sex":'F'} ,{'zid':-2, 'uid':-2, 'first_name': 'Sergeant', 'name':'Cross', "sex":'M'},{'zid':-1, 'uid':-1, 'first_name': 'Steele', 'name':'Steele', "sex":'M'}];
 	}
+
 	function getAppFriendIds() {
 		console.log("getAppFriendIds called")
 		return {{ app_friends | safe | default([]) }};
@@ -24,8 +28,11 @@
 
 	function onGameLoaded(seen, popp, canvas) {
 		console.log("Game is loaded " +seen +", " + popp + ", " + canvas)
+		// Hide Loading div
+		document.getElementById("loading_game").style.display = "none";
 		return
 	}
+
 	function openInAppPurchaseAPI(gid, snid, snuid,cid,a,b,c) {
 		console.log("Purchase " +gid +", " + snid + ", " + snuid+ ", " + cid+ ", " + a+ ", " + b+ ", " + c)
 		return
@@ -334,44 +341,7 @@
 		<div id="content" class="fb_content clearfix">
 			<div>
 				<div id="mainContainer">
-					<div id="contentCol" class="clearfix hasRightCol">
-						<div id="rightCol" role="complementary">
-							<div class="fixedAux">
-								<div class="canvasRHCFooter" id="pagelet_canvas_footer_content" data-referrer="pagelet_canvas_footer_content" data-referrer="pagelet_canvas_footer_content">
-									<div class="mtl">
-										<div class="rhcFooterWrap" role="contentinfo">
-
-											<div class="rhcFooterCopyright fsm fwn fcg">
-												<span>Empires &amp; Allies</span>
-												 · 
-												<a href="#">App Privacy</a>
-												 · 
-												<a href="#">App Terms</a>
-												 · 
-												<a href="https://github.com/AcidCaos/raisetheempires#readme" target="_blank">Report/Contact this App</a>
-											</div>
-
-											<div class="fsm fwn fcg">
-												<a rel="dialog" href="#" title="Use Facebook in another language." role="button">English (US)</a>
-												 · 
-												<a href="http://www.facebook.com/privacy/explanation" title="Learn about your privacy and Facebook.">Privacy</a>
-												 · 
-												<a href="http://www.facebook.com/policies?ref=pf" title="Review our terms and policies.">Terms</a>
-												 · 
-												<a href="http://www.facebook.com/help/cookies?ref_type=sitefooter" title="Cookies">Cookies</a>
-												 · 
-												<div class="-cx-PRIVATE-uiInlineBlock__root uiPopover" id="rhc_footer_selector">
-													<a class="rhcFooterSelectorButton -cx-PRIVATE-uiPopover__trigger" href="#" aria-haspopup="true" aria-expanded="false" rel="toggle" id="u_0_3" role="button">
-														More <i class="img sp_ctntui sx_321d1b"></i>
-													</a>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-
+					<div id="contentCol" class="clearfix">
 						<div id="contentArea" role="main" aria-describedby="pageTitle">
 							<div class="uiInterstitial canvas_error_page " title="" style="margin-bottom: 20px">
 								
@@ -463,9 +433,9 @@
 								</div>
 
 							</div></center>
-
-							<center><div style="text-align: center; width:1010px;">
-								<div class="gameButtons" id="gameButtons" style=" margin-bottom:4px; margin-left: 5px; text-align: left; /*border: solid 1px*/; height:20px; padding-top: 4px;">
+							<center>
+							<div style="text-align: center; width:1010px;">
+								<div class="gameButtons" id="gameButtons" style=" margin-bottom:4px; margin-left: 5px; text-align: left; height:20px; padding-top: 4px;">
 									<style>
 										#gameButtons a.unsel {
 											color: #000;
@@ -518,26 +488,35 @@
 									<a title="Adds 10k Empire Points" href="/gazillionaire" class="unsel">Get Empire Points</a>
 									<a href="#" class="unsel">Earn Empire Points</a>
 									<a href="#" class="unsel">GameCards</a>
-
 									<a href="#" style="display:inline; float:right; padding-top: 0px;"><img src="layouts/globe.png" style="height:25px"></a>
-
 								</div>
-								
+							</div>
+							<div>
 								<div style="margin:10px">
 								</div>
-								<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" WIDTH="1000" HEIGHT="750" id="ea" ALIGN="">
-									<param NAME=movie VALUE="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf">
-									<param name=FlashVars value="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1">  <!--serverTime=1565300889& mute=true& &zlingshot_zoom= skipFacebook=false&decouple_from_facebook=false&decoupled_facebook_id=5452 -->
-									<param NAME=quality VALUE=high>
-									<param NAME=bgcolor VALUE=#333399>
-					                <param name="allowFullScreen" value="true" />
-									<embed src="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf" allowFullScreen="true" FlashVars="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1" quality=high bgcolor=#333399 WIDTH="1000" HEIGHT="750" NAME="ea" ALIGN="" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
-									</embed>
-								</object>
-
-								<!-- Debug table removed from here: caused some div-float problems -->
-
-							</div></center>
+								<div style="position: relative; width: 1000px; height: 750px; margin: 0; padding: 0; border: 0;">
+									<object id="game_object" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" WIDTH="1000" HEIGHT="750" id="ea" ALIGN="">
+										<param NAME=movie VALUE="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf">
+										<param name=FlashVars value="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1">  <!--serverTime=1565300889& mute=true& &zlingshot_zoom= skipFacebook=false&decouple_from_facebook=false&decoupled_facebook_id=5452 -->
+										<param NAME=quality VALUE=high>
+										<param NAME=bgcolor VALUE=#333399>
+										<param name="allowFullScreen" value="true" />
+										<embed id="game_embed" src="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf" allowFullScreen="true" FlashVars="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1" quality=high bgcolor="#333399" WIDTH="1000" HEIGHT="750" NAME="ea" ALIGN="" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
+										</embed>
+									</object>
+									<!-- Loading game div is rendered on top of the flash object. -->
+									<div id="loading_game" style="position: absolute; top: 0; right: 0; width: 1000px; height: 750px; display: inline-block; margin: 0; padding: 0; border: 0; background-color: #e5f1fd;">
+										<div  style="padding-top: 350px;">
+											<center>
+												<img src="layouts/loading.gif">
+												<br>
+												<p id="loading_message" style="font-size: 11px;">Loading game...</p>
+											</center>
+										</div>
+									</div>
+								</div>
+							</div>
+							</center>
 						</div>
 
 						<div style="margin: 30px"></div>

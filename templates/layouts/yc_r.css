@@ -21,7 +21,7 @@ body{
 	margin:0;
 	min-width:980px;
 	padding-left:10px;
-	padding-right:10px;
+	/*padding-right:10px;*/
 	width:auto!important
 }
 body.liquid div#contentArea{
@@ -82,18 +82,18 @@ body.canvas.liquid div#globalContainer{
 	min-width:1020px
 }
 body.canvas #mainContainer{
-	border-right:1px solid #b3b3b3
+	border-right:0px
 }
 body.canvas #contentCol{
 	padding-top:0
 }
 body.canvas #rightCol{
-	border-left:1px solid #b3b3b3;
-	margin-left:-1px;
-	min-height:1px
+	border-left:0px;
+	margin-left:0px;
+	min-height:0px
 }
 body.canvas div#contentArea{
-	border-right:1px solid #b3b3b3
+	border-right:0px
 }
 body.canvas div#contentArea::after{
 	display:none
@@ -260,8 +260,6 @@ body.canvas.center_fixed_width_app #pagelet_canvas_content{
 	margin-bottom:15px
 }
 .uiInterstitialBar{
-	border-bottom-right-radius:3px;
-	border-bottom-left-radius:3px;
 	line-height:16px;
 	padding:8px 10px
 }
@@ -360,7 +358,7 @@ img{
 	padding-bottom:0
 }
 #mainContainer{
-	margin-left:-1px;
+	margin-left:0px;
 	display:block;
 	width:100%
 }
