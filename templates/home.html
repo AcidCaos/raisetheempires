@@ -508,12 +508,31 @@
 									<div id="loading_game" style="position: absolute; top: 0; right: 0; width: 1000px; height: 750px; display: inline-block; margin: 0; padding: 0; border: 0; background-color: #e5f1fd;">
 										<div  style="padding-top: 350px;">
 											<center>
-												<img src="layouts/loading.gif">
+												<img id="loading_gif" src="layouts/loading.gif">
 												<br>
-												<p id="loading_message" style="font-size: 11px;">Loading game...</p>
+												<p id="loading_message" style="font-size: 11px;">Detecting flash...</p>
+												<br>
+												<div id="flash_enabler" style="display: none; border-radius: 20px; border: 1px solid #e5f1fd">
+													<!-- Fake Flash object to trigger flash enable popup -->
+													<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0">
+														<embed id="game_embed" bgcolor="#e5f1fd" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
+														</embed>
+													</object>
+												</div>
 											</center>
 										</div>
 									</div>
+									<script src="js/flash.js"></script>
+									<script type="text/javascript" charset="utf-8">
+										if (! isFlashEnabled()) {
+											document.getElementById("loading_gif").style.display = "none";
+											document.getElementById("loading_message").innerHTML= '<b>Flash is not enabled.</b><br>Please, enable flash and <a href="javascript: document.location.reload()">refresh</a>.';
+											document.getElementById("flash_enabler").style.display = "block";
+										}
+										else {
+											document.getElementById("loading_message").innerHTML= 'Loading game...';
+										}
+									</script>
 								</div>
 							</div>
 							</center>

@@ -524,6 +524,10 @@ def change_log():
 def template_layouts(path):
     return send_from_directory_mod("templates/layouts", path)
 
+@app.route("/js/<path:path>")
+def template_js(path):
+    return send_from_directory_mod("templates/js", path)
+
 @app.route('/nullassets/<path:path>')
 def send_sol_assets(path):
     return send_from_directory_mod('assets/sol_assets_octdict/assets', path)
