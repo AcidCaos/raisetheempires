@@ -141,7 +141,7 @@ def no_debug():
 @app.route("/wipe_session", methods=['GET', 'POST'])
 def wipe_session():
     session.clear()
-    response = make_response(redirect('/home.html'))
+    response = make_response(redirect('/login.html'))
     # response.set_cookie('session', '', expires=0)
     return response
 
