@@ -265,7 +265,7 @@ def get_sessions_friends(saves):
                 "first_name": save['user_object']["userInfo"]["worldName"],
                 "name": save['user_object']["userInfo"]["worldName"],
                 "sex": "F",
-                "portrait": "layouts/avatars/" + save['profilePic'] if '' in save and save['profilePic'] is not None else random_image(),
+                "portrait": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save and save['profilePic'] is not None else random_image(),
                 "pic": "",
                 "pic_square": ""
         } for save in saves if validate_save(save) and save['user_object']["userInfo"]["player"]["level"] >= -6]
