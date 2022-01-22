@@ -2,18 +2,27 @@
   "info": {
     "uid": 123,
     "resource": 3,
-    "coins": 100,
+    "coins": 3015,
+    "energy": 15,
+    "oil": 25,
+    "wood": 120,
+    "aluminum": 100,
+    "copper": 0,
+    "gold": 0,
+    "iron": 0,
+    "uranium": 0,
     "xp": 93,
     "level": 6,
-    "socialXpGood": 0,
-    "socialLevelGood": 1,
-    "socialXpBad": 0,
+    "socialXpGood": 64,
+    "socialLevelGood": 17,
+    "socialXpBad": 3,
     "socialLevelBad": 1,
-    "profilePic": null,
+    "profilePic": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
     "dominanceRank": 1,
     "tending": {
-      "actions": 3
+      "actions": 2
     },
+     "inactive____pvpInfo": {"status":2, "ts": 1591142368, "pillTS":1591142368},
     "pvpImmunityTimestamp": 1893456000
   },
   "friend": {
@@ -26,12 +35,26 @@
     "pic": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
     "pic_square": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png"
   },
-  "neighbor": true,
   "worldName": "Natalie's Empire",
   "titanName": "Natalie",
-  "expansions": {"data": [0,0,0,0,805306368,6291456,49152,0,0,0,0]},
+  "expansions": {
+    "data": [
+      0,
+      0,
+      0,
+      0,
+      805306368,
+      6291456,
+      49152,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "neighbor": true,
   "recommendedFriends": true,
-  "zyngaFriends": false,
+  "zyngaFriends": true,
   "empireFriends": true,
   "sevenDayFriends": false,
   "fourteenDayFriends": false,
@@ -41,6 +64,3693 @@
   "zyngaFriendsByEngagement": false,
   "empireFriendsByEngagement": false,
   "appFriendId": 123,
-  "objects": null,
-  "roads": null
+  "objects": [
+    {
+      "id": 1001,
+      "itemName": "rock02",
+      "position": "66,79,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1005,
+      "itemName": "tree46",
+      "position": "68,87,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1006,
+      "itemName": "bush 01",
+      "position": "69,86,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1009,
+      "itemName": "tree48",
+      "position": "70,82,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1010,
+      "itemName": "tree30",
+      "position": "69,80,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1011,
+      "itemName": "tree47",
+      "position": "70,80,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1014,
+      "itemName": "tree32",
+      "position": "71,84,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1015,
+      "itemName": "tree32",
+      "position": "75,84,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1020,
+      "itemName": "rock03",
+      "position": "95,64,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1022,
+      "itemName": "bush 01",
+      "position": "97,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1024,
+      "itemName": "tree47",
+      "position": "99,64,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1026,
+      "itemName": "rock04",
+      "position": "91,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1027,
+      "itemName": "rock03",
+      "position": "87,56,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1029,
+      "itemName": "tree47",
+      "position": "89,56,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1030,
+      "itemName": "bush 01",
+      "position": "87,55,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1031,
+      "itemName": "rock03",
+      "position": "84,62,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1032,
+      "itemName": "rock01",
+      "position": "82,70,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1045,
+      "itemName": "tree47",
+      "position": "85,71,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1057,
+      "itemName": "rock03",
+      "position": "68,88,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1058,
+      "itemName": "tree30",
+      "position": "85,73,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1060,
+      "itemName": "tree48",
+      "position": "85,74,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1061,
+      "itemName": "tree48",
+      "position": "71,87,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1062,
+      "itemName": "rock04",
+      "position": "71,80,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1064,
+      "itemName": "tree51",
+      "position": "73,86,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1066,
+      "itemName": "tree48",
+      "position": "73,84,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1068,
+      "itemName": "rock03",
+      "position": "73,82,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1075,
+      "itemName": "tree46",
+      "position": "75,88,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1076,
+      "itemName": "rock02",
+      "position": "75,86,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1079,
+      "itemName": "bush 01",
+      "position": "78,88,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1081,
+      "itemName": "rock03",
+      "position": "78,86,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1082,
+      "itemName": "tree46",
+      "position": "81,87,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1083,
+      "itemName": "tree30",
+      "position": "82,87,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1085,
+      "itemName": "tree48",
+      "position": "83,89,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1087,
+      "itemName": "tree46",
+      "position": "79,79,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1089,
+      "itemName": "rock02",
+      "position": "80,79,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1090,
+      "itemName": "tree32",
+      "position": "80,81,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1092,
+      "itemName": "tree46",
+      "position": "80,83,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1093,
+      "itemName": "rock02",
+      "position": "80,84,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1094,
+      "itemName": "tree48",
+      "position": "77,84,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1096,
+      "itemName": "tree48",
+      "position": "83,85,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1097,
+      "itemName": "tree51",
+      "position": "82,83,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1098,
+      "itemName": "tree48",
+      "position": "84,87,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1100,
+      "itemName": "tree30",
+      "position": "85,89,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1101,
+      "itemName": "tree47",
+      "position": "87,87,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1102,
+      "itemName": "rock02",
+      "position": "87,88,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1103,
+      "itemName": "bush 01",
+      "position": "88,87,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1105,
+      "itemName": "tree46",
+      "position": "91,83,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1107,
+      "itemName": "rock03",
+      "position": "88,83,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1109,
+      "itemName": "tree32",
+      "position": "87,81,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1112,
+      "itemName": "tree48",
+      "position": "85,81,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1113,
+      "itemName": "tree48",
+      "position": "86,79,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1114,
+      "itemName": "rock03",
+      "position": "83,79,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1117,
+      "itemName": "bush 01",
+      "position": "73,80,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1119,
+      "itemName": "rock04",
+      "position": "82,77,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1122,
+      "itemName": "rock01",
+      "position": "83,92,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1124,
+      "itemName": "bush 01",
+      "position": "83,96,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1130,
+      "itemName": "rock04",
+      "position": "91,76,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1139,
+      "itemName": "tree46",
+      "position": "83,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1140,
+      "itemName": "bush 01",
+      "position": "84,64,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1141,
+      "itemName": "rock02",
+      "position": "86,64,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1142,
+      "itemName": "tree32",
+      "position": "87,62,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1143,
+      "itemName": "rock02",
+      "position": "83,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1145,
+      "itemName": "tree31",
+      "position": "88,59,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1147,
+      "itemName": "tree46",
+      "position": "87,59,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1148,
+      "itemName": "tree48",
+      "position": "89,60,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1150,
+      "itemName": "tree48",
+      "position": "89,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1151,
+      "itemName": "tree48",
+      "position": "91,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1152,
+      "itemName": "tree30",
+      "position": "90,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1153,
+      "itemName": "tree30",
+      "position": "91,62,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1155,
+      "itemName": "tree30",
+      "position": "72,82,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1156,
+      "itemName": "tree47",
+      "position": "84,95,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1158,
+      "itemName": "tree30",
+      "position": "85,86,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1160,
+      "itemName": "tree46",
+      "position": "80,83,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1163,
+      "itemName": "tree51",
+      "position": "88,75,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1166,
+      "itemName": "rock02",
+      "position": "87,77,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1170,
+      "itemName": "rock02",
+      "position": "91,72,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1172,
+      "itemName": "rock04",
+      "position": "89,73,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1178,
+      "itemName": "tree48",
+      "position": "82,81,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1179,
+      "itemName": "tree32",
+      "position": "85,77,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1188,
+      "itemName": "rock04",
+      "position": "92,69,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1190,
+      "itemName": "tree48",
+      "position": "88,70,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1191,
+      "itemName": "tree31",
+      "position": "90,72,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1192,
+      "itemName": "tree51",
+      "position": "89,68,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1196,
+      "itemName": "tree47",
+      "position": "88,74,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1201,
+      "itemName": "tree48",
+      "position": "87,67,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1206,
+      "itemName": "tree47",
+      "position": "92,71,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2000,
+      "itemName": "tree24",
+      "position": "14,40,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2001,
+      "itemName": "tree28",
+      "position": "15,38,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2002,
+      "itemName": "tree29",
+      "position": "16,40,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2003,
+      "itemName": "plant01",
+      "position": "15,41,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2004,
+      "itemName": "rock01",
+      "position": "16,38,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2006,
+      "itemName": "tree24",
+      "position": "18,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2007,
+      "itemName": "plant01",
+      "position": "18,45,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2008,
+      "itemName": "tree29",
+      "position": "20,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2009,
+      "itemName": "tree27",
+      "position": "22,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2011,
+      "itemName": "tree26",
+      "position": "18,41,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2012,
+      "itemName": "tree28",
+      "position": "18,37,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2013,
+      "itemName": "rock03",
+      "position": "21,40,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2014,
+      "itemName": "rock04",
+      "position": "20,38,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2015,
+      "itemName": "tree24",
+      "position": "20,40,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2016,
+      "itemName": "tree27",
+      "position": "19,38,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2017,
+      "itemName": "tree27",
+      "position": "19,35,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2018,
+      "itemName": "tree27",
+      "position": "28,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2019,
+      "itemName": "tree28",
+      "position": "26,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2020,
+      "itemName": "tree24",
+      "position": "24,45,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2021,
+      "itemName": "rock02",
+      "position": "26,42,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2022,
+      "itemName": "tree24",
+      "position": "29,43,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2023,
+      "itemName": "tree24",
+      "position": "22,42,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2024,
+      "itemName": "tree28",
+      "position": "23,42,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2025,
+      "itemName": "tree24",
+      "position": "41,10,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2027,
+      "itemName": "plant01",
+      "position": "40,12,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2028,
+      "itemName": "rock01",
+      "position": "37,10,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2029,
+      "itemName": "tree27",
+      "position": "35,11,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2030,
+      "itemName": "rock04",
+      "position": "35,12,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2034,
+      "itemName": "tree27",
+      "position": "41,21,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2035,
+      "itemName": "tree28",
+      "position": "40,20,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2036,
+      "itemName": "tree29",
+      "position": "39,18,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2037,
+      "itemName": "tree24",
+      "position": "38,18,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2038,
+      "itemName": "tree24",
+      "position": "37,19,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2039,
+      "itemName": "rock04",
+      "position": "36,17,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2040,
+      "itemName": "tree24",
+      "position": "35,17,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2041,
+      "itemName": "tree26",
+      "position": "35,15,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2042,
+      "itemName": "rock02",
+      "position": "30,15,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2043,
+      "itemName": "tree28",
+      "position": "32,14,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2044,
+      "itemName": "tree28",
+      "position": "33,15,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2045,
+      "itemName": "tree29",
+      "position": "32,16,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2046,
+      "itemName": "rock02",
+      "position": "40,26,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2047,
+      "itemName": "tree24",
+      "position": "41,28,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2048,
+      "itemName": "plant01",
+      "position": "41,29,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2049,
+      "itemName": "tree28",
+      "position": "39,27,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2050,
+      "itemName": "plant01",
+      "position": "39,28,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2051,
+      "itemName": "rock01",
+      "position": "35,28,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2052,
+      "itemName": "tree25",
+      "position": "34,28,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2053,
+      "itemName": "tree25",
+      "position": "35,25,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2055,
+      "itemName": "plant01",
+      "position": "37,24,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2056,
+      "itemName": "rock03",
+      "position": "32,25,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2057,
+      "itemName": "tree27",
+      "position": "22,18,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2059,
+      "itemName": "plant01",
+      "position": "22,19,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2060,
+      "itemName": "tree29",
+      "position": "36,26,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2061,
+      "itemName": "tree25",
+      "position": "39,11,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2062,
+      "itemName": "tree29",
+      "position": "38,13,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2063,
+      "itemName": "tree25",
+      "position": "39,16,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2064,
+      "itemName": "tree28",
+      "position": "40,15,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2065,
+      "itemName": "rock01",
+      "position": "24,18,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2066,
+      "itemName": "rock02",
+      "position": "22,32,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2067,
+      "itemName": "tree24",
+      "position": "22,31,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2069,
+      "itemName": "tree29",
+      "position": "21,34,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2070,
+      "itemName": "tree29",
+      "position": "21,36,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2071,
+      "itemName": "tree28",
+      "position": "22,25,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2072,
+      "itemName": "tree26",
+      "position": "23,24,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2073,
+      "itemName": "tree28",
+      "position": "23,21,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2074,
+      "itemName": "tree25",
+      "position": "24,21,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2075,
+      "itemName": "rock04",
+      "position": "25,22,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2076,
+      "itemName": "tree26",
+      "position": "26,19,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2077,
+      "itemName": "tree27",
+      "position": "26,21,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2078,
+      "itemName": "tree24",
+      "position": "27,23,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2079,
+      "itemName": "tree27",
+      "position": "26,24,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2080,
+      "itemName": "tree29",
+      "position": "27,25,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2081,
+      "itemName": "tree27",
+      "position": "26,28,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2084,
+      "itemName": "rock04",
+      "position": "26,33,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2085,
+      "itemName": "tree28",
+      "position": "26,32,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2087,
+      "itemName": "tree25",
+      "position": "26,31,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2088,
+      "itemName": "tree29",
+      "position": "27,30,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2089,
+      "itemName": "tree27",
+      "position": "29,30,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2090,
+      "itemName": "rock03",
+      "position": "29,31,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2091,
+      "itemName": "tree24",
+      "position": "31,32,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2092,
+      "itemName": "tree27",
+      "position": "33,33,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2093,
+      "itemName": "tree26",
+      "position": "32,30,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2095,
+      "itemName": "tree26",
+      "position": "24,34,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2096,
+      "itemName": "tree29",
+      "position": "29,33,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2097,
+      "itemName": "tree28",
+      "position": "29,41,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2098,
+      "itemName": "plant01",
+      "position": "32,41,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2099,
+      "itemName": "tree28",
+      "position": "33,39,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2100,
+      "itemName": "tree24",
+      "position": "31,39,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2101,
+      "itemName": "tree25",
+      "position": "30,39,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2102,
+      "itemName": "tree27",
+      "position": "31,40,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2103,
+      "itemName": "rock02",
+      "position": "29,36,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2104,
+      "itemName": "tree27",
+      "position": "31,37,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2105,
+      "itemName": "tree25",
+      "position": "32,36,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2106,
+      "itemName": "tree26",
+      "position": "27,35,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2107,
+      "itemName": "rock03",
+      "position": "25,37,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2108,
+      "itemName": "tree29",
+      "position": "24,40,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2109,
+      "itemName": "tree27",
+      "position": "22,39,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2110,
+      "itemName": "tree29",
+      "position": "27,38,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2111,
+      "itemName": "tree29",
+      "position": "27,40,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2112,
+      "itemName": "tree29",
+      "position": "23,37,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2113,
+      "itemName": "tree24",
+      "position": "29,18,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2114,
+      "itemName": "tree26",
+      "position": "32,22,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2115,
+      "itemName": "rock03",
+      "position": "30,21,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2116,
+      "itemName": "tree29",
+      "position": "30,19,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2117,
+      "itemName": "tree28",
+      "position": "29,21,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2118,
+      "itemName": "tree26",
+      "position": "29,23,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2119,
+      "itemName": "tree27",
+      "position": "31,25,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2120,
+      "itemName": "tree26",
+      "position": "30,26,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2121,
+      "itemName": "tree26",
+      "position": "30,28,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2122,
+      "itemName": "tree29",
+      "position": "32,18,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2123,
+      "itemName": "tree28",
+      "position": "36,22,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2124,
+      "itemName": "tree29",
+      "position": "35,20,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2125,
+      "itemName": "plant01",
+      "position": "20,43,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2126,
+      "itemName": "tree27",
+      "position": "24,30,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2127,
+      "itemName": "plant01",
+      "position": "25,32,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2128,
+      "itemName": "plant01",
+      "position": "24,31,0",
+      "referenceItem": null
+    },
+    {
+      "id": 2129,
+      "itemName": "plant01",
+      "position": "39,21,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3000,
+      "itemName": "tree43",
+      "position": "49,67,0",
+      "referenceItem": null,
+      "state": "3",
+      "lastUpdated": 1642835633886.176
+    },
+    {
+      "id": 3001,
+      "itemName": "tree51",
+      "position": "50,64,0",
+      "referenceItem": null,
+      "state": "3",
+      "lastUpdated": 1642835633870.2158
+    },
+    {
+      "id": 3002,
+      "itemName": "tree31",
+      "position": "50,63,0",
+      "referenceItem": null,
+      "state": "3",
+      "lastUpdated": 1642835639900.5151
+    },
+    {
+      "id": 3003,
+      "itemName": "tree44",
+      "position": "42,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3004,
+      "itemName": "tree45",
+      "position": "42,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3005,
+      "itemName": "tree43",
+      "position": "42,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3006,
+      "itemName": "tree45",
+      "position": "43,62,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3007,
+      "itemName": "tree32",
+      "position": "44,60,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3010,
+      "itemName": "tree49",
+      "position": "47,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3011,
+      "itemName": "tree45",
+      "position": "45,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3012,
+      "itemName": "tree31",
+      "position": "46,57,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3013,
+      "itemName": "tree43",
+      "position": "47,56,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3014,
+      "itemName": "tree44",
+      "position": "46,55,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3015,
+      "itemName": "tree43",
+      "position": "52,62,0",
+      "referenceItem": null,
+      "state": "3",
+      "lastUpdated": 1642835639913.979
+    },
+    {
+      "id": 3016,
+      "itemName": "bush 01",
+      "position": "62,69,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3017,
+      "itemName": "tree32",
+      "position": "63,66,0",
+      "referenceItem": null,
+      "state": "3",
+      "lastUpdated": 1642836179638.979
+    },
+    {
+      "id": 3018,
+      "itemName": "tree44",
+      "position": "65,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3019,
+      "itemName": "tree31",
+      "position": "65,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3020,
+      "itemName": "tree45",
+      "position": "67,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3021,
+      "itemName": "tree44",
+      "position": "69,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3029,
+      "itemName": "tree44",
+      "position": "65,51,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3030,
+      "itemName": "tree32",
+      "position": "63,52,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3031,
+      "itemName": "tree43",
+      "position": "63,50,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3032,
+      "itemName": "tree44",
+      "position": "61,48,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3033,
+      "itemName": "tree51",
+      "position": "58,48,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3035,
+      "itemName": "tree31",
+      "position": "57,52,0",
+      "referenceItem": null,
+      "state": "3",
+      "lastUpdated": 1642834048168.181
+    },
+    {
+      "id": 3036,
+      "itemName": "tree45",
+      "position": "56,42,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3037,
+      "itemName": "tree44",
+      "position": "59,43,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3038,
+      "itemName": "tree45",
+      "position": "58,45,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3039,
+      "itemName": "bush 01",
+      "position": "60,46,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3040,
+      "itemName": "bush 01",
+      "position": "56,46,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3041,
+      "itemName": "tree45",
+      "position": "54,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3042,
+      "itemName": "tree43",
+      "position": "52,46,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3043,
+      "itemName": "tree44",
+      "position": "51,47,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3044,
+      "itemName": "tree32",
+      "position": "52,47,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3045,
+      "itemName": "tree31",
+      "position": "51,49,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3046,
+      "itemName": "tree50",
+      "position": "54,49,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3047,
+      "itemName": "tree44",
+      "position": "49,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3048,
+      "itemName": "tree32",
+      "position": "46,43,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3049,
+      "itemName": "tree44",
+      "position": "46,42,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3050,
+      "itemName": "tree45",
+      "position": "42,46,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3051,
+      "itemName": "tree45",
+      "position": "44,46,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3052,
+      "itemName": "tree44",
+      "position": "42,48,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3053,
+      "itemName": "tree43",
+      "position": "46,50,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3054,
+      "itemName": "tree44",
+      "position": "48,50,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3055,
+      "itemName": "bush 01",
+      "position": "48,48,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3056,
+      "itemName": "bush 01",
+      "position": "49,46,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3057,
+      "itemName": "bush 01",
+      "position": "53,51,0",
+      "referenceItem": null,
+      "state": "3",
+      "lastUpdated": 1642834056269.689
+    },
+    {
+      "id": 3058,
+      "itemName": "tree45",
+      "position": "46,52,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3059,
+      "itemName": "tree49",
+      "position": "48,52,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3060,
+      "itemName": "bush 01",
+      "position": "48,54,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3061,
+      "itemName": "bush 01",
+      "position": "49,60,0",
+      "referenceItem": null,
+      "state": "3",
+      "lastUpdated": 1642835639928.976
+    },
+    {
+      "id": 3063,
+      "itemName": "tree49",
+      "position": "57,64,0",
+      "referenceItem": null,
+      "state": "3",
+      "lastUpdated": 1642834056259.715
+    },
+    {
+      "id": 3064,
+      "itemName": "tree50",
+      "position": "47,61,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3065,
+      "itemName": "tree44",
+      "position": "46,61,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3066,
+      "itemName": "tree50",
+      "position": "60,51,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3067,
+      "itemName": "tree44",
+      "position": "69,61,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3068,
+      "itemName": "tree44",
+      "position": "68,57,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3070,
+      "itemName": "tree45",
+      "position": "67,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3071,
+      "itemName": "tree32",
+      "position": "65,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3072,
+      "itemName": "tree31",
+      "position": "66,56,0",
+      "referenceItem": null
+    },
+    {
+      "id": 3074,
+      "itemName": "tree50",
+      "position": "62,58,0",
+      "referenceItem": null,
+      "state": "3",
+      "lastUpdated": 1642834048176.159
+    },
+    {
+      "id": 3075,
+      "itemName": "tree43",
+      "position": "51,58,0",
+      "referenceItem": null,
+      "state": "3",
+      "lastUpdated": 1642835523296.8882
+    },
+    {
+      "id": 3078,
+      "itemName": "tree50",
+      "position": "65,61,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4000,
+      "itemName": "tree43",
+      "position": "93,49,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4002,
+      "itemName": "tree43",
+      "position": "92,43,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4004,
+      "itemName": "rock01",
+      "position": "92,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4005,
+      "itemName": "tree44",
+      "position": "82,48,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4015,
+      "itemName": "bush 01",
+      "position": "90,43,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4016,
+      "itemName": "rock02",
+      "position": "50,14,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4017,
+      "itemName": "tree44",
+      "position": "52,14,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4018,
+      "itemName": "tree44",
+      "position": "59,15,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4019,
+      "itemName": "rock02",
+      "position": "60,15,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4020,
+      "itemName": "bush 01",
+      "position": "50,29,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4021,
+      "itemName": "tree44",
+      "position": "50,27,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4023,
+      "itemName": "tree45",
+      "position": "50,24,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4024,
+      "itemName": "rock03",
+      "position": "52,26,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4025,
+      "itemName": "tree44",
+      "position": "54,30,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4026,
+      "itemName": "tree43",
+      "position": "54,32,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4027,
+      "itemName": "tree45",
+      "position": "60,32,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4028,
+      "itemName": "rock04",
+      "position": "58,30,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4029,
+      "itemName": "tree43",
+      "position": "57,31,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4030,
+      "itemName": "bush 01",
+      "position": "56,31,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4031,
+      "itemName": "rock02",
+      "position": "56,32,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4032,
+      "itemName": "tree32",
+      "position": "57,28,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4033,
+      "itemName": "tree31",
+      "position": "60,30,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4034,
+      "itemName": "tree50",
+      "position": "60,28,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4035,
+      "itemName": "rock03",
+      "position": "61,27,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4036,
+      "itemName": "bush 01",
+      "position": "63,29,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4037,
+      "itemName": "tree49",
+      "position": "63,27,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4038,
+      "itemName": "tree32",
+      "position": "64,27,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4039,
+      "itemName": "tree51",
+      "position": "62,24,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4040,
+      "itemName": "tree45",
+      "position": "63,22,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4041,
+      "itemName": "tree51",
+      "position": "65,24,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4042,
+      "itemName": "rock01",
+      "position": "66,22,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4043,
+      "itemName": "tree43",
+      "position": "68,22,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4044,
+      "itemName": "tree45",
+      "position": "70,23,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4045,
+      "itemName": "tree44",
+      "position": "72,23,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4046,
+      "itemName": "tree50",
+      "position": "68,25,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4047,
+      "itemName": "rock02",
+      "position": "66,32,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4048,
+      "itemName": "rock03",
+      "position": "70,32,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4049,
+      "itemName": "rock03",
+      "position": "67,27,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4050,
+      "itemName": "tree43",
+      "position": "67,30,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4051,
+      "itemName": "bush 01",
+      "position": "68,31,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4052,
+      "itemName": "tree51",
+      "position": "69,29,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4053,
+      "itemName": "tree32",
+      "position": "72,29,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4054,
+      "itemName": "rock04",
+      "position": "74,28,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4055,
+      "itemName": "tree50",
+      "position": "73,27,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4056,
+      "itemName": "tree31",
+      "position": "74,27,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4057,
+      "itemName": "tree44",
+      "position": "77,27,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4058,
+      "itemName": "rock03",
+      "position": "76,29,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4059,
+      "itemName": "tree32",
+      "position": "75,31,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4060,
+      "itemName": "tree44",
+      "position": "74,34,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4061,
+      "itemName": "rock02",
+      "position": "74,35,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4062,
+      "itemName": "tree43",
+      "position": "74,40,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4063,
+      "itemName": "rock02",
+      "position": "75,39,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4064,
+      "itemName": "tree44",
+      "position": "75,38,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4065,
+      "itemName": "tree45",
+      "position": "77,39,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4066,
+      "itemName": "tree31",
+      "position": "79,38,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4067,
+      "itemName": "rock04",
+      "position": "79,39,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4068,
+      "itemName": "tree50",
+      "position": "77,37,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4069,
+      "itemName": "tree43",
+      "position": "81,40,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4070,
+      "itemName": "tree31",
+      "position": "78,31,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4071,
+      "itemName": "tree44",
+      "position": "85,30,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4072,
+      "itemName": "rock02",
+      "position": "84,31,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4073,
+      "itemName": "rock01",
+      "position": "83,33,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4074,
+      "itemName": "rock03",
+      "position": "81,35,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4075,
+      "itemName": "tree51",
+      "position": "81,33,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4076,
+      "itemName": "tree45",
+      "position": "81,31,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4077,
+      "itemName": "tree51",
+      "position": "78,34,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4078,
+      "itemName": "tree51",
+      "position": "83,37,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4079,
+      "itemName": "tree32",
+      "position": "83,39,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4080,
+      "itemName": "tree45",
+      "position": "88,39,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4081,
+      "itemName": "tree50",
+      "position": "86,40,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4082,
+      "itemName": "rock03",
+      "position": "86,41,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4083,
+      "itemName": "tree32",
+      "position": "84,42,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4084,
+      "itemName": "tree45",
+      "position": "83,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4086,
+      "itemName": "rock01",
+      "position": "85,46,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4087,
+      "itemName": "tree31",
+      "position": "87,46,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4090,
+      "itemName": "bush 01",
+      "position": "86,48,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4092,
+      "itemName": "tree43",
+      "position": "87,48,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4094,
+      "itemName": "rock03",
+      "position": "88,47,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4096,
+      "itemName": "tree45",
+      "position": "90,47,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4097,
+      "itemName": "rock04",
+      "position": "89,45,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4098,
+      "itemName": "bush 01",
+      "position": "53,16,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4099,
+      "itemName": "tree43",
+      "position": "53,17,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4100,
+      "itemName": "tree45",
+      "position": "51,18,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4101,
+      "itemName": "tree44",
+      "position": "50,20,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4102,
+      "itemName": "rock03",
+      "position": "51,20,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4103,
+      "itemName": "rock02",
+      "position": "52,22,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4104,
+      "itemName": "tree50",
+      "position": "53,21,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4105,
+      "itemName": "tree31",
+      "position": "54,20,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4106,
+      "itemName": "tree50",
+      "position": "56,20,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4107,
+      "itemName": "tree30",
+      "position": "57,20,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4108,
+      "itemName": "bush 01",
+      "position": "57,21,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4109,
+      "itemName": "tree44",
+      "position": "57,18,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4110,
+      "itemName": "tree45",
+      "position": "59,17,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4111,
+      "itemName": "rock01",
+      "position": "58,19,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4112,
+      "itemName": "bush 01",
+      "position": "60,19,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4113,
+      "itemName": "tree50",
+      "position": "60,21,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4114,
+      "itemName": "rock04",
+      "position": "60,22,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4118,
+      "itemName": "tree50",
+      "position": "54,25,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4119,
+      "itemName": "tree50",
+      "position": "55,27,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4120,
+      "itemName": "tree51",
+      "position": "55,22,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4121,
+      "itemName": "tree31",
+      "position": "57,23,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4122,
+      "itemName": "tree32",
+      "position": "56,24,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4123,
+      "itemName": "tree49",
+      "position": "56,27,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4124,
+      "itemName": "tree32",
+      "position": "59,25,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4125,
+      "itemName": "tree32",
+      "position": "70,26,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4126,
+      "itemName": "tree50",
+      "position": "69,27,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4127,
+      "itemName": "tree30",
+      "position": "76,33,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4129,
+      "itemName": "tree30",
+      "position": "87,44,0",
+      "referenceItem": null
+    },
+    {
+      "id": 4130,
+      "itemName": "tree31",
+      "position": "88,43,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5000,
+      "itemName": "tree27",
+      "position": "14,64,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5001,
+      "itemName": "tree28",
+      "position": "15,62,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5002,
+      "itemName": "tree28",
+      "position": "16,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5003,
+      "itemName": "plant01",
+      "position": "15,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5004,
+      "itemName": "tree26",
+      "position": "17,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5005,
+      "itemName": "tree29",
+      "position": "20,64,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5006,
+      "itemName": "tree29",
+      "position": "22,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5007,
+      "itemName": "tree25",
+      "position": "22,60,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5008,
+      "itemName": "rock02",
+      "position": "23,59,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5009,
+      "itemName": "tree27",
+      "position": "25,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5010,
+      "itemName": "tree28",
+      "position": "27,54,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5011,
+      "itemName": "tree28",
+      "position": "32,55,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5012,
+      "itemName": "tree27",
+      "position": "33,54,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5013,
+      "itemName": "tree25",
+      "position": "31,56,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5014,
+      "itemName": "rock04",
+      "position": "28,55,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5015,
+      "itemName": "plant01",
+      "position": "33,57,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5016,
+      "itemName": "tree26",
+      "position": "27,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5017,
+      "itemName": "tree29",
+      "position": "25,60,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5018,
+      "itemName": "tree24",
+      "position": "25,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5019,
+      "itemName": "rock04",
+      "position": "25,64,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5020,
+      "itemName": "tree27",
+      "position": "27,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5021,
+      "itemName": "tree29",
+      "position": "27,64,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5022,
+      "itemName": "tree29",
+      "position": "27,66,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5023,
+      "itemName": "tree27",
+      "position": "30,62,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5024,
+      "itemName": "tree27",
+      "position": "33,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5025,
+      "itemName": "tree28",
+      "position": "33,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5026,
+      "itemName": "rock01",
+      "position": "31,63,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5027,
+      "itemName": "tree25",
+      "position": "30,64,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5028,
+      "itemName": "plant01",
+      "position": "31,65,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5029,
+      "itemName": "tree26",
+      "position": "24,66,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5030,
+      "itemName": "tree24",
+      "position": "22,68,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5031,
+      "itemName": "plant01",
+      "position": "23,69,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5032,
+      "itemName": "rock03",
+      "position": "26,68,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5033,
+      "itemName": "rock01",
+      "position": "22,71,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5034,
+      "itemName": "tree27",
+      "position": "22,73,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5035,
+      "itemName": "plant01",
+      "position": "22,76,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5036,
+      "itemName": "tree28",
+      "position": "23,75,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5037,
+      "itemName": "tree27",
+      "position": "25,70,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5038,
+      "itemName": "tree26",
+      "position": "25,71,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5039,
+      "itemName": "tree25",
+      "position": "29,70,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5041,
+      "itemName": "rock04",
+      "position": "26,73,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5042,
+      "itemName": "tree29",
+      "position": "28,72,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5043,
+      "itemName": "tree25",
+      "position": "27,80,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5044,
+      "itemName": "tree24",
+      "position": "32,71,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5046,
+      "itemName": "tree25",
+      "position": "32,73,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5048,
+      "itemName": "tree26",
+      "position": "30,72,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5049,
+      "itemName": "plant01",
+      "position": "30,74,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5051,
+      "itemName": "tree27",
+      "position": "30,76,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5053,
+      "itemName": "tree29",
+      "position": "29,77,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5054,
+      "itemName": "rock02",
+      "position": "27,77,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5055,
+      "itemName": "tree24",
+      "position": "28,75,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5057,
+      "itemName": "tree26",
+      "position": "26,75,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5059,
+      "itemName": "tree25",
+      "position": "31,79,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5060,
+      "itemName": "tree26",
+      "position": "31,81,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5061,
+      "itemName": "plant01",
+      "position": "33,80,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5062,
+      "itemName": "rock04",
+      "position": "32,83,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5063,
+      "itemName": "tree28",
+      "position": "35,79,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5064,
+      "itemName": "plant01",
+      "position": "35,78,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5065,
+      "itemName": "tree28",
+      "position": "37,78,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5066,
+      "itemName": "tree29",
+      "position": "37,80,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5067,
+      "itemName": "tree27",
+      "position": "35,82,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5068,
+      "itemName": "tree26",
+      "position": "35,84,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5069,
+      "itemName": "rock03",
+      "position": "37,83,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5070,
+      "itemName": "plant01",
+      "position": "53,97,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5071,
+      "itemName": "tree28",
+      "position": "57,93,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5072,
+      "itemName": "tree27",
+      "position": "53,95,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5073,
+      "itemName": "tree25",
+      "position": "51,96,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5074,
+      "itemName": "tree28",
+      "position": "48,97,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5075,
+      "itemName": "rock02",
+      "position": "46,93,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5076,
+      "itemName": "tree24",
+      "position": "46,92,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5077,
+      "itemName": "tree27",
+      "position": "47,88,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5078,
+      "itemName": "rock03",
+      "position": "47,89,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5079,
+      "itemName": "tree28",
+      "position": "56,83,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5080,
+      "itemName": "tree27",
+      "position": "53,82,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5081,
+      "itemName": "plant01",
+      "position": "53,79,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5083,
+      "itemName": "rock01",
+      "position": "51,80,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5084,
+      "itemName": "tree24",
+      "position": "50,79,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5085,
+      "itemName": "rock03",
+      "position": "48,79,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5089,
+      "itemName": "rock04",
+      "position": "51,92,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5090,
+      "itemName": "tree29",
+      "position": "49,93,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5091,
+      "itemName": "tree29",
+      "position": "52,90,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5092,
+      "itemName": "tree28",
+      "position": "55,90,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5093,
+      "itemName": "plant01",
+      "position": "54,88,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5094,
+      "itemName": "tree29",
+      "position": "50,88,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5095,
+      "itemName": "tree25",
+      "position": "52,88,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5096,
+      "itemName": "tree25",
+      "position": "56,87,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5097,
+      "itemName": "tree29",
+      "position": "53,85,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5098,
+      "itemName": "tree25",
+      "position": "52,84,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5100,
+      "itemName": "plant01",
+      "position": "51,85,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5101,
+      "itemName": "tree26",
+      "position": "47,84,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5102,
+      "itemName": "rock04",
+      "position": "49,84,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5103,
+      "itemName": "rock02",
+      "position": "45,78,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5104,
+      "itemName": "tree27",
+      "position": "44,78,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5105,
+      "itemName": "tree25",
+      "position": "46,81,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5106,
+      "itemName": "plant01",
+      "position": "41,89,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5107,
+      "itemName": "rock01",
+      "position": "38,88,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5108,
+      "itemName": "tree28",
+      "position": "41,87,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5109,
+      "itemName": "tree27",
+      "position": "40,86,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5110,
+      "itemName": "tree29",
+      "position": "43,80,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5111,
+      "itemName": "plant01",
+      "position": "44,82,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5112,
+      "itemName": "tree26",
+      "position": "42,83,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5113,
+      "itemName": "tree25",
+      "position": "41,84,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5114,
+      "itemName": "tree29",
+      "position": "40,81,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5115,
+      "itemName": "tree28",
+      "position": "41,79,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5116,
+      "itemName": "tree24",
+      "position": "36,89,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5118,
+      "itemName": "tree25",
+      "position": "35,86,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5119,
+      "itemName": "tree26",
+      "position": "35,87,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5121,
+      "itemName": "tree28",
+      "position": "30,86,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5122,
+      "itemName": "tree26",
+      "position": "32,86,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5124,
+      "itemName": "tree25",
+      "position": "29,60,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5126,
+      "itemName": "plant01",
+      "position": "28,62,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5127,
+      "itemName": "tree25",
+      "position": "38,86,0",
+      "referenceItem": null
+    },
+    {
+      "id": 5128,
+      "itemName": "tree25",
+      "position": "50,82,0",
+      "referenceItem": null
+    },
+    {
+      "id": 6000,
+      "itemName": "bricks_red",
+      "position": "57,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 6001,
+      "itemName": "bricks_pink",
+      "position": "56,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 6002,
+      "itemName": "bricks_red",
+      "position": "55,58,0",
+      "referenceItem": null
+    },
+    {
+      "id": 6003,
+      "itemName": "bricks_pink",
+      "position": "57,57,0",
+      "referenceItem": null
+    },
+    {
+      "id": 6004,
+      "itemName": "bricks_red",
+      "position": "57,56,0",
+      "referenceItem": null
+    },
+    {
+      "id": 6005,
+      "itemName": "bricks_red",
+      "position": "56,57,0",
+      "referenceItem": null
+    },
+    {
+      "id": 6006,
+      "itemName": "bricks_pink",
+      "position": "56,56,0",
+      "referenceItem": null
+    },
+    {
+      "id": 6007,
+      "itemName": "bricks_pink",
+      "position": "55,57,0",
+      "referenceItem": null
+    },
+    {
+      "id": 6008,
+      "itemName": "bricks_red",
+      "position": "55,56,0",
+      "referenceItem": null
+    },
+    {
+      "id": 6011,
+      "itemName": "Small Island Hut",
+      "position": "52,55,0",
+      "referenceItem": null,
+      "state": 8
+    },
+    {
+      "id": 6012,
+      "itemName": "Small Island Hut",
+      "position": "57,53,0",
+      "referenceItem": null,
+      "state": 8
+    },
+    {
+      "id": 6017,
+      "itemName": "vehicle11",
+      "position": "55,56,0",
+      "referenceItem": null
+    },
+    {
+      "id": 6018,
+      "itemName": "infantry01",
+      "position": "57,57,0",
+      "referenceItem": null
+    },
+    {
+      "id": 1028,
+      "itemName": "Small Bungalow Damaged",
+      "position": "66,54,0",
+      "referenceItem": null
+    },
+    {
+      "id": 10001,
+      "itemName": "Barracks 01",
+      "position": "54,60,0",
+      "referenceItem": null,
+      "state": "8",
+      "check_state": {
+        "2": {
+          "-label": "clearing",
+          "-className": "SimpleAuto",
+          "-stateName": "2",
+          "-autoNext": "3",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "ConFence",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "ClearingLandMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_clearing",
+          "-visitTooltip": "generic_clearing",
+          "-visitorRewardType": "build"
+        },
+        "4": {
+          "-label": "constructing",
+          "-className": "SimpleAuto",
+          "-stateName": "4",
+          "-autoNext": "5",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "DirtLot",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "PouringFoundationMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_constructing",
+          "-visitTooltip": "generic_constructing",
+          "-visitorRewardType": "build"
+        },
+        "6": {
+          "-label": "finishing",
+          "-className": "SimpleAuto",
+          "-stateName": "6",
+          "-autoNext": "7",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "Foundation",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "FinishingMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_finishing",
+          "-visitTooltip": "generic_finishing",
+          "-visitorRewardType": "build"
+        },
+        "11": {
+          "-label": "harvesting",
+          "-className": "SimpleAuto",
+          "-stateName": "11",
+          "-autoNext": "8",
+          "-energy": "0",
+          "-xp": "0",
+          "-wood": "0|0",
+          "-oil": "0|0",
+          "-rare": "0|0",
+          "-buildable": "1",
+          "-dooberType": "default",
+          "-onExitWorking": "0",
+          "-clientDuration": "0s",
+          "-duration": "0",
+          "-actionMessage": "HarvestingMessage",
+          "-progressBar": "always",
+          "-tooltip": "unit_harvesting",
+          "-visitTooltip": "",
+          "-visitorRewardType": "NONE",
+          "-multiharvestableserver": "false",
+          "-decoEffect": "contractYield"
+        }
+      },
+      "lastUpdated": 1642836390277.994
+    },
+    {
+      "id": 10002,
+      "itemName": "statue01",
+      "position": "56,57,0",
+      "referenceItem": null,
+      "state": 0,
+      "lastUpdated": 1642833887835.293
+    },
+    {
+      "id": 10003,
+      "itemName": "Small Island Hut",
+      "position": "59,55,0",
+      "referenceItem": null,
+      "state": "8",
+      "check_state": {
+        "2": {
+          "-label": "clearing",
+          "-className": "SimpleAuto",
+          "-stateName": "2",
+          "-autoNext": "3",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "ConFence",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "ClearingLandMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_clearing",
+          "-visitTooltip": "generic_clearing",
+          "-visitorRewardType": "build"
+        },
+        "4": {
+          "-label": "constructing",
+          "-className": "SimpleAuto",
+          "-stateName": "4",
+          "-autoNext": "5",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "DirtLot",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "PouringFoundationMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_constructing",
+          "-visitTooltip": "generic_constructing",
+          "-visitorRewardType": "build"
+        },
+        "6": {
+          "-label": "finishing",
+          "-className": "SimpleAuto",
+          "-stateName": "6",
+          "-autoNext": "7",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "Foundation",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "FinishingMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_finishing",
+          "-visitTooltip": "generic_finishing",
+          "-visitorRewardType": "build"
+        },
+        "10": {
+          "-label": "spawning",
+          "-className": "SimpleAuto",
+          "-stateName": "10",
+          "-autoNext": "8",
+          "-coins": "10",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "CollectingTaxesMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_collecting",
+          "-visitTooltip": "generic_collecting",
+          "-visitorRewardType": "tax",
+          "-multiharvestableserver": "true",
+          "-decoEffect": "maturationYield"
+        }
+      },
+      "lastUpdated": 1642836147563.252
+    },
+    {
+      "id": 10004,
+      "itemName": "Small Island Hut",
+      "position": "54,53,0",
+      "referenceItem": null,
+      "state": "8",
+      "check_state": {
+        "2": {
+          "-label": "clearing",
+          "-className": "SimpleAuto",
+          "-stateName": "2",
+          "-autoNext": "3",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "ConFence",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "ClearingLandMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_clearing",
+          "-visitTooltip": "generic_clearing",
+          "-visitorRewardType": "build"
+        },
+        "4": {
+          "-label": "constructing",
+          "-className": "SimpleAuto",
+          "-stateName": "4",
+          "-autoNext": "5",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "DirtLot",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "PouringFoundationMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_constructing",
+          "-visitTooltip": "generic_constructing",
+          "-visitorRewardType": "build"
+        },
+        "6": {
+          "-label": "finishing",
+          "-className": "SimpleAuto",
+          "-stateName": "6",
+          "-autoNext": "7",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "Foundation",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "FinishingMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_finishing",
+          "-visitTooltip": "generic_finishing",
+          "-visitorRewardType": "build"
+        },
+        "10": {
+          "-label": "spawning",
+          "-className": "SimpleAuto",
+          "-stateName": "10",
+          "-autoNext": "8",
+          "-coins": "10",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "CollectingTaxesMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_collecting",
+          "-visitTooltip": "generic_collecting",
+          "-visitorRewardType": "tax",
+          "-multiharvestableserver": "true",
+          "-decoEffect": "maturationYield"
+        }
+      },
+      "lastUpdated": 1642836147579.863
+    },
+    {
+      "id": 10005,
+      "itemName": "Small Farm",
+      "position": "52,58,0",
+      "referenceItem": null,
+      "state": "8",
+      "check_state": {
+        "2": {
+          "-label": "clearing",
+          "-className": "SimpleAuto",
+          "-stateName": "2",
+          "-autoNext": "3",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "ConFence",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "ClearingLandMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_clearing",
+          "-visitTooltip": "generic_clearing",
+          "-visitorRewardType": "build"
+        },
+        "4": {
+          "-label": "constructing",
+          "-className": "SimpleAuto",
+          "-stateName": "4",
+          "-autoNext": "5",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "DirtLot",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "PouringFoundationMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_constructing",
+          "-visitTooltip": "generic_constructing",
+          "-visitorRewardType": "build"
+        },
+        "6": {
+          "-label": "finishing",
+          "-className": "SimpleAuto",
+          "-stateName": "6",
+          "-autoNext": "7",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "Foundation",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "FinishingMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_finishing",
+          "-visitTooltip": "generic_finishing",
+          "-visitorRewardType": "build"
+        },
+        "11": {
+          "-label": "harvesting",
+          "-className": "SimpleAuto",
+          "-stateName": "11",
+          "-autoNext": "8",
+          "-energy": "-1",
+          "-xp": "1",
+          "-coins": "100",
+          "-dooberType": "default",
+          "-onExitWorking": "0",
+          "-icon": "",
+          "-imageType": "Harvestable",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "HarvestingCropsMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_harvesting",
+          "-visitTooltip": "generic_harvesting",
+          "-harvestingState": "1",
+          "-visitorRewardType": "harvest",
+          "-multiharvestableserver": "true"
+        }
+      },
+      "lastUpdated": 1642835917105.31
+    },
+    {
+      "id": 10006,
+      "itemName": "infantry01",
+      "position": "56,58,0",
+      "referenceItem": null,
+      "state": 0,
+      "lastUpdated": 1642835608865.592
+    },
+    {
+      "id": 10007,
+      "itemName": "Barracks 01",
+      "position": "57,60,0",
+      "referenceItem": null,
+      "state": "8",
+      "check_state": {
+        "2": {
+          "-label": "clearing",
+          "-className": "SimpleAuto",
+          "-stateName": "2",
+          "-autoNext": "3",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "ConFence",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "ClearingLandMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_clearing",
+          "-visitTooltip": "generic_clearing",
+          "-visitorRewardType": "build"
+        },
+        "4": {
+          "-label": "constructing",
+          "-className": "SimpleAuto",
+          "-stateName": "4",
+          "-autoNext": "5",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "DirtLot",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "PouringFoundationMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_constructing",
+          "-visitTooltip": "generic_constructing",
+          "-visitorRewardType": "build"
+        },
+        "6": {
+          "-label": "finishing",
+          "-className": "SimpleAuto",
+          "-stateName": "6",
+          "-autoNext": "7",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "Foundation",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "FinishingMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_finishing",
+          "-visitTooltip": "generic_finishing",
+          "-visitorRewardType": "build"
+        },
+        "11": {
+          "-label": "harvesting",
+          "-className": "SimpleAuto",
+          "-stateName": "11",
+          "-autoNext": "8",
+          "-energy": "0",
+          "-xp": "0",
+          "-wood": "0|0",
+          "-oil": "0|0",
+          "-rare": "0|0",
+          "-buildable": "1",
+          "-dooberType": "default",
+          "-onExitWorking": "0",
+          "-clientDuration": "0s",
+          "-duration": "0",
+          "-actionMessage": "HarvestingMessage",
+          "-progressBar": "always",
+          "-tooltip": "unit_harvesting",
+          "-visitTooltip": "",
+          "-visitorRewardType": "NONE",
+          "-multiharvestableserver": "false",
+          "-decoEffect": "contractYield"
+        }
+      },
+      "lastUpdated": 1642836095070.342
+    },
+    {
+      "id": 10008,
+      "itemName": "vehicle11",
+      "position": "56,56,0",
+      "referenceItem": null,
+      "state": 0,
+      "lastUpdated": 1642836102228.328
+    },
+    {
+      "id": 10009,
+      "itemName": "vehicle11",
+      "position": "57,56,0",
+      "referenceItem": null,
+      "state": 0,
+      "lastUpdated": 1642836116662.056
+    },
+    {
+      "id": 10010,
+      "itemName": "Small Stilt House",
+      "position": "61,55,0",
+      "referenceItem": null,
+      "state": "8",
+      "check_state": {
+        "2": {
+          "-label": "clearing",
+          "-className": "SimpleAuto",
+          "-stateName": "2",
+          "-autoNext": "3",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "ConFence",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "ClearingLandMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_clearing",
+          "-visitTooltip": "generic_clearing",
+          "-visitorRewardType": "build"
+        },
+        "4": {
+          "-label": "constructing",
+          "-className": "SimpleAuto",
+          "-stateName": "4",
+          "-autoNext": "5",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "DirtLot",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "PouringFoundationMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_constructing",
+          "-visitTooltip": "generic_constructing",
+          "-visitorRewardType": "build"
+        },
+        "6": {
+          "-label": "finishing",
+          "-className": "SimpleAuto",
+          "-stateName": "6",
+          "-autoNext": "7",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "Foundation",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "FinishingMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_finishing",
+          "-visitTooltip": "generic_finishing",
+          "-visitorRewardType": "build"
+        },
+        "10": {
+          "-label": "spawning",
+          "-className": "SimpleAuto",
+          "-stateName": "10",
+          "-autoNext": "8",
+          "-coins": "25",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "CollectingTaxesMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_collecting",
+          "-visitTooltip": "generic_collecting",
+          "-visitorRewardType": "tax",
+          "-multiharvestableserver": "true",
+          "-decoEffect": "maturationYield"
+        }
+      },
+      "lastUpdated": 1642840966317.6292
+    },
+    {
+      "id": 10011,
+      "itemName": "Small Stilt House",
+      "position": "50,55,0",
+      "referenceItem": null,
+      "state": "8",
+      "check_state": {
+        "2": {
+          "-label": "clearing",
+          "-className": "SimpleAuto",
+          "-stateName": "2",
+          "-autoNext": "3",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "ConFence",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "ClearingLandMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_clearing",
+          "-visitTooltip": "generic_clearing",
+          "-visitorRewardType": "build"
+        },
+        "4": {
+          "-label": "constructing",
+          "-className": "SimpleAuto",
+          "-stateName": "4",
+          "-autoNext": "5",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "DirtLot",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "PouringFoundationMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_constructing",
+          "-visitTooltip": "generic_constructing",
+          "-visitorRewardType": "build"
+        },
+        "6": {
+          "-label": "finishing",
+          "-className": "SimpleAuto",
+          "-stateName": "6",
+          "-autoNext": "7",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-imageType": "Foundation",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "FinishingMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_finishing",
+          "-visitTooltip": "generic_finishing",
+          "-visitorRewardType": "build"
+        },
+        "10": {
+          "-label": "spawning",
+          "-className": "SimpleAuto",
+          "-stateName": "10",
+          "-autoNext": "8",
+          "-coins": "25",
+          "-energy": "-1",
+          "-xp": "1",
+          "-dooberType": "default",
+          "-clientDuration": "2.0s",
+          "-duration": "0",
+          "-actionMessage": "CollectingTaxesMessage",
+          "-progressBar": "always",
+          "-tooltip": "generic_collecting",
+          "-visitTooltip": "generic_collecting",
+          "-visitorRewardType": "tax",
+          "-multiharvestableserver": "true",
+          "-decoEffect": "maturationYield"
+        }
+      },
+      "lastUpdated": 1642840966353.533
+    },
+    {
+      "id": 10012,
+      "itemName": "infantry01",
+      "position": "55,57,0",
+      "referenceItem": null,
+      "state": 0,
+      "lastUpdated": 1642836401435.163
+    }
+  ],
+  "roads": [
+          "54,55|54,55",
+          "55,55|55,55",
+          "56,55|56,55",
+          "57,55|57,55",
+          "58,55|58,55",
+          "58,56|58,56",
+          "58,57|58,57",
+          "58,58|58,58",
+          "58,59|58,59",
+          "57,59|57,59",
+          "56,59|56,59",
+          "55,59|55,59",
+          "54,59|54,59",
+          "54,58|54,58",
+          "54,57|54,57",
+          "54,56|54,56",
+          "56,54|56,54",
+          "56,53|56,53",
+          "56,52|56,52",
+          "56,51|56,51",
+          "56,60|56,60",
+          "56,61|56,61",
+          "56,62|56,62",
+          "56,63|56,63",
+          "59,57|59,57",
+          "60,57|60,57",
+          "61,57|61,57",
+          "62,57|62,57",
+          "53,57|53,57",
+          "52,57|52,57",
+          "51,57|51,57",
+          "50,57|50,57"
+  ]
 }
