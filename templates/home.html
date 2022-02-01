@@ -2,15 +2,21 @@
 <html lang="en">
 
 <head>
+	<!-- Meta -->
+	<meta charset="utf-8"/>
+	<!-- Title and Icon -->
 	<title id="pageTitle">Empires &amp; Allies on Facebook | Facebook</title>
 	<link rel="shortcut icon" href="layouts/icon.png"/>
 	<link rel="icon" type="image/png" href="layouts/icon.png"/>
-	<meta charset="utf-8"/>
+	<!-- CSS -->
     <link rel="stylesheet" href="layouts/yc_r.css"/>
+	<!-- JS -->
+	<script src="js/flash.js"></script>
 <script>
 	function getUserInfo() {
 	    console.log("getUserInfo called")
 		document.getElementById("loading_message").innerHTML= "Loading User info...";
+		document.getElementById("flash_enabler").style.display = "none";
 	    return {'zid': {{ zid | default(-1000) }}, 'uid': {{ zid | default(-1000) }}, 'first_name': {{ computername | tojson }}, 'name':{{ computername | tojson }}, "sex":'F', 'pic_square': '{{ picture }}'};
 	}
 
@@ -494,17 +500,16 @@
 							<div>
 								<div style="margin:10px">
 								</div>
-								<div style="position: relative; width: 1000px; height: 750px; margin: 0; padding: 0; border: 0;">
+								<!--<div style="position: relative; width: 1000px; height: 750px; margin: 0; padding: 0; border: 0;">
 									<object id="game_object" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" WIDTH="1000" HEIGHT="750" id="ea" ALIGN="">
 										<param NAME=movie VALUE="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf">
 										<param name=FlashVars value="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1">  <!--serverTime=1565300889& mute=true& &zlingshot_zoom= skipFacebook=false&decouple_from_facebook=false&decoupled_facebook_id=5452 -->
-										<param NAME=quality VALUE=high>
+										<!--<param NAME=quality VALUE=high>
 										<param NAME=bgcolor VALUE=#333399>
 										<param name="allowFullScreen" value="true" />
 										<embed id="game_embed" src="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf" allowFullScreen="true" FlashVars="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1" quality=high bgcolor="#333399" WIDTH="1000" HEIGHT="750" NAME="ea" ALIGN="" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
 										</embed>
 									</object>
-									<!-- Loading game div is rendered on top of the flash object. -->
 									<div id="loading_game" style="position: absolute; top: 0; right: 0; width: 1000px; height: 750px; display: inline-block; margin: 0; padding: 0; border: 0; background-color: #e5f1fd;">
 										<div  style="padding-top: 350px;">
 											<center>
@@ -513,7 +518,7 @@
 												<p id="loading_message" style="font-size: 11px;">Detecting flash...</p>
 												<br>
 												<div id="flash_enabler" style="display: none; border-radius: 20px; border: 1px solid #e5f1fd">
-													<!-- Fake Flash object to trigger flash enable popup -->
+
 													<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0">
 														<embed id="game_embed" bgcolor="#e5f1fd" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
 														</embed>
@@ -522,16 +527,68 @@
 											</center>
 										</div>
 									</div>
-									<script src="js/flash.js"></script>
+									<div id="loading_game" style="position: absolute; top: 0; left: 0; width:1000px; height:750px; background-color: white;">
+										<div name="motd" style="width:750px; height:500px; display: inline-block; margin: 0; padding: 0; border: 0;  background-image: url('layouts/motds/MOTD_Espionage_HQ.png'); background-size: cover; background-position: center; background-repeat: no-repeat; background-clip: border-box; margin-top: 100px;">
+											<div name="EA_frame" style="width:750px; height:750px; display: inline-block; margin: 0; padding: 0; border: 0; background-image: url('layouts/loading_frame_remastered.png'); background-size: contain; background-position: center; background-repeat: no-repeat; margin-top: -130px;">
+												<center style="padding-top: 470px; width: 570px; height: 650px; margin: 0; border: 0; /*background-color: #e5f1fd;*/">
+													<img id="loading_gif" src="layouts/loading.gif">
+													<br>
+													<p id="loading_message" style="font-size: 30px; color: white; text-shadow: 0px 0px 6px black;">Detecting flash...</p>											
+												</center>
+												<div style="width: 750px; position: absolute; top: 0; padding-top: 300px;">
+													<center>
+														<div id="flash_enabler" style="display: none; width: 300px; border-radius: 20px; border: 1px solid #e5f1fd; overflow: hidden;">
+															<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" width=300>
+																<embed id="game_embed" bgcolor="#e5f1fd" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer" width=300>
+																</embed>
+															</object>
+														</div>
+													</center>
+												</div>
+											</div>
+										</div>
+									</div>
 									<script type="text/javascript" charset="utf-8">
-										if (! isFlashEnabled()) {
-											document.getElementById("loading_gif").style.display = "none";
-											document.getElementById("loading_message").innerHTML= '<b>Flash is not enabled.</b><br>Please, enable flash and <a href="javascript: document.location.reload()">refresh</a>.';
-											document.getElementById("flash_enabler").style.display = "block";
-										}
-										else {
-											document.getElementById("loading_message").innerHTML= 'Loading game...';
-										}
+										loadingScreenUpdate()
+									</script>
+								</div>-->
+								<div style="position: relative; width: 1000px; min-height: 750px; margin: 0; padding: 0; border: 0;">
+									<div id="game_object" style="width: 1000px; min-height: 750px; display: inline-block; margin: 0; padding: 0; border: 0;">
+										<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" WIDTH="1000" HEIGHT="750" id="ea" ALIGN="">
+											<param NAME=movie VALUE="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf">
+											<param name=FlashVars value="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1">  <!--serverTime=1565300889& mute=true& &zlingshot_zoom= skipFacebook=false&decouple_from_facebook=false&decoupled_facebook_id=5452 -->
+											<param NAME=quality VALUE=high>
+											<param NAME=bgcolor VALUE=#333399>
+											<param name="allowFullScreen" value="true" />
+											<embed id="game_embed" src="/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf" allowFullScreen="true" FlashVars="serverTime={{ time | default(1308211688) }}&is_staging=true&debugMode=true&generateSchema=1&sn_app_url=&stats=1" quality=high bgcolor="#333399" WIDTH="1000" HEIGHT="750" NAME="ea" ALIGN="" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
+											</embed>
+										</object>
+									</div>
+									<!-- Loading game div is rendered on top of the flash object. -->
+									<div id="loading_game" style="position: absolute; top: 0; left: 0; width:1000px; height:750px; background-color: white;">
+										<div name="motd" style="width:750px; height:500px; display: inline-block; margin: 0; padding: 0; border: 0;  background-image: url('layouts/motds/MOTD_Espionage_HQ.png'); background-size: cover; background-position: center; background-repeat: no-repeat; background-clip: border-box; margin-top: 100px;">
+											<div name="EA_frame" style="width:750px; height:750px; display: inline-block; margin: 0; padding: 0; border: 0; background-image: url('layouts/loading_frame_remastered.png'); background-size: contain; background-position: center; background-repeat: no-repeat; margin-top: -130px;">
+												<center style="padding-top: 470px; width: 570px; height: 650px; margin: 0; border: 0; /*background-color: #e5f1fd;*/">
+													<!--<img id="loading_gif" src="layouts/loading.gif">-->
+													<br>
+													<p id="loading_message" style="font-size: 30px; color: white; text-shadow: 0px 0px 6px black;">Detecting flash...</p>											
+												</center>
+												<div style="width: 750px; position: absolute; top: 0; padding-top: 300px;">
+													<center>
+														<div id="flash_enabler" style="/*display: none;*/ width: 300px; /*border-radius: 20px; border: 1px solid #e5f1fd; overflow: hidden;*/">
+															<!-- Fake Flash object to trigger flash enable popup -->
+															<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" width=300>
+																<embed id="game_embed" WMODE="transparent" bgcolor="white" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer" width=300>
+																</embed>
+															</object>
+														</div>
+													</center>
+												</div>
+											</div>
+										</div>
+									</div>
+									<script type="text/javascript" charset="utf-8">
+										loadingScreenUpdate()
 									</script>
 								</div>
 							</div>

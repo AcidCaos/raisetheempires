@@ -12,4 +12,13 @@ function isFlashEnabled() {
     return flash;
 }
 
-isFlashEnabled();
+function loadingScreenUpdate() {
+    if (! isFlashEnabled()) {
+        document.getElementById("loading_gif").style.display = "none";
+        document.getElementById("loading_message").innerHTML= '<b>Flash is not enabled.</b><br>Please, enable flash and <a href="javascript: document.location.reload()">refresh</a>.';
+        //document.getElementById("flash_enabler").style.display = "block";
+    }
+    else {
+        document.getElementById("loading_message").innerHTML= 'Loading game...';
+    }
+}
