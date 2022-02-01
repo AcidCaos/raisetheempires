@@ -16,12 +16,14 @@
 	function getUserInfo() {
 	    console.log("getUserInfo called")
 		document.getElementById("loading_message").innerHTML= "Loading User info...";
+		document.getElementById("inner_progress_bar").style.width = "30%";
 		document.getElementById("flash_enabler").style.display = "none";
 	    return {'zid': {{ zid | default(-1000) }}, 'uid': {{ zid | default(-1000) }}, 'first_name': {{ computername | tojson }}, 'name':{{ computername | tojson }}, "sex":'F', 'pic_square': '{{ picture }}'};
 	}
 
 	function getFriendData() {
 	    console.log("getFriendData called")
+		document.getElementById("inner_progress_bar").style.width = "50%";
 		document.getElementById("loading_message").innerHTML= "Loading Friends data...";
 		return {{ allies | safe | default([]) }};
 		// return  [{'zid':123, 'uid':123, 'first_name': 'Natalie', 'name':'Portman', "sex":'F'} ,{'zid':-2, 'uid':-2, 'first_name': 'Sergeant', 'name':'Cross', "sex":'M'},{'zid':-1, 'uid':-1, 'first_name': 'Steele', 'name':'Steele', "sex":'M'}];
@@ -29,11 +31,13 @@
 
 	function getAppFriendIds() {
 		console.log("getAppFriendIds called")
+		document.getElementById("inner_progress_bar").style.width = "70%";
 		return {{ app_friends | safe | default([]) }};
 	}
 
 	function onGameLoaded(seen, popp, canvas) {
 		console.log("Game is loaded " +seen +", " + popp + ", " + canvas)
+		document.getElementById("inner_progress_bar").style.width = "100%";
 		// Hide Loading div
 		document.getElementById("loading_game").style.display = "none";
 		return
@@ -566,12 +570,15 @@
 									</div>
 									<!-- Loading game div is rendered on top of the flash object. -->
 									<div id="loading_game" style="position: absolute; top: 0; left: 0; width:1000px; height:750px; background-color: white;">
-										<div name="motd" style="width:750px; height:500px; display: inline-block; margin: 0; padding: 0; border: 0;  background-image: url('layouts/motds/MOTD_Espionage_HQ.png'); background-size: cover; background-position: center; background-repeat: no-repeat; background-clip: border-box; margin-top: 100px;">
+										<div name="motd" style="width:750px; height:500px; display: inline-block; margin: 0; padding: 0; border: 0;  background-image: url('{{ motd | safe }}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-clip: border-box; margin-top: 100px; box-shadow: inset 0px -30px 70px 50px #000;">
 											<div name="EA_frame" style="width:750px; height:750px; display: inline-block; margin: 0; padding: 0; border: 0; background-image: url('layouts/loading_frame_remastered.png'); background-size: contain; background-position: center; background-repeat: no-repeat; margin-top: -130px;">
-												<center style="padding-top: 470px; width: 570px; height: 650px; margin: 0; border: 0; /*background-color: #e5f1fd;*/">
+												<center style="padding-top: 490px; width: 570px; margin: 0; border: 0; /*background-color: #e5f1fd;*/">
 													<!--<img id="loading_gif" src="layouts/loading.gif">-->
 													<br>
-													<p id="loading_message" style="font-size: 30px; color: white; text-shadow: 0px 0px 6px black;">Detecting flash...</p>											
+													<p id="loading_message" style="font-size: 30px; color: white; text-shadow: 0px 0px 6px black; margin-bottom: 15px;">Detecting flash...</p>											
+													<div id="progress_bar" style="display: flex; width: 45%; height: 18px; border-radius: 10px; overflow: hidden; background-color: #6d5554; box-shadow: inset 0px 4px 9px -1px #4c4635;"> 
+														<div id="inner_progress_bar" style="width: 0%; background-color: #e6b104; box-shadow: inset 0px 4px 9px -1px #fae361; transition: width 1s linear;"></div>
+													</div>
 												</center>
 												<div style="width: 750px; position: absolute; top: 0; padding-top: 300px;">
 													<center>

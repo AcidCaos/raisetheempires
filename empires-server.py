@@ -41,6 +41,7 @@ from quest_engine import *
 from state_machine import *
 from logger import socketio, report_tutorial_step, report_world_log, report_other_log
 import copy
+import random
 
 try:
     from flask_compress import Compress
@@ -100,7 +101,8 @@ def home():
                            app_friends=json.dumps(get_allies_id(saves)),
                            computername=session['user_object']["userInfo"]["worldName"] if 'user_object' in session else "Emperor",
                            picture=get_avatar_pic(),
-                           dropdown_items=get_sessions_dropdown_info(saves)
+                           dropdown_items=get_sessions_dropdown_info(saves),
+                           motd=get_motd()
                            )
 
 
@@ -500,6 +502,73 @@ def get_avail_avatars():
                     "17_AirForceCP_01_100.png"]
     return avatar_list
 
+def get_avail_motds():
+    # return avatar_file_names in os.walk(os.path.join(my_games_path() ,"templates/layouts/motds"))
+    # TODO
+    motds = [
+        "Loading_BattleBlitz.png",
+        "MOTD_AssailantAmbush01.png",
+        "MOTD_BkgdBlueCity.png",
+        "MOTD_BlazingInferno02.png",
+        "MOTD_BlazingInferno03.png",
+        "MOTD_BlazingInferno07.png",
+        "MOTD_BlueBarrage11.png",
+        "MOTD_BlueBarrage3.png",
+        "MOTD_BlueBarrage6.png",
+        "MOTD_BlueBarrage8.png",
+        "MOTD_BlueBarrage9.png",
+        "MOTD_BuildableAmityNavalStation.png",
+        "MOTD_BuildableCompCenter.png",
+        "MOTD_BuildableDeco_01.png",
+        "MOTD_BuildableDeco_02.png",
+        "MOTD_BuildableFarmCamp.png",
+        "MOTD_BuildableLighthouse.png",
+        "MOTD_BuildableNeighborhood.png",
+        "MOTD_Campaign02Part01.png",
+        "MOTD_ChefVille.png",
+        "MOTD_CommandoDamageAcademy.png",
+        "MOTD_DangerousDeployments3.png",
+        "MOTD_DecoBuildableCyberWarfare.png",
+        "MOTD_DecoDogPark.png",
+        "MOTD_DooberDrop.png",
+        "MOTD_ElementZCollider.png",
+        "MOTD_Espionage_HQ.png",
+        "MOTD_FactoryRefresh.png",
+        "MOTD_FierceFighters2.png",
+        "MOTD_FrenchXMilitaryCenter.png",
+        "MOTD_MGS_02.png",
+        "MOTD_MGS_03.png",
+        "MOTD_MGS_04.png",
+        "MOTD_MS_036.png",
+        "MOTD_MS_038.png",
+        "MOTD_MS_040.png",
+        "MOTD_MS_041.png",
+        "MOTD_MS_042.png",
+        "MOTD_MS_043.png",
+        "MOTD_MS_044_03.png",
+        "MOTD_MS_045_02.png",
+        "MOTD_MS_046_03.png",
+        "MOTD_MS_047_03.png",
+        "MOTD_MS_050_02.png",
+        "MOTD_MenacingMarines01.png",
+        "MOTD_MiniGame.png",
+        "MOTD_OreMine.png",
+        "MOTD_Parliament.png",
+        "MOTD_PotOfOre.png",
+        "MOTD_QuestBuildableStatue.png",
+        "MOTD_Research_1_1.png",
+        "MOTD_SovereignSentinels01.png",
+        "MOTD_SovereignSentinels04.png",
+        "MOTD_SurvivalModeRefresh02.png",
+        "MOTD_TheVille.png",
+        "MOTD_Tier08.png",
+        "MOTD_TierSurfacing.png",
+        "MOTD_VRTrainingSimulator.png",
+        "MOTD_VeteranWarriors01.png",
+        "MOTD_WorldGames.png"
+    ]
+    return motds
+
 @app.route("/new.html")
 def new_player_page():
     saves = get_saves()
@@ -515,6 +584,10 @@ def choose_avatar(path):
 def get_avatar_pic():
     avatar_pic = "layouts/avatars/" + session['profilePic'] if 'profilePic' in session and session['profilePic'] is not None else random_image()
     return avatar_pic
+
+def get_motd():
+    motd = "layouts/motds/" + random.choice(get_avail_motds())
+    return motd
 
 @app.route("/changelog.txt")
 def change_log():

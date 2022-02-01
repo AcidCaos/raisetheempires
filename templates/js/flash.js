@@ -19,6 +19,7 @@ function loadingScreenUpdate() {
         //document.getElementById("flash_enabler").style.display = "block";
     }
     else {
-        document.getElementById("loading_message").innerHTML= 'Loading game...';
+        document.getElementById("loading_message").innerHTML = 'Loading game...';
+        document.getElementById("inner_progress_bar").style.width = "10%";
     }
 }
