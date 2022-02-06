@@ -2,10 +2,9 @@
 
 import json
 
+import battle_engine
 import pytest
 from flask import Flask, session
-
-import battle_engine
 
 app = Flask(__name__)
 app.secret_key = 'test'
@@ -395,3 +394,88 @@ def test_spawn_fleet_quest_odd_fleets():
         assert session["fleets"] == {'fleet1_2341959767162880': None, 'fleet3_2341959767162880': None}
 
 
+def test_decode_unit_count_list():
+    res = battle_engine.decode_unit_count_list([
+        {
+            "-U43": "2",
+            "-PCK": "1"
+        },
+        {"-U43": "2"}
+    ])
+    assert res == ["U43", "U43", "PCK", "U43", "U43"]
+
+
+def test_encode_unit_string():
+    res = battle_engine.encode_unit_string("U43")
+    assert res == 'U43,,,,'
+
+
+def test_encode_unit_string_with_hp_shields():
+    res = battle_engine.encode_unit_string("U43", hp=40, shield=1)
+    assert res == 'U43,40,1,,'
+
+
+
+def test_encode_unit_strings():
+    res = battle_engine.encode_unit_strings(["U43", "U43", "PCK", "U43", "U43"])
+    assert res == ["U43,,,,", "U43,,,,", "PCK,,,,", "U43,,,,", "U43,,,,"]
+
+
+def test_decode_unit_string():
+    res = battle_engine.decode_unit_string('U43,1,2,3,4')
+    assert res == 'U43'
+
+
+def test_decode_unit_strings():
+    res = battle_engine.decode_unit_strings(["U43,,,,", "U43,,,,", "PCK,,,,", "U43,,,,", "U43,,,,"])
+    assert res == ["U43", "U43", "PCK", "U43", "U43"]
+
+
+
+def test_get_survival_player_fleet():
+
+    with app.test_request_context():
+
+        setup_session_invade()
+
+        session["last_battle"] = ([10, 11, 12, 13, 14], [], [({'-name': 'consumable75', '-type': 'consumable', '-subtype': 'consumable',
+                             '-storable': 'true', '-buyable': 'true', '-code': 'N75', '-version': '2',
+                             'requiredLevel': '10', 'cost': {'-cash': '30'}, 'tooltip': {'-type': 'consumable'},
+                             'consumable': {'-duration': '0', '-energy': '0', '-type': 'all',
+                                            '-diweapon': 'DefenseShield', '-postWait': '1s',
+                                            '-givesAbility': 'shield'}, 'image': [
+                                  {'-name': 'icon',
+                                   '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_96.png'},
+                                  {'-name': 'cursor',
+                                   '-url': 'assets/game/consumables/ConsumablesUI.swf/Shield_01_49.png'}],
+                             'loc': {'-sentenceName': 'true'},
+                             'requiredExperiment': {'-name': 'empires_consumable_2', '-variants': '3'}}, ('ally', 2), 999999)])
+
+        res = battle_engine.get_survival_player_fleet()
+
+        assert res == {
+            "type": "army",
+            "uid": 2341959767162880,
+            "name": "fleet14_2341959767162880",
+            "status": 2048,  # survival player
+            "target": "",
+            "consumables": [],
+            "inventory": [],
+            "playerLevel": 1,
+            "specialBits": None,
+            "lost": None,
+            "lastUnitLost": None,
+            "lastIndexLost": None,
+            "allies": None,
+            "battleTarget": None,
+            "battleTimestamp": None,
+            "ransomRandom": None,
+            "ransomResource": None,
+            "ransomAmount": None,
+            "units": ['V06,10,0,,', 'V06,11,0,,', 'UN33,12,1,,', 'UN33,13,0,,', 'UL61,14,0,,'],
+            "store": [0],  # [0, 0, 0],
+            "fleets": [],
+            "upgrades": {'V06': "XD05,XT05,XA05,XC05,XR05,XS05"},
+            "hp": None,
+            "invader": False
+        }

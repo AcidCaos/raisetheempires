@@ -29,7 +29,8 @@ import pyamf
 import mod_engine
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
     get_active_island_by_map, set_active_island_by_map, format_player_fleet, \
-    cancel_unstarted_invasions, register_fleetname_fleet, get_last_fleet_name, is_shielded
+    cancel_unstarted_invasions, register_fleetname_fleet, get_last_fleet_name, is_shielded, decode_unit_count_list, \
+    encode_unit_strings, get_survival_player_fleet
 from game_settings import get_zid, initial_island, random_image, randomReward, get_sessions_id, unlock_expansion, \
     lookup_wave, lookup_crew_template
 import threading, webbrowser
@@ -51,8 +52,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.07a.2022_01_15"
-release_date = 'Saturday, 15 January 2022'
+version = "0.07a.2022_02_06"
+release_date = 'Sunday, 06 February 2022'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -2497,10 +2498,7 @@ def load_survival_mode_response(param):
         wave_index = wave_index - 1
     wave = lookup_wave("set3", wave_index)
 
-    baddies = ['%s,,,,' % baddy[1:] for sub_fleet in
-               simple_list(wave['fleet'])
-               for baddy, count in sub_fleet.items()
-               for i in range(int(count))]
+    baddies = encode_unit_strings(decode_unit_count_list(wave['fleet']))
 
     fleet = {
         "type": wave["-unitType"],
@@ -2561,37 +2559,6 @@ def load_survival_mode_response(param):
     return load_survival_mode_resp
 
 
-def get_survival_player_fleet():
-    player_units = session["fleets"][get_last_fleet_name()]
-    subtype = lookup_item_by_code(player_units[0].split(',')[0])["-subtype"]
-
-    fleet = {
-    "type": subtype,
-    "uid": get_zid(),
-    "name": get_last_fleet_name(),
-    "status": 2048,  # survival player
-    "target": "",
-    "consumables": [],
-    "inventory": [],
-    "playerLevel": 1,
-    "specialBits": None,
-    "lost": None,
-    "lastUnitLost": None,
-    "lastIndexLost": None,
-    "allies": None,
-    "battleTarget": None,
-    "battleTimestamp": None,
-    "ransomRandom": None,
-    "ransomResource": None,
-    "ransomAmount": None,
-    "units": ["%s,%d,%d,," % (p.split(',')[0], session["last_battle"][0][i], is_shielded(("ally", i), session["last_battle"][2])) for i, p in enumerate(player_units) if session["last_battle"][0][i] != 0],
-    "store": [0],  # [0, 0, 0],
-    "fleets": [],
-    "upgrades": None,
-    "hp": None,
-    "invader": False
-    }
-    return fleet
 
 # def unit_encode
 

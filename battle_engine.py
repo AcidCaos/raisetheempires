@@ -2,14 +2,13 @@ import math
 
 from flask import session
 
-from game_settings import lookup_item_by_code, game_settings, get_zid, lookup_items_by_type, \
-    lookup_items_by_type_and_subtype
+from game_settings import lookup_item_by_code, game_settings, get_zid, lookup_items_by_type_and_subtype
 from logger import report_battle_log
 from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_seed_z, roll_random_between, \
     handle_quest_progress, progress_action, roll_random_float, all_lambda, progress_parameter_equals, do_rewards, \
     roll_reward_random_float, progress_battle_damage_count, progress_useAOA_consumable, progress_useGeneral_consumable, \
     progress_parameter_implies
-from save_engine import get_saves, store_session, lookup_objects_save_by_position
+from save_engine import get_saves, store_session
 
 
 def battle_complete_response(params):
@@ -465,6 +464,29 @@ def get_friendly_by_ally_fleet(name):
     return [fleet[5:] for fleet in session["fleets"] if fleet.startswith('ally_') and name in session["fleets"][fleet]][0]
 
 
+def decode_unit_count_list(raw_units):
+    return [baddy[1:] for sub_fleet in
+            simple_list(raw_units)
+            for baddy, count in sub_fleet.items()
+            for i in range(int(count))]
+
+
+def encode_unit_string(code, hp='', shield=''):
+    return '%s,%s,%s,,' % (code, hp, shield)
+
+
+def encode_unit_strings(codes):
+    return [encode_unit_string(code) for code in codes]
+
+
+def decode_unit_string(unit_string):
+    return unit_string.split(',')[0]
+
+
+def decode_unit_strings(unit_strings):
+    return [decode_unit_string(unit_string) for unit_string in unit_strings]
+
+
 def unit_roll(attacker_weak, defender_weak):
     if attacker_weak:
         return -2
@@ -593,6 +615,41 @@ def get_new_enemy_fleet_name():
         i += 2
         fleet_name = "fleet" + str(i) + "_" + str(get_zid())
     return fleet_name
+
+
+def get_survival_player_fleet():
+    player_units = session["fleets"][get_last_fleet_name()]
+    subtype = lookup_item_by_code(player_units[0].split(',')[0])["-subtype"]
+    research = session['user_object']["userInfo"]["world"]["research"]
+
+
+    fleet = {
+    "type": subtype,
+    "uid": get_zid(),
+    "name": get_last_fleet_name(),
+    "status": 2048,  # survival player
+    "target": "",
+    "consumables": [],
+    "inventory": [],
+    "playerLevel": 1,
+    "specialBits": None,
+    "lost": None,
+    "lastUnitLost": None,
+    "lastIndexLost": None,
+    "allies": None,
+    "battleTarget": None,
+    "battleTimestamp": None,
+    "ransomRandom": None,
+    "ransomResource": None,
+    "ransomAmount": None,
+    "units": ["%s,%d,%d,," % (p.split(',')[0], session["last_battle"][0][i], is_shielded(("ally", i), session["last_battle"][2])) for i, p in enumerate(player_units) if session["last_battle"][0][i] != 0],
+    "store": [0],  # [0, 0, 0],
+    "fleets": [],
+    "upgrades": {p.split(',')[0]: ",".join(research.get(p.split(',')[0])) for i, p in enumerate(player_units) if session["last_battle"][0][i] != 0 and research.get(p.split(',')[0])},
+    "hp": None,
+    "invader": False
+    }
+    return fleet
 
 
 # new TAssignConsumable("AI",null,0,0,null) 2nd ability
