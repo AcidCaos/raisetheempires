@@ -2549,8 +2549,9 @@ def crew_request_response(params):
         num_slots = len(crewTemplate["position"])
 
         # Empty slots are automatically filled.
+        auto_accept_friends = [f for f in friends if allies[str(f)]["neighbor"]] # only neighbor allies can be added
         avail_slots = max(min(num_slots - len(current_crew), num_slots), 0)
-        new_crew = current_crew + friends[:avail_slots]
+        new_crew = current_crew + auto_accept_friends[:avail_slots]
         building["crewInfo"] = [str(x) for x in new_crew] # string needed, so that no friend is 'deleted' on display
         
         print(building_name, "new crew (max", num_slots, "slots):", building.get("crewInfo", []))
