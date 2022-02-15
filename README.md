@@ -1,4 +1,4 @@
-![Empires & Allies](templates/layouts/logo.png "Empires & Allies logo")
+![Empires & Allies](templates/img/logo.png "Empires & Allies logo")
 
 > Empires and Allies(Facebook) officially closed June 17th, 2013
 

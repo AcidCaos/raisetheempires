@@ -1,78 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title id="pageTitle">Empires &amp; Allies on Facebook | Facebook</title>
-	<link rel="shortcut icon" href="layouts/icon.png"/>
-	<link rel="icon" type="image/png" href="layouts/icon.png"/>
+	<!-- Meta -->
 	<meta charset="utf-8"/>
-    <link rel="stylesheet" href="layouts/yc_r.css"/>
+	<!-- Title and Icon -->
+	<title id="pageTitle">Empires &amp; Allies</title>
+	<link rel="shortcut icon" href="img/icon.png"/>
+	<link rel="icon" type="image/png" href="img/icon.png"/>
+	<!-- CSS -->
+    <link rel="stylesheet" href="css/facebook.css"/>
 </head>
-
-<body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US" 
-style="overflow: hidden;">
-	<div class="-cx-PRIVATE-fbLayout__root">
-	  	<div id="pagelet_bluebar" data-referrer="pagelet_bluebar">
-	  		<div id="blueBarHolder">
-	  			<div id="blueBar">
-	  				<div>
-	  					<div class="loggedout_menubar_container">
-	  						<div class="clearfix loggedout_menubar">
-	  							<a class="lfloat" href="#" title="Go to Facebook Home">
-	  								<i class="fb_logo img sp_e2gpgs sx_584554">
-	  									<u>Facebook logo</u>
-	  								</i>
-	  							</a>
-	  						</div>
-	  					</div>
-	  				<div class="signupBanner">
-	  					<div class="signup_bar_container">
-	  						<div class="signup_box clearfix">
-			  				</div>
-			  			</div>
-			  		</div>
-			  	</div>
-	  		</div>
-		</div>
-	</div>
-	<div class="mvl ptm uiInterstitial canvas_error_page uiInterstitialLarge uiBoxWhite" title="">
+<body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); overflow: auto;">
+	<div class="mvl ptm uiInterstitial canvas_error_page uiInterstitialLarge uiBoxWhite">
+		<!-- HEAD TITLE -->
 		<div class="uiHeader uiHeaderBottomBorder mhl mts uiHeaderPage interstitialHeader">
 			<div class="clearfix uiHeaderTop">
 				<div>
-					<h2 class="uiHeaderTitle" aria-hidden="true" style="float: left"> Empires &amp; Allies</h2>
-					<img src="layouts/epoints.png" height="18px" style="margin-left: 5px">
+					<img src="img/epoints.png" height="18px" style="margin-left: 5px;">
+					<h2 class="uiHeaderTitle" aria-hidden="true" style="margin-left: 2px; display: inline-block;">
+						 <a href="#" style="text-decoration: none;">Empires &amp; Allies </a>
+					</h2>
+					<p style="display: inline-block; margin: 0 0 4px 6px;">By Raise the Empires team</p>
 				</div>
 			</div>
 		</div>
+		<!-- WECOME CONTENT -->
 		<div class="phl ptm uiInterstitialContent">
-			By Raise the Empires team
 			<br>
-			<br>
-			<b>Game version:</b> alpha {{ version | default("UNKNOWN version")}}
+			<b>Game version:</b> alpha {{ version | default("UNKNOWN version")}} (<a href="releases.html">see Changes</a>)
 			<br>
 			<b>Release date:</b> {{ release_date | default("UNKNOWN version")}}
-			<br>
-			<br>
-
+			<br><br><br>
 			<div style="position:relative;padding-top:56.25%;">
-				<iframe style="position:absolute;top:0;left:0;width:100%;height:100%;" src="https://www.youtube.com/embed/pAdlyz9miqo?controls=0&autoplay=1" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+				<iframe style="position:absolute;top:0;left:0;width:100%;height:100%;" src="https://www.youtube.com/embed/pAdlyz9miqo?controls=0" frameborder="0" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>
 			</div>
 		</div>
-		<div class="uiInterstitialBar uiBoxGray topborder">
+		<!-- FOOTER -->
+		<div id="footer" class="uiInterstitialBar uiBoxGray topborder">
 			<div class="clearfix">
 				<div class="rfloat">
-					<a class="uiButton uiButtonConfirm" href="login.html" role="button" name="try_again_button">
+					<a class="uiButton uiButtonConfirm" href="/login.html" role="button" name="try_again_button">
 						<span class="uiButtonText">Play now</span>
 					</a>
-					<a class="inputaux uiButton" href="https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2" role="button" name="exit_button" target="_blank">
-						<span class="uiButtonText">E&amp;A Wiki</span>
-					</a>
-					<a class="inputaux uiButton" href="releases.html" role="button" name="exit_button">
-						<span class="uiButtonText">Change log</span>
-					</a>
-				</div>
-				<div class="pts">
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
+	<!-- LOADING -->
+	<div id="canvas_throbber">
+		<div class="mbl fsl fwb" id="canvas_throbber_text">Loading...</div>
+		<img class="mtl img" src="img/loading.gif" alt="" width="32" height="32"/>
+	</div>
+</body>
+</html>

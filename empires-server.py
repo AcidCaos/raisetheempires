@@ -100,7 +100,7 @@ def home():
                            allies=json.dumps(get_allies_friend(saves),
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
                            app_friends=json.dumps(get_allies_id(saves)),
-                           computername=session['user_object']["userInfo"]["worldName"] if 'user_object' in session else "Emperor",
+                           worldname=session['user_object']["userInfo"]["worldName"] if 'user_object' in session else "Emperor",
                            picture=get_avatar_pic(),
                            dropdown_items=get_sessions_dropdown_info(saves),
                            motd=get_motd()
@@ -170,11 +170,11 @@ def get_sessions_dropdown_info(saves):
     if saves:
         response = [{
             "session_id": save['session_id'],
-            # "expiry" : record.expiry,
             "uid": save['user_object']["userInfo"]["player"]["uid"],
             "world_name": save['user_object']["userInfo"]["worldName"],
             "level": save['user_object']["userInfo"]["player"]["level"],
             "xp": save['user_object']["userInfo"]["player"]["xp"],
+            "profilePic": "img/avatars/" + (save['profilePic'] if 'profilePic' in save and save['profilePic'] is not None else "blank.png"),
         } for save in saves if validate_save(save)]
     else:
         response = []
@@ -192,7 +192,7 @@ def get_sessions_info(saves):
             "socialLevelGood": save['user_object']["userInfo"]["player"]["socialLevelGood"],
             "socialXpBad": save['user_object']["userInfo"]["player"]["socialXpBad"],
             "socialLevelBad": save['user_object']["userInfo"]["player"]["socialLevelBad"],
-            "profilePic": "layouts/avatars/" + save['profilePic'] if 'profilePic' in save and save['profilePic'] is not None  else random_image(),
+            "profilePic": "img/avatars/" + (save['profilePic'] if 'profilePic' in save and save['profilePic'] is not None else "blank.png"),
             "dominanceRank": 1,
             "pvpNumOccupiers": len([k for k, v in save['user_object']["pvp"]["invaders"].items() if k != "pve"]),
             "pvpNumOccupiersNotDefended": len([k for k, v in save['user_object']["pvp"]["invaders"].items() if k != "pve"]),
@@ -484,7 +484,7 @@ def login_page():
 
 def get_avail_avatars():
     # list(set([u for u in fetch_urls() if u.endswith('.png')]))
-    # return avatar_file_names in os.walk(os.path.join(my_games_path() ,"templates/layouts"))
+    # return avatar_file_names in os.walk(os.path.join(my_games_path() ,"templates/img"))
     # TODO
     avatar_list = ["2_PincusCP_100.png",
                     "4_NavyCP_04_100.png",
@@ -504,7 +504,7 @@ def get_avail_avatars():
     return avatar_list
 
 def get_avail_motds():
-    # return avatar_file_names in os.walk(os.path.join(my_games_path() ,"templates/layouts/motds"))
+    # return avatar_file_names in os.walk(os.path.join(my_games_path() ,"templates/img/motds"))
     # TODO
     motds = [
         "Loading_BattleBlitz.png",
@@ -659,24 +659,28 @@ def choose_avatar(path):
     return response
 
 def get_avatar_pic():
-    avatar_pic = "layouts/avatars/" + session['profilePic'] if 'profilePic' in session and session['profilePic'] is not None else random_image()
+    avatar_pic = "img/avatars/" + (session['profilePic'] if 'profilePic' in session and session['profilePic'] is not None else "blank.png")
     return avatar_pic
 
 def get_motd():
-    motd = "layouts/motds/" + random.choice(get_avail_motds())
+    motd = "img/motds/" + random.choice(get_avail_motds())
     return motd
 
 @app.route("/changelog.txt")
 def change_log():
     return render_template("changelog.txt")
 
-@app.route("/layouts/<path:path>")
-def template_layouts(path):
-    return send_from_directory_mod("templates/layouts", path)
+@app.route("/img/<path:path>")
+def template_img(path):
+    return send_from_directory_mod("templates/img", path)
 
 @app.route("/js/<path:path>")
 def template_js(path):
     return send_from_directory_mod("templates/js", path)
+
+@app.route("/css/<path:path>")
+def template_css(path):
+    return send_from_directory_mod("templates/css", path)
 
 @app.route('/nullassets/<path:path>')
 def send_sol_assets(path):

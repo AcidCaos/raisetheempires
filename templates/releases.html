@@ -1,56 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title id="pageTitle">Empires &amp; Allies on Facebook | Facebook</title>
-	<link rel="shortcut icon" href="layouts/icon.png"/>
+	<!-- Meta -->
 	<meta charset="utf-8"/>
-    <link rel="stylesheet" href="layouts/yc_r.css"/>
+	<!-- Title and Icon -->
+	<title id="pageTitle">Empires &amp; Allies</title>
+	<link rel="shortcut icon" href="img/icon.png"/>
+	<link rel="icon" type="image/png" href="img/icon.png"/>
+	<!-- CSS -->
+	<link rel="stylesheet" href="css/facebook.css"/>
+	<!-- JS -->
 	<script src="//code.jquery.com/jquery-3.4.1.min.js"></script>
 </head>
-
-<body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US">
-
-	<!-- TOP BANNER -->
-
-	<div class="-cx-PRIVATE-fbLayout__root">
-	  	<div id="pagelet_bluebar" data-referrer="pagelet_bluebar">
-	  		<div id="blueBarHolder">
-	  			<div id="blueBar">
-	  				<div>
-	  					<div class="loggedout_menubar_container">
-	  						<div class="clearfix loggedout_menubar">
-	  							<a class="lfloat" href="/" title="Go to Facebook Home">
-	  								<i class="fb_logo img sp_e2gpgs sx_584554">
-	  									<u>Facebook logo</u>
-	  								</i>
-	  							</a>
-	  						</div>
-	  					</div>
-	  				<div class="signupBanner">
-	  					<div class="signup_bar_container">
-	  						<div class="signup_box clearfix">
-			  				</div>
-			  			</div>
-			  		</div>
-			  	</div>
-	  		</div>
-		</div>
-	</div>
-
-	<!-- PAGE BODY -->
-
+<body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US" style="overflow: auto;">
 	<div id="globalContainer" class="uiContextualLayerParent">
 		<div id="content" class="fb_content clearfix">
 			<div>
 				<div>
 					<div id="contentCol" class="clearfix">
 						<div id="contentArea" role="main" aria-describedby="pageTitle" style="border-right: 0px">
-							
 							<div style="float:left;">
-								<img src="layouts/DrSeabolt.png" style="width:80%">
-
+								<img src="img/DrSeabolt.png" style="width:80%">
 							</div>
-
 							<div class="mvl ptm uiInterstitial canvas_error_page uiBoxWhite" title="" style="margin:70px" style="float:right">
 								<div class="uiHeader uiHeaderBottomBorder mhl mts uiHeaderPage interstitialHeader">
 									<div class="clearfix uiHeaderTop">
@@ -60,11 +31,8 @@
 										</div>
 									</div>
 								</div>
-								<div class="phl ptm uiInterstitialContent" style="height:450px">
-									<!-- <?php //include('changelog.txt'); ?> -->
-
-									<div id="changelog" style="height:100%; width:100%; white-space: pre; overflow-y: scroll">
-										<!--<object data="changelog.txt" type="text/plain" style="height:100%; width:100%"></object>-->
+								<div class="phl ptm uiInterstitialContent" style="height: 270px">
+									<div id="changelog" style="height:100%; width:100%; white-space: pre; overflow: auto;">
 									</div>
 									<script>
 										$("#changelog").load("/changelog.txt");
@@ -72,19 +40,18 @@
 								</div>
 								<div class="uiInterstitialBar uiBoxGray topborder">
 									<div class="clearfix">
-										<div class="rfloat">
-											<a class="uiButton uiButtonConfirm" href="/" role="button" name="try_again_button">
+										<div class="lfloat">
+											<a class="inputaux uiButton" href="/" role="button" name="exit_button">
 												<span class="uiButtonText">Back</span>
 											</a>
-										</div>
-										<div class="pts">
 										</div>
 									</div>
 								</div>
 							</div>
+							<!-- LOADING -->
 							<div id="canvas_throbber">
 								<div class="mbl fsl fwb" id="canvas_throbber_text">Loading...</div>
-								<img class="mtl img" src="https://web.archive.org/web/20130619115711im_/https://fbstatic-a.akamaihd.net/rsrc.php/v2/y9/r/jKEcVPZFk-2.gif" alt="" width="32" height="32"/>
+								<img class="mtl img" src="img/loading.gif" alt="" width="32" height="32"/>
 							</div>
 						</div>
 					</div>
@@ -93,5 +60,3 @@
 		</div>
 	</div>
 </div>
-
-

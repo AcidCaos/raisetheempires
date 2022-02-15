@@ -986,7 +986,7 @@ img{
 	background-position:-19px -60px
 }
 .sp_ctntui{
-	background-image:url(logos.png);
+	background-image:url(../img/logos.png);
 	background-size:auto;
 	background-repeat:no-repeat;
 	display:inline-block;
@@ -1270,7 +1270,7 @@ img{
 	white-space:nowrap
 }
 .uiButton{
-	background-image:url(buttons.png);
+	background-image:url(../img/buttons.png);
 	background-repeat:no-repeat;
 	background-size:auto;
 	background-position:-352px -152px;
@@ -1310,7 +1310,7 @@ img{
 	white-space:nowrap
 }
 .uiButtonConfirm{
-	background-image:url(buttons.png);
+	background-image:url(../img/buttons.png);
 	background-repeat:no-repeat;
 	background-size:auto;
 	background-position:-352px -201px;
@@ -1336,7 +1336,7 @@ img{
 	vertical-align:middle
 }
 .-cx-PRIVATE-uiButton__root{
-	background-image:url(buttons.png);
+	background-image:url(../img/buttons.png);
 	background-repeat:no-repeat;
 	background-size:auto;
 	background-position:-352px -152px;
@@ -1504,7 +1504,7 @@ a.-cx-PRIVATE-uiPopover__trigger{
 	width:980px
 }
 .sp_e2gpgs{
-	background-image:url(facebook.png);
+	background-image:url(../img/facebook.png);
 	background-size:auto;
 	background-repeat:no-repeat;
 	display:inline-block;

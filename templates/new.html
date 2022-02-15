@@ -1,71 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title id="pageTitle">Empires &amp; Allies on Facebook | Facebook</title>
-	<link rel="shortcut icon" href="layouts/icon.png"/>
-	<link rel="icon" type="image/png" href="layouts/icon.png"/>
+	<!-- Meta -->
 	<meta charset="utf-8"/>
-    <link rel="stylesheet" href="layouts/yc_r.css"/>
+	<!-- Title and Icon -->
+	<title id="pageTitle">Empires &amp; Allies</title>
+	<link rel="shortcut icon" href="img/icon.png"/>
+	<link rel="icon" type="image/png" href="img/icon.png"/>
+	<!-- CSS -->
+	<link rel="stylesheet" href="css/facebook.css"/>
+	<!-- JS -->
+	<script src="js/session.js"></script>
 </head>
-
-<script>
-
-	function eatCookie() {
-        document.cookie= "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-		console.log("session cookie eaten");
-        location.href = "/home.html";
-	}
-	
-</script>
-
-<body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US" 
-style="overflow: hidden;">
-	<div class="-cx-PRIVATE-fbLayout__root">
-	  	<div id="pagelet_bluebar" data-referrer="pagelet_bluebar">
-	  		<div id="blueBarHolder">
-	  			<div id="blueBar">
-	  				<div>
-	  					<div class="loggedout_menubar_container">
-	  						<div class="clearfix loggedout_menubar">
-	  							<a class="lfloat" href="/" title="Go to Facebook Home">
-	  								<i class="fb_logo img sp_e2gpgs sx_584554">
-	  									<u>Facebook logo</u>
-	  								</i>
-	  							</a>
-	  						</div>
-	  					</div>
-			  		</div>
-			  	</div>
-	  		</div>
-		</div>
-	</div>
-	<br>
-	<br>
-	<br>
-	<div class="mvl ptm uiInterstitial canvas_error_page uiInterstitialLarge uiBoxWhite" title="">
+<body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); overflow: auto;">
+	<div class="mvl ptm uiInterstitial canvas_error_page uiInterstitialLarge uiBoxWhite">
+		<!-- HEAD TITLE -->
 		<div class="uiHeader uiHeaderBottomBorder mhl mts uiHeaderPage interstitialHeader">
 			<div class="clearfix uiHeaderTop">
 				<div>
-					<h2 class="uiHeaderTitle" aria-hidden="true" style="float: left"> Empires &amp; Allies</h2>
-					<img src="layouts/epoints.png" height="18px" style="margin-left: 5px">
+					<img src="img/epoints.png" height="18px" style="margin-left: 5px;">
+					<h2 class="uiHeaderTitle" aria-hidden="true" style="margin-left: 2px; display: inline-block;">
+						 <a href="/" style="text-decoration: none;">Empires &amp; Allies </a>
+					</h2>
+					<p style="display: inline-block; margin: 0 0 4px 6px;">By Raise the Empires team</p>
 				</div>
 			</div>
 		</div>
+		<!-- NEW EMPIRE CONTENT -->
 		<div class="phl ptm uiInterstitialContent">
-			By Raise the Empires team |  Version alpha {{ version | default("UNKNOWN version")}} from {{ release_date | default("UNKNOWN version")}}
-			<br>
 			<br>
 			<div style="margin-left:20px; font-size:13px;">
 				<p style="font-size:14px;"><b>Choose your avatar:</b></p>
-				<div style="margin-left:15px; overflow-y: scroll; max-height: 200px;">
+				<div style="margin-left:15px; overflow-y: auto; max-height: 220px;">
 					{% for avatar in avatars %}
-						<a title="Choose this avatar" onclick="eatCookie(); return true" href="/chooseavatar/{{avatar}}"><img src="layouts/avatars/{{avatar}}" height=70px></a>
+						<a title="Choose this avatar" onclick="cleanHome(); return true" href="/chooseavatar/{{avatar}}"><img src="img/avatars/{{avatar}}" height=70px></a>
 					{% endfor %}
 					<br>
 				</div>
 				<br><br>
-				<p style="font-size:12px; display: inline;"><b> or <a href="/login.html">I already have an empire</a></b></p>
+				<p style="font-size:12px; display: inline;"><b> or <a href="/login.html">Open an existing empire</a></b></p>
 			</div>
 		</div>
 	</div>
-</div>
+	<!-- LOADING -->
+	<div id="canvas_throbber">
+		<div class="mbl fsl fwb" id="canvas_throbber_text">Loading...</div>
+		<img class="mtl img" src="img/loading.gif" alt="" width="32" height="32"/>
+	</div>
+</body>
+</html>

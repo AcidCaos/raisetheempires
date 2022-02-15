@@ -1,0 +1,30 @@
+.zBar {
+    text-align: left;
+    border: solid 1px;
+    border-color: #DCDCDC;
+    width:1000px;
+    height:105px;
+    border-radius:15px;
+    margin-bottom: 15px;
+    padding: 0px 10px 0px 10px;
+    background-color:#F8F8FB;
+    background-image: url('../img/remake.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.zBarButtons {
+    display: inline-block;
+    border: solid 1px;
+    border-color: #DCDCDC;
+    width:50px;
+    height:50px;
+    border-radius:5px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    cursor: pointer;
+}
+
+.zBarButtons:hover {
+    border-color: #FAFAFA;
+}

@@ -1,0 +1,41 @@
+#gameButtons a.unsel {
+    color: #000;
+    background-color:#FFFAF0;
+    font: 12px Arial;
+    border: solid 1.2px;
+    text-decoration: none;
+    display:inline;
+    padding: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-color: #DEB887;
+    border-radius: 15px;
+    margin-left: 3px;
+}
+
+#gameButtons a.selec {
+    color: #000;
+    background-color:#FFA500;
+    font: 12px Arial;
+    border: solid 1.2px;
+    text-decoration: none;
+    display:inline;
+    padding: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-color: #DEB887;
+    border-radius: 15px;
+    margin-left: 3px;
+    box-shadow: inset 0px 3px 4px -1px #ffffff;
+}
+
+#gameButtons a.unsel:hover {
+    background-color:#FFFEFB;
+    border: solid 1.2px;
+    border-color: #DEB887;
+}
+
+#gameButtons a.selec:hover {
+    background-color:#FFB711;
+    box-shadow: inset 0px 3px 3px -1px #ffDA11;
+}

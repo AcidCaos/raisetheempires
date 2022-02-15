@@ -1,0 +1,84 @@
+.logbox {
+    /*max-width: 450px;*/
+    /*min-width: 325px;*/
+    width: 450px;
+    height: 200px;
+    vertical-align: top;
+    overflow-y: scroll;
+    z-index: 5;
+    display: inline-block;
+}
+
+.tooltiplink {
+    color: olive;
+    position: relative;
+    display: inline-block;
+}
+
+.tooltiplink.response {
+    color: cadetblue;
+}
+
+.req_odd {
+    color: crimson;
+}
+
+.tooltiplink .tooltip {
+    /* width: 120px; */
+    background-color: black;
+    color: #fff;
+    /* text-align: center; */
+    /* padding: 5px 0; */
+    padding: 0px 0px 2px 2px;
+    /* border-radius: 6px; */
+
+    /* Position the tooltip text - see examples below! */
+    /*position: absolute;*/
+    position: fixed;
+    display: none;
+
+    /*z-index: 1;*/
+    z-index: 2000;
+    vertical-align: top;
+    /* 			bottom: 100%;
+              left: 50%; */
+
+    /* margin-left: -60px; */
+    /* Use half of the width (120/2 = 60), to center the tooltip */
+}
+
+.tooltiplink:hover .tooltip {
+    /* z-index: 5; */
+    display: inline;
+    top: 0;
+    left: 118px;
+
+}
+
+.tooltiplink:hover {
+    position: relative;
+}
+
+.tooltiplink .tooltip::after {
+    content: " ";
+    /*position: absolute;*/
+    position: fixed;
+
+    top: 100%;
+    /* At the bottom of the tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
+}
+
+body:focus-within {
+overflow: hidden;
+padding-right: 17px;
+/*position: fixed;*/
+/*z-index: 3;*/
+ /*height: 100%;*/
+}
+
+/*body::-webkit-scrollbar{ width: 0}*/
