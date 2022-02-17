@@ -52,6 +52,22 @@ def test_init_battle_invade_self_consumable():
     run_init_battle_invade({'id': 3, 'ch': 2985, 'level': 0, 'name': 'fleet14_2341959767162880', 'fleet': None, 'map': None, 'code': 'N02'})
 
 
+def test_init_battle_ai_invade_consumable():
+    # AI consumable
+    run_init_battle_invade({'id': 0, 'ch': 1329, 'level': 0, 'name': 'AI', 'fleet': None, 'map': None, 'code': None})
+
+
+#lvl 20 wave survival mode
+# attack 1
+#  fleets before {'fleet1_3398563345700246': None, 'fleet3_3398563345700246': None, 'fleet5_3398563345700246': None, 'fleet7_3398563345700246': None, 'fleet9_3398563345700246': None, 'fleet11_3398563345700246': None, 'FleetName': {'type': 'army', 'uid': 1, 'name': 'FleetName', 'status': 4096, 'target': '', 'consumables': [], 'inventory': [], 'playerLevel': 20, 'specialBits': None, 'lost': None, 'lastUnitLost': None, 'lastIndexLost': None, 'allies': None, 'battleTarget': None, 'battleTimestamp': None, 'ransomRandom': None, 'ransomResource': None, 'ransomAmount': None, 'units': ['V04,,,,', 'U05,,,,', 'SU03,,,,', 'V62,,,,'], 'store': [0], 'fleets': [], 'upgrades': None, 'hp': None, 'invader': True}, 'fleet12_3398563345700246': ['UN33,780,0,0,0', 'UN33,780,0,1,0', 'UN06,740,0,2,0', 'UN06,740,0,3,0', 'V06,180,1,4,0']}
+# {'ch': 3833, 'fleet': 'fleet12_3398563345700246', 'target': 'FleetName', 'map': None, 'id': [0, 0]}
+# def 1
+# {'fleet': None, 'level': 0, 'id': 0, 'ch': 1221, 'map': None, 'name': 'AI', 'code': None}
+# {'fleet1_3398563345700246': None, 'fleet3_3398563345700246': None, 'fleet5_3398563345700246': None, 'fleet7_3398563345700246': None, 'fleet9_3398563345700246': None, 'fleet11_3398563345700246': None, 'FleetName': {'type': 'army', 'uid': 1, 'name': 'FleetName', 'status': 4096, 'target': '', 'consumables': [], 'inventory': [], 'playerLevel': 20, 'specialBits': None, 'lost': None, 'lastUnitLost': None, 'lastIndexLost': None, 'allies': None, 'battleTarget': None, 'battleTimestamp': None, 'ransomRandom': None, 'ransomResource': None, 'ransomAmount': None, 'units': ['V04,,,,', 'U05,,,,', 'SU03,,,,', 'V62,,,,'], 'store': [0], 'fleets': [], 'upgrades': None, 'hp': None, 'invader': True}, 'fleet12_3398563345700246': ['UN33,780,0,0,0', 'UN33,780,0,1,0', 'UN06,740,0,2,0', 'UN06,740,0,3,0', 'V06,180,1,4,0']}
+#
+
+
+
 def test_init_battle_first_quest():
     run_init_battle_dynamic(
         {'id': [0, 0], 'fleet': 'fleet1_2341959767162880', 'target': 'Q6016', 'ch': 3027, 'map': None},

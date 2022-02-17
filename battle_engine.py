@@ -332,15 +332,23 @@ def init_battle(params):
     if 'target' not in params:
         fleet_or_name = params['fleet'] if params['fleet'] else params['name']
         if params.get("name") == "AI":
-            print("AI fleet")
-            future_enemy_fleet = get_new_enemy_fleet_name()
-            friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                          session['fleets'][get_previous_fleet_name(get_previous_fleet_name(get_previous_fleet_name(future_enemy_fleet)))]]
-            baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in
-                       simple_list(
-                           session['fleets'][get_previous_fleet_name(get_previous_fleet_name(future_enemy_fleet))])
-                       for baddy, count in sub_fleet.items()
-                       for i in range(int(count))]
+            if params['map'] is not None:
+                future_enemy_fleet = get_new_enemy_fleet_name()
+                friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                              session['fleets'][get_previous_fleet_name(get_previous_fleet_name(get_previous_fleet_name(future_enemy_fleet)))]]
+                baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in
+                           simple_list(
+                               session['fleets'][get_previous_fleet_name(get_previous_fleet_name(future_enemy_fleet))])
+                           for baddy, count in sub_fleet.items()
+                           for i in range(int(count))]
+            else:
+                [(fleet_name, enemy_fleet)] = [(k, v) for k, v in session['fleets'].items() if
+                                               isinstance(v, dict) and v.get('name') == "FleetName"]
+                print("Survival AI fleet" if enemy_fleet["status"] == 4096 else "Invader AI fleet")
+                baddies = [lookup_item_by_code(baddy.split(',')[0])
+                           for baddy in enemy_fleet["units"]]
+                friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                              session['fleets'][get_last_fleet_name()]]
         elif params['name'] == "FleetName":
             print("Invader target consumable")
             [(fleet_name, enemy_fleet)] = [(k, v) for k, v in session['fleets'].items() if isinstance(v, dict) and v.get('name') == "FleetName"]

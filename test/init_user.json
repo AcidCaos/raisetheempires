@@ -3273,18 +3273,29 @@
     {
       "uid": 123,
       "resource": 3,
-      "coins": 100,
+      "energy": 15,
+      "coins": 3015,
+      "wood": 120,
+      "oil": 25,
+      "aluminum": 100,
+      "copper": 0,
+      "gold": 0,
+      "iron": 0,
+      "uranium": 0,
       "xp": 93,
       "level": 6,
-      "socialXpGood": 0,
-      "socialLevelGood": 1,
-      "socialXpBad": 0,
+      "socialXpGood": 64,
+      "socialLevelGood": 17,
+      "socialXpBad": 3,
       "socialLevelBad": 1,
-      "profilePic": null,
+      "profilePic": "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png",
       "dominanceRank": 1,
       "tending": {
-        "actions": 3
+        "actions": 2
       },
+      "inactive____pvpInfo": {"pillTS": 1591142368,
+                              "status": 2,
+                              "ts": 1591142368},
       "pvpImmunityTimestamp": 1893456000
     },
     {

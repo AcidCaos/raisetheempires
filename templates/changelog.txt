@@ -1,4 +1,9 @@
 upcoming
+    Added Survival Mode part 3: AI powers Nat 06/02/2022 23:21
+    New UI. Web source cleaned. AcidCaos 15/02/2022 22:17
+    UI: zBar reachable on loading frame. Fix: auto staffing only with neighbors. AcidCaos 15/02/2022 19:07
+    More loading screen backgrounds Willy030125* 08/02/2022 14:28
+    Added more MOTDs Willy030125* 08/02/2022 14:22
     Added Survival Mode part 2: upgraded units Nat 06/02/2022 22:52
     Added Survival Mode part 1 Nat 15/01/2022 03:58
     Fix exiting battle cleans up fight Nat 13/01/2022 00:07
