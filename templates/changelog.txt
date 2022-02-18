@@ -1,10 +1,21 @@
 upcoming
+    Trying to add a blur background Willy030125* 18/02/2022 05:45
     Added Survival Mode part 3: AI powers Nat 06/02/2022 23:21
     New UI. Web source cleaned. AcidCaos 15/02/2022 22:17
     UI: zBar reachable on loading frame. Fix: auto staffing only with neighbors. AcidCaos 15/02/2022 19:07
     More loading screen backgrounds Willy030125* 08/02/2022 14:28
     Added more MOTDs Willy030125* 08/02/2022 14:22
     Added Survival Mode part 2: upgraded units Nat 06/02/2022 22:52
+    Loading screen IV: Loading bar, random MOTDs. AcidCaos 01/02/2022 16:22
+    Loading screen III: frame. flash enabling (firefox and chromium support) AcidCaos 01/02/2022 14:54
+    Natalie's island fix Willy030125* 22/01/2022 17:46
+    redirect link fix Willy030125* 22/01/2022 17:22
+    fix neighbor's profilePic Willy030125* 22/01/2022 14:47
+    Loading screen II. Flash enabling AcidCaos 19/01/2022 16:37
+    Added loading screen AcidCaos 17/01/2022 19:32
+    Crew migration. Fixed decoCrewBuyOnce. AcidCaos 15/01/2022 22:32
+    Added crew members AcidCaos 15/01/2022 21:34
+    Fix: handle invalid command arguments. AcidCaos 15/01/2022 21:30
     Added Survival Mode part 1 Nat 15/01/2022 03:58
     Fix exiting battle cleans up fight Nat 13/01/2022 00:07
     Bonus Streak Bar Nat 12/01/2022 23:39
