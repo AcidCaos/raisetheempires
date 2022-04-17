@@ -1,6 +1,7 @@
 upcoming
+    Fix quests with different comparison filters 17/04/2022 13:27
     Trying to add a blur background Willy030125* 18/02/2022 05:45
-    Added Survival Mode part 3: AI powers Nat 06/02/2022 23:21
+    Added Survival Mode part 3: AI powers Nat 17/02/2022 23:21
     New UI. Web source cleaned. AcidCaos 15/02/2022 22:17
     UI: zBar reachable on loading frame. Fix: auto staffing only with neighbors. AcidCaos 15/02/2022 19:07
     More loading screen backgrounds Willy030125* 08/02/2022 14:28

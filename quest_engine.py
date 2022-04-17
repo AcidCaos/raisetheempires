@@ -129,9 +129,22 @@ def world_state_change(*state_args):
 
 def progress_finish_building_count_placed(state, state_machine, game_item, step, previous_state, *state_args):
     return lambda task, progress, i, *args: \
-        task["_action"] in ["finishBuilding", "countPlaced"] and task["_item"] == game_item[
-            '-code'] and progress < int(task["_total"]) and state['-stateName'] == state_machine['-builtState'] and \
+        task["_action"] in ["finishBuilding", "countPlaced"] and progress_match_filters(game_item)(task, progress, i, *args) and \
+        progress < int(task["_total"]) and state['-stateName'] == state_machine['-builtState'] and \
         int(previous_state['-stateName']) < int(state['-stateName'])
+
+
+def progress_match_filters(game_item):
+    return all_lambda(
+        progress_parameter_implies("_item", game_item.get("-code", "")),
+        progress_parameter_implies("_type", game_item.get("-type", "")),
+        progress_parameter_implies("_subtype", game_item.get("-subtype", "")),
+        progress_parameter_implies("_unitClass", game_item.get("-unitClass", "")),
+        progress_parameter_implies("_warehouseType", game_item.get("-warehouseType", "")),
+        progress_parameter_implies("_superore", game_item.get("-superore", "")),
+        progress_parameter_implies("_resourceType", game_item.get("-resourceType", "")),
+        progress_parameter_implies("_villain", game_item.get("-villain", ""))
+    )
 
 
 def progress_inventory_count():
