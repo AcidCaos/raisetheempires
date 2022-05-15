@@ -130,14 +130,19 @@ def get_allies_info():
 @app.route("/nodebug.html")
 def no_debug():
     print("no debug page")
+    if not validate_save(session, True):
+        print("Invalid save game")
+        return make_response(redirect('/save-editor')) #todo disable save editor toggle?
     saves = get_saves()
     return render_template("nodebug.html", time=datetime.now().timestamp(), zid=str(get_zid()),
                            version=version,
                            allies=json.dumps(get_allies_friend(saves),
                                              default=lambda o: '<not serializable>', sort_keys=False, indent=2),
                            app_friends=json.dumps(get_allies_id(saves)),
+                           worldname=session['user_object']["userInfo"]["worldName"] if 'user_object' in session else "Emperor",
                            picture=get_avatar_pic(),
-                           dropdown_items=get_sessions_dropdown_info(saves)
+                           dropdown_items=get_sessions_dropdown_info(saves),
+                           motd=get_motd()
                            )
 
 
