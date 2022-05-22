@@ -1388,7 +1388,9 @@ def init_user():
                         "empires_consumable_2": 3, "empire_research_shield_upgrade": 2, "empires_support_units": 5,
                         "empire_buildable_zrig_master": 3, "empire_request2_master": 2, "empire_mfs_uili": 4,
                         "empire_survivalmode3_master": 3, "empire_survivalMode_master": 2,
-                        "empire_survivalmode_enhancements": 2},
+                        "empire_survivalmode_enhancements": 2, "empire_mech_fight_master": 3, "empire_mech_fight_gate_flat": 5,
+                        "empire_mech_lab_master": 3, "empire_titanresearch_master": 2, "empire_tier_8": 4,
+                        "empire_campv2_enabled": 2, "empire_campaign_mastery": 2},
         "completedQuests": [],
         "decorationsInfo": None,
         "treasureVaultHighlights": None,
@@ -1546,6 +1548,15 @@ def user_response():
     if item_inventory.get("B17", 0) < 25:
         item_inventory["B17"] = 25
         print("Refilling deck turret to 25")  # until friend gift mechanisms are working
+
+    mechLab_inventory_req = session['user_object']["userInfo"]["player"]["xp"]
+    # Set level 21 (1881 xp) for all players to get Titan Lab in inventory
+    if mechLab_inventory_req > 1880:
+        # every session should only get once
+        if not any(i["itemName"] == "MechLab" for i in session['user_object']["userInfo"]["world"]["objects"]):
+            if item_inventory.get("TL01", 0) < 1:
+                item_inventory["TL01"] = 1
+                print("Level 21 has been reached, Titan Lab unlocked at inventory")
 
     handle_quest_progress(meta, progress_inventory_count())
     handle_quest_progress(meta, progress_neighbor_count())

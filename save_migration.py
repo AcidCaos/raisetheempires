@@ -58,6 +58,13 @@ def migrate(meta, version, target_version):
         session['user_object']["experiments"]["empire_survivalmode3_master"] = 3
         session['user_object']["experiments"]["empire_survivalMode_master"] = 2
         session['user_object']["experiments"]["empire_survivalmode_enhancements"] = 2
+        session['user_object']["experiments"]["empire_mech_fight_master"] = 3
+        session['user_object']["experiments"]["empire_mech_fight_gate_flat"] = 5
+        session['user_object']["experiments"]["empire_mech_lab_master"] = 3
+        session['user_object']["experiments"]["empire_titanresearch_master"] = 2
+        session['user_object']["experiments"]["empire_tier_8"] = 4
+        session['user_object']["experiments"]["empire_campv2_enabled"] = 2
+        session['user_object']["experiments"]["empire_campaign_mastery"] = 2
         session['save_version'] = version
     if version and version.startswith("0.08a") and version != target_version:  # upcoming
         pass
