@@ -1,7 +1,7 @@
 pyinstaller
 tendo
 py3amf
-flask<2.1.0
+flask
 flask_session
 flask_sqlalchemy
 flask_compress

@@ -13,6 +13,8 @@ from init_settings import *
 if not debug:
     me = singleton.SingleInstance()
 
+if os.name == 'nt':
+    os.system('color')
 
 from save_engine import save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
     store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path
@@ -21,7 +23,11 @@ from builtins import print
 from time import sleep
 from datetime import timedelta
 
-from flask import Flask, render_template, send_from_directory, request, Response, make_response, redirect, safe_join
+from flask import Flask, render_template, send_from_directory, request, Response, make_response, redirect
+try:
+    from flask import safe_join # flask 2.1.0 : safe_join is removed, use werkzeug.utils.safe_join instead."
+except ImportError:
+    from werkzeug.utils import safe_join
 from flask_session import Session
 from pyamf import remoting
 import pyamf
