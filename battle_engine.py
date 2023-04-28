@@ -1037,7 +1037,12 @@ def get_unit_max_strength(unit, ally, params=None):
 #     return None, None
 
 def get_current_island(params):
+    # Campaign 01
     if params and 'map' in params and params['map'] and params['map'][0] == 'C':
+        map_item = lookup_item_by_code(params["map"])
+        return get_active_island_by_map(params['map']) + (map_item,)
+    # Campaign 02
+    if params and 'map' in params and params['map'] and params['map'][0] == 'D':
         map_item = lookup_item_by_code(params["map"])
         return get_active_island_by_map(params['map']) + (map_item,)
     return None, None, None
