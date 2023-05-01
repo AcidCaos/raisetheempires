@@ -1,7 +1,7 @@
 pyinstaller==5.1
 tendo==0.2.15
 py3amf==0.8.10
-flask==2.0.3
+flask==2.3.2
 flask_session==0.4.0
 flask_sqlalchemy==2.5.1
 flask_compress==1.12
