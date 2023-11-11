@@ -290,14 +290,23 @@ def test_exit_battle_response():
 
 def test_load_survival_mode_response():
     with app.test_request_context():
+        session['fleets'] = {}
 
         res = empires_server.load_survival_mode_response({'set': 'set3', 'eliteMode': False})
 
         assert res == {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                        "data": {'state': 2, 'storage': {"curSet": "set3", "curWave": 1, "curLoop": 0, "curPlayerFleet": None,
                                                         "curEnemyFleet": None, "lastPlayedTime": 0,
-                                                        "rewardRefreshCount": 0, "rewards": None,
-                                                        "rewardChanged": False}}}
+                                                        "rewardRefreshCount": 0, "rewards": {},
+                                                        "rewardChanged": False},
+                                'enemyWaveFleet': {'type': 'army', 'uid': 1, 'name': 'FleetName', 'status': 4096,
+                                                   'target': '', 'consumables': [], 'inventory': [], 'playerLevel': 1,
+                                                   'specialBits': None, 'lost': None, 'lastUnitLost': None,
+                                                   'lastIndexLost': None, 'allies': None, 'battleTarget': None,
+                                                   'battleTimestamp': None, 'ransomRandom': None,
+                                                   'ransomResource': None, 'ransomAmount': None,
+                                                   'units': ['U01,,,,'], 'store': [0],
+                                                   'fleets': [], 'upgrades': None, 'hp': None, 'invader': True}}}
 
 # {'set': None, 'eliteMode': False}
 # fleets before {'fleet1_3398563345700246': None, 'fleet3_3398563345700246': None, 'fleet5_3398563345700246': None, 'fleet7_3398563345700246': None, 'fleet9_3398563345700246': None, 'fleet11_3398563345700246': None, 'FleetName': {'type': 'army', 'uid': 1, 'name': 'FleetName', 'status': 4096, 'target': '', 'consumables': [], 'inventory': [], 'playerLevel': 19, 'specialBits': None, 'lost': None, 'lastUnitLost': None, 'lastIndexLost': None, 'allies': None, 'battleTarget': None, 'battleTimestamp': None, 'ransomRandom': None, 'ransomResource': None, 'ransomAmount': None, 'units': ['V61,,,,', 'V03,,,,', 'U05,,,,'], 'store': [0], 'fleets': [], 'upgrades': None, 'hp': None, 'invader': True}, 'fleet12_3398563345700246': ['UN33,780,0,0,0', 'UN33,780,0,1,0', 'UN06,740,0,2,0', 'UN06,740,0,3,0', 'V06,180,1,4,0']}
@@ -374,5 +383,5 @@ def test_post_gateway(monkeypatch):
         assert remoting.decode(response_result.data).bodies[0][1].body['data'] == [{'errorType': 0, 'userId': 1, 'metadata': {'newPVE': 0}, 'data': []}]
 
 
-pytest.main(['-rPA'])
-# pytest.main(['-rPA', '-vv'])
+# pytest.main(['-rPA'])
+pytest.main(['-rPA', '-vv'])

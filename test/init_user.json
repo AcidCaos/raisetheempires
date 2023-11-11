@@ -3313,6 +3313,36 @@
       "tending": {
         "actions": 3
       }
+    },
+    {
+      "uid": 131,
+      "resource": 3,
+      "coins": 5015,
+      "energy": 20,
+      "oil": 100,
+      "wood": 225,
+      "aluminum": 100,
+      "copper": 100,
+      "gold": 100,
+      "iron": 100,
+      "uranium": 100,
+      "xp": 235874,
+      "level": 85,
+      "socialXpGood": 10025,
+      "socialLevelGood": 100,
+      "socialXpBad": 3,
+      "socialLevelBad": 1,
+      "profilePic": "assets/game/GeneralAssetGroup_UI.swf/BubbleSafari_50.png",
+      "dominanceRank": 1,
+      "tending": {
+        "actions": 2
+      },
+      "inactive____pvpInfo": {
+        "status": 2,
+        "ts": 1591142368,
+        "pillTS": 1591142368
+      },
+      "pvpImmunityTimestamp": 1893456000
     }
   ],
         "unlockedResource": {"aluminum": 3, "copper": 4, "gold": 5, "iron": 6},
