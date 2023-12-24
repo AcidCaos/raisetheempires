@@ -36,7 +36,7 @@ import mod_engine
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
     get_active_island_by_map, set_active_island_by_map, format_player_fleet, \
     cancel_unstarted_invasions, register_fleetname_fleet, get_last_fleet_name, is_shielded, decode_unit_count_list, \
-    encode_unit_strings, get_survival_player_fleet
+    encode_unit_strings, get_survival_player_fleet, encode_unit_string
 from game_settings import get_zid, initial_island, random_image, randomReward, get_sessions_id, unlock_expansion, \
     lookup_wave, lookup_crew_template
 import threading, webbrowser
@@ -2590,18 +2590,24 @@ def crew_request_response(params):
 def exit_battle_response():
     exit_battle_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
+
+    #session["last_battle"] = session["battle"]
     session["battle"] = None
 
     return exit_battle_response
 
 
 def load_survival_mode_response(param):
-    wave_index = session["fleets"]["FleetName"]["playerLevel"] + 1 if "FleetName" in session["fleets"] and session["fleets"]["FleetName"]["status"] == 4096 and param["set"] is None else 1
-    if param.get("continueGame") or "playerFleet" in param:
+    wave_index = session["fleets"]["FleetName"]["playerLevel"] + 1 if is_continued_survival(param) else 1
+    if param.get("continueGame") or "playerFleet" in param or (not is_new_wave_survival(param) and is_resume_survival()):
         wave_index = wave_index - 1
     wave = lookup_wave("set3", wave_index)
 
-    baddies = encode_unit_strings(decode_unit_count_list(wave['fleet']))
+    if "playerFleet" not in param and not is_new_wave_survival(param) and is_resume_survival():
+        unit_codes = decode_unit_count_list(wave['fleet'])
+        baddies = [encode_unit_string(code, hp=hp) for code, hp in zip(unit_codes, session["battle"][1]) if hp > 0]
+    else:
+        baddies = encode_unit_strings(decode_unit_count_list(wave['fleet']))
 
     fleet = {
         "type": wave["-unitType"],
@@ -2638,7 +2644,7 @@ def load_survival_mode_response(param):
                                                                     "rewardRefreshCount": 0, "rewards": {},
                                                                     "rewardChanged": False}}}
         session["fleets"][param['playerFleetName']] = param["playerFleet"]["units"]
-    elif param["set"] is None and not param.get("continueGame"):
+    elif is_new_wave_survival(param):
         # load_survival_mode_resp = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
         #                            "data": {}}
         load_survival_mode_resp = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
@@ -2649,6 +2655,21 @@ def load_survival_mode_response(param):
                                                                     "rewardChanged": False}, "enemyWaveFleet": fleet, "playerFleet":get_survival_player_fleet()}}
         session["battle"] = session["last_battle"]
         session["battle"] = ([e for e in session["battle"][0] if e != 0], None, session["battle"][2])
+        register_fleetname_fleet(fleet)
+    elif is_resume_survival():
+        print("resume paused survival")
+        # load_survival_mode_resp = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+        #                            "data": {}}
+        load_survival_mode_resp = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
+                                   "data": {'state': 3,
+                                            'storage': {"curSet": "set3", "curWave": wave_index, "curLoop": 0,
+                                                        "curPlayerFleet": get_survival_player_fleet(),
+                                                        "curEnemyFleet": fleet, "lastPlayedTime": 0,
+                                                        "rewardRefreshCount": 0, "rewards": {},
+                                                        "rewardChanged": False}, "enemyWaveFleet": fleet,
+                                            "playerFleet": get_survival_player_fleet()}}
+        #session["battle"] = session["last_battle"]  # paused # current battle is still in battle  WorldService.exitBattle isn't called on pause only genericString with ExitBattle
+        # session["battle"] = ([e for e in session["battle"][0] if e != 0], None, session["battle"][2])
         register_fleetname_fleet(fleet)
     else:
         load_survival_mode_resp = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
@@ -2661,6 +2682,20 @@ def load_survival_mode_response(param):
         session["last_battle"] = None
     return load_survival_mode_resp
 
+
+def is_continued_survival(param):
+    return "FleetName" in session["fleets"] and \
+           session["fleets"]["FleetName"]["status"] == 4096 and \
+           (param["set"] is None or is_resume_survival())
+
+
+def is_new_wave_survival(param):
+    return param["set"] is None and not param.get("continueGame")
+
+
+def is_resume_survival():
+    return session.get("last_battle") and "FleetName" in session["fleets"] and session["fleets"]["FleetName"][
+        "status"] == 4096
 
 
 # def unit_encode
