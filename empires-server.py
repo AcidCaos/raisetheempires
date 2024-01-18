@@ -392,6 +392,7 @@ def save_editor():
             'profilePic': session['profilePic'] if 'profilePic' in session else None,
             'quests': session['quests'] if 'quests' in session else None,
             'battle': session['battle'] if 'battle' in session else None,
+            'last_battle': session['last_battle'] if 'last_battle' in session else None,
             'fleets': session['fleets'] if 'fleets' in session else None,
             'population': session['population'] if 'population' in session else None,
             'saved': session['saved'] if 'saved' in session else None,
@@ -2605,7 +2606,8 @@ def load_survival_mode_response(param):
 
     if "playerFleet" not in param and not is_new_wave_survival(param) and is_resume_survival():
         unit_codes = decode_unit_count_list(wave['fleet'])
-        baddies = [encode_unit_string(code, hp=hp) for code, hp in zip(unit_codes, session["battle"][1]) if hp > 0]
+        #baddies = [encode_unit_string(code, hp=hp) for code, hp in zip(unit_codes, session["battle"][1]) if hp > 0]
+        baddies = encode_unit_strings(decode_unit_count_list(wave['fleet']))
     else:
         baddies = encode_unit_strings(decode_unit_count_list(wave['fleet']))
 

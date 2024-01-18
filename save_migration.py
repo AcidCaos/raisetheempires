@@ -71,7 +71,7 @@ def migrate(meta, version, target_version):
 
 
 def is_0_08a_preview(version):
-    return version == "0.08a" and "empire_request2_master" not in session['user_object']["experiments"]
+    return version == "0.08a" and "empire_mech_lab_master" not in session['user_object']["experiments"]
 
 
 def zero_yield(extra):
