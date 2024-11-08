@@ -200,23 +200,47 @@ def handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths):
     if sum(baddie_strengths) == 0:
         print("Enemy defeated")
         session["last_battle"] = session["battle"]
-        session["battle"] = None
+
+        replaying = session["battle"][3].replaying
+        battle_island = session["battle"][3].island
+
+
         handle_quest_progress(meta, all_lambda(progress_action("fight"),
                                                progress_parameter_implies("_fleetname", params.get("target"))))
         map_name, current_island, map_item = get_current_island(params)
+
+        if replaying:
+            current_island = battle_island
         if current_island is not None:
             handle_quest_progress(meta, all_lambda(progress_action("islandWin"),
                                                    progress_parameter_equals("_island", str(current_island))))
-            do_rewards("Campaign", map_item['island'][current_island].get("reward"), meta)
-            do_rewards("Liberty Bond", {"_type": "item", "_item": "xk01", "_count": "1"}, meta)
+            reward_multiplier = get_reward_multiplier()
+            combat_replay_reward_minimum = 100# combatReplayRewardMinimum
 
-            next_island_id = map_item['island'][current_island].get('-unlocks')
-            if next_island_id is not None:
-                print("Activating next island", map_name, next_island_id)
-                set_active_island_by_map(map_name, int(next_island_id))
+            modifier = (lambda a: math.ceil(
+                a * reward_multiplier if a <= combat_replay_reward_minimum else max(a * reward_multiplier,
+                                                                                    combat_replay_reward_minimum))) if replaying else lambda a: a
+            item_modifier = (lambda a: 0) if replaying else lambda a: a
+            do_rewards("Campaign", map_item['island'][current_island].get("reward"), meta, inc_modifier=modifier, item_modifier=item_modifier)
+            if not replaying:
+                do_rewards("Liberty Bond", {"_type": "item", "_item": "xk01", "_count": "1"}, meta)
+
+            if not replaying:
+                next_island_id = map_item['island'][current_island].get('-unlocks')
+                if next_island_id is not None:
+                    print("Activating next island", map_name, next_island_id)
+                    set_active_island_by_map(map_name, int(next_island_id))
+                else:
+                    print("Current island group finished", map_name)
+                    set_active_island_by_map(map_name, len(map_item['island']))
             else:
-                print("Current island group finished", map_name)
-                set_active_island_by_map(map_name, len(map_item['island']))
+                print("Currently replaying no island activation needed")
+            tokens_before = get_min_island_mastery_from_battle()
+            increment_mastery()
+            tokens_after = get_min_island_mastery_from_battle()
+            if tokens_after > tokens_before:
+                do_rewards("Mastery Token", {"_type": "item", "_item": "VTK", "_count": "1"}, meta)
+
         elif "attackHostId" in params:
             print("challenge won")
             invasion_complete(params["attackHostId"], params, friendlies, friendly_strengths)
@@ -243,6 +267,7 @@ def handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths):
             else:
                 print("challenge with consumable won")
                 invasion_complete(enemy_fleet['uid'], params, friendlies, friendly_strengths)
+        session["battle"] = None
 
 
 def neighbor_repelled(enemy_fleet):
@@ -329,52 +354,85 @@ def handle_shield_upgrades(friendlies, player_unit_id):
 
 
 def init_battle(params):
-    if 'target' not in params:
-        fleet_or_name = params['fleet'] if params['fleet'] else params['name']
-        if params.get("name") == "AI":
-            if params['map'] is not None:
-                future_enemy_fleet = get_new_enemy_fleet_name()
-                friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                              session['fleets'][get_previous_fleet_name(get_previous_fleet_name(get_previous_fleet_name(future_enemy_fleet)))]]
-                baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in
-                           simple_list(
-                               session['fleets'][get_previous_fleet_name(get_previous_fleet_name(future_enemy_fleet))])
-                           for baddy, count in sub_fleet.items()
-                           for i in range(int(count))]
-            else:
-                [(fleet_name, enemy_fleet)] = [(k, v) for k, v in session['fleets'].items() if
-                                               isinstance(v, dict) and v.get('name') == "FleetName"]
-                print("Survival AI fleet" if enemy_fleet["status"] == 4096 else "Invader AI fleet")
+    try:
+        if 'target' not in params:
+            fleet_or_name = params['fleet'] if params['fleet'] else params['name']
+            if params.get("name") == "AI":
+                if params['map'] is not None:
+                    future_enemy_fleet = get_new_enemy_fleet_name()
+                    friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                                  session['fleets'][get_previous_fleet_name(get_previous_fleet_name(get_previous_fleet_name(future_enemy_fleet)))]]
+                    baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in
+                               simple_list(
+                                   session['fleets'][get_previous_fleet_name(get_previous_fleet_name(future_enemy_fleet))])
+                               for baddy, count in sub_fleet.items()
+                               for i in range(int(count))]
+                else:
+                    [(fleet_name, enemy_fleet)] = [(k, v) for k, v in session['fleets'].items() if
+                                                   isinstance(v, dict) and v.get('name') == "FleetName"]
+                    print("Survival AI fleet" if enemy_fleet["status"] == 4096 else "Invader AI fleet")
+                    baddies = [lookup_item_by_code(baddy.split(',')[0])
+                               for baddy in enemy_fleet["units"]]
+                    friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                                  session['fleets'][get_last_fleet_name()]]
+            elif params['name'] == "FleetName":
+                print("Invader target consumable")
+                [(fleet_name, enemy_fleet)] = [(k, v) for k, v in session['fleets'].items() if isinstance(v, dict) and v.get('name') == "FleetName"]
                 baddies = [lookup_item_by_code(baddy.split(',')[0])
                            for baddy in enemy_fleet["units"]]
                 friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
                               session['fleets'][get_last_fleet_name()]]
-        elif params['name'] == "FleetName":
-            print("Invader target consumable")
-            [(fleet_name, enemy_fleet)] = [(k, v) for k, v in session['fleets'].items() if isinstance(v, dict) and v.get('name') == "FleetName"]
-            baddies = [lookup_item_by_code(baddy.split(',')[0])
-                       for baddy in enemy_fleet["units"]]
-            friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                          session['fleets'][get_last_fleet_name()]]
-        elif fleet_or_name in session['fleets'] and isinstance(simple_list(session['fleets'][fleet_or_name])[0], str):
-            print("Ally direct target")
-            friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                          session['fleets'][fleet_or_name]]
-            if get_next_fleet_name(fleet_or_name) not in session['fleets']:
-                baddies = [lookup_item_by_code(baddy.split(',')[0]) for sub_fleet in
-                           simple_list(session['fleets']['FleetName'])
-                           for baddy in sub_fleet["units"]]
-            else:
-                baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in
-                           simple_list(session['fleets'][get_next_fleet_name(fleet_or_name)])
+            elif fleet_or_name in session['fleets'] and isinstance(simple_list(session['fleets'][fleet_or_name])[0], str):
+                print("Ally direct target")
+                friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                              session['fleets'][fleet_or_name]]
+                if get_next_fleet_name(fleet_or_name) not in session['fleets']:
+                    baddies = [lookup_item_by_code(baddy.split(',')[0]) for sub_fleet in
+                               simple_list(session['fleets']['FleetName'])
+                               for baddy in sub_fleet["units"]]
+                else:
+                    baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in
+                               simple_list(session['fleets'][get_next_fleet_name(fleet_or_name)])
+                               for baddy, count in sub_fleet.items()
+                               for i in range(int(count))]
+            elif fleet_or_name in session['fleets']:
+                baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][fleet_or_name])
                            for baddy, count in sub_fleet.items()
                            for i in range(int(count))]
-        elif fleet_or_name in session['fleets']:
-            baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][fleet_or_name])
+                friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                              session['fleets'][get_previous_fleet_name(fleet_or_name)]]
+            else:
+                open_quests = [e["name"] for e in session["quests"] if e["complete"] == False]
+                task = None
+                friendlies = None
+                for q in open_quests:
+                    quest = lookup_quest(q)
+                    tasks = get_tasks(quest)
+                    task = [t for t in tasks if t["_action"] == "fight" and t.get("_fleetname") == params['fleet']]
+                    if task:
+                        task = task[0]
+                        friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                                      session['fleets'][get_friendly_by_ally_fleet(params['name'])]]
+                        break
+
+                enemy_fleet = lookup_item_by_code(task["_item"])
+                baddies = [lookup_item_by_code(baddie_slot["-item"]) for baddie_slot in simple_list(enemy_fleet["baddie"])]
+                if not friendlies:
+                    friendlies = [lookup_item_by_code(friendly[1:]) for friendly, count in task["fleet"].items() for i in
+                                  range(int(count))]
+        elif params['target'].startswith('fleet'):
+            baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][params['target']])
                        for baddy, count in sub_fleet.items()
                        for i in range(int(count))]
             friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                          session['fleets'][get_previous_fleet_name(fleet_or_name)]]
+                          session['fleets'][params['fleet']]]
+        elif params['target'] == "FleetName":
+            print("Invader target")
+            baddies = [lookup_item_by_code(baddy.split(',')[0]) for sub_fleet in
+                       simple_list(session['fleets']['FleetName'])
+                       for baddy in sub_fleet["units"]]
+            friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
+                          session['fleets'][params['fleet']]]
         else:
             open_quests = [e["name"] for e in session["quests"] if e["complete"] == False]
             task = None
@@ -382,71 +440,49 @@ def init_battle(params):
             for q in open_quests:
                 quest = lookup_quest(q)
                 tasks = get_tasks(quest)
-                task = [t for t in tasks if t["_action"] == "fight" and t.get("_fleetname") == params['fleet']]
+                task = [t for t in tasks if t["_action"] == "fight" and t.get("_fleetname") == params['target']]
                 if task:
                     task = task[0]
                     friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                                  session['fleets'][get_friendly_by_ally_fleet(params['name'])]]
+                                  session['fleets'][params['fleet']]]
                     break
+
+            if not task:
+                quest = lookup_quest(params['target'])
+                tasks = get_tasks(quest)
+                [task] = [t for t in tasks if t["_action"] == "fight"]
 
             enemy_fleet = lookup_item_by_code(task["_item"])
             baddies = [lookup_item_by_code(baddie_slot["-item"]) for baddie_slot in simple_list(enemy_fleet["baddie"])]
             if not friendlies:
                 friendlies = [lookup_item_by_code(friendly[1:]) for friendly, count in task["fleet"].items() for i in
                               range(int(count))]
-    elif params['target'].startswith('fleet'):
-        baddies = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(session['fleets'][params['target']])
-                   for baddy, count in sub_fleet.items()
-                   for i in range(int(count))]
-        friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                      session['fleets'][params['fleet']]]
-    elif params['target'] == "FleetName":
-        print("Invader target")
-        baddies = [lookup_item_by_code(baddy.split(',')[0]) for sub_fleet in
-                   simple_list(session['fleets']['FleetName'])
-                   for baddy in sub_fleet["units"]]
-        friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                      session['fleets'][params['fleet']]]
-    else:
-        open_quests = [e["name"] for e in session["quests"] if e["complete"] == False]
-        task = None
-        friendlies = None
-        for q in open_quests:
-            quest = lookup_quest(q)
-            tasks = get_tasks(quest)
-            task = [t for t in tasks if t["_action"] == "fight" and t.get("_fleetname") == params['target']]
-            if task:
-                task = task[0]
-                friendlies = [lookup_item_by_code(friendly.split(',')[0]) for friendly in
-                              session['fleets'][params['fleet']]]
-                break
 
-        if not task:
-            quest = lookup_quest(params['target'])
-            tasks = get_tasks(quest)
-            [task] = [t for t in tasks if t["_action"] == "fight"]
-
-        enemy_fleet = lookup_item_by_code(task["_item"])
-        baddies = [lookup_item_by_code(baddie_slot["-item"]) for baddie_slot in simple_list(enemy_fleet["baddie"])]
-        if not friendlies:
-            friendlies = [lookup_item_by_code(friendly[1:]) for friendly, count in task["fleet"].items() for i in
-                          range(int(count))]
-
-    if "battle" not in session or not session["battle"]:
-        baddie_strengths = [get_unit_max_strength(baddie, False, params) for baddie in baddies]
-        friendly_strengths = [get_unit_max_strength(friendly, True) for friendly in friendlies]
-        active_consumables = []
-        defenseshield_upgrade_activate(friendlies, active_consumables)
-        session["battle"] = (friendly_strengths, baddie_strengths, active_consumables)
-    else:
-        (friendly_strengths, baddie_strengths, active_consumables) = session["battle"]
-        if baddie_strengths is None:  # survival mode
+        if not has_battle() or (session["battle"][0] is None and session["battle"][1] is None and session["battle"][2] is None):
             baddie_strengths = [get_unit_max_strength(baddie, False, params) for baddie in baddies]
-            active_consumables[:] = [(consumable, target, tries) for consumable, target, tries
-                                     in active_consumables if target[0] == "ally"]
-            session["battle"] = (friendly_strengths, baddie_strengths, active_consumables)
-    return friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables
+            friendly_strengths = [get_unit_max_strength(friendly, True) for friendly in friendlies]
+            active_consumables = []
+            defenseshield_upgrade_activate(friendlies, active_consumables)
+            session["battle"] = (friendly_strengths, baddie_strengths, active_consumables,
+                                 BattleContext() if not has_battle() else session["battle"][3])
+        else:
+            (friendly_strengths, baddie_strengths, active_consumables, battle_context) = session["battle"]
+            if baddie_strengths is None:  # survival mode
+                baddie_strengths = [get_unit_max_strength(baddie, False, params) for baddie in baddies]
+                active_consumables[:] = [(consumable, target, tries) for consumable, target, tries
+                                         in active_consumables if target[0] == "ally"]
+                session["battle"] = (friendly_strengths, baddie_strengths, active_consumables, battle_context)
+        return friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables
+    except Exception as ex:
+        # requires python >=3.11
+        # ex.add_note(f"Registered fleets: { repr(session.get('fleets')) }")
+        # ex.add_note(f"Battle: { repr(session.get('battle')) }")
+        # ex.add_note(f"Params: { repr(params) }")
 
+        print(f"Registered fleets: { repr(session.get('fleets')) }")
+        print(f"Battle: { repr(session.get('battle')) }")
+        print(f"Params: { repr(params) }")
+        raise
 
 def get_previous_fleet_name(name):
     print("Using previous fleet as friendlies for ally consumables")
@@ -594,10 +630,156 @@ def next_campaign_response(params):
     #TODO what if defeated?
     fleet_name = get_new_enemy_fleet_name()
 
+    replaying = "index" in params and params["index"] > -1
+
+    mastery = get_island_mastery(params["map"], island)
+    if mastery > 0:
+        enemy_fleet = get_mastery_units(enemy_fleet, mastery)
+
     session["fleets"][fleet_name] = enemy_fleet
-    print("Enemy fleet:", enemy_fleet)
+    print(f"Enemy fleet { fleet_name }:", enemy_fleet)
+
+    battle_context = BattleContext(map_name=params["map"], island=island, replaying=replaying)
+
+    #lookup_items_by_type_and_subtype("Buildable", "air")
+
+    if not has_battle():
+        session["battle"] = (None, None, None, battle_context)
+    else:
+        session["battle"][3] = battle_context
 
     return next_campaign_response
+
+
+def get_mastery_units(enemy_fleet, mastery):
+
+    # fleet can be complex!!
+    # "fleet": [
+    #     {
+    #         "-U43": "2",
+    #         "-PCK": "1"
+    #     },
+    #     {"-U43": "2"}
+    # ],
+
+    initial_units = [lookup_item_by_code(baddy[1:]) for sub_fleet in simple_list(enemy_fleet)
+                     for baddy, count in sub_fleet.items()
+                     for i in range(int(count))]
+
+    new_units = []
+    for unit in initial_units:
+        proposed_units = [e for i in range(int(unit["unit"].get("-tier", "1")) + min(mastery, 2), 0, -1) for e in
+                  lookup_items_by_type_and_subtype("Buildable", unit["-subtype"]) if
+                  "unit" in e and "villain" not in e["unit"]["-type"] and "mega" not in e["unit"][
+                      "-type"] and int(e["unit"].get("-tier", "1")) == i and unit["-unitClass"] == e[
+                      "-unitClass"]]
+        proposed_units.sort(key=lambda x: (-int(x["unit"].get("-tier", "1")), x['-code']))
+        new_units.append(proposed_units[0])
+
+    return recompress_unit_fleet(new_units)
+    #for each unit
+    #lookup_items_by_type_and_subtype("Buildable", "air")  <<subtype
+    # tier = unit iter + mastery level, BUT fallback to lower tier if no unit
+    # some units have no tier = tier 1
+    # match unit class (e.g,airsupport)
+    # can't be villain
+
+
+def increment_mastery():
+    campaign = session['user_object']['userInfo']['world']['campaign']
+    if not has_battle_context():
+        return
+    battle_context = session["battle"][3]
+
+    if battle_context.map_name not in campaign["mastery"]:
+        campaign["mastery"][battle_context.map_name] = 0
+
+    if campaign["mastery"][battle_context.map_name] >> battle_context.island * 2 & 0b11 != 0b11:
+        campaign["mastery"][battle_context.map_name] += (1 << battle_context.island * 2)
+
+
+def get_island_mastery_from_battle():
+    if not has_battle_context() or not session["battle"][3].replaying:
+        return 0
+
+    battle_context = session["battle"][3]
+    return get_island_mastery(battle_context.map_name, battle_context.island)
+
+
+def get_island_mastery(map_name, island):
+    island_mastery = session['user_object']['userInfo']['world']['campaign']["mastery"].get(map_name, 0)
+
+    return island_mastery >> island * 2 & 0b11
+
+    #return island_mastery[island] if island < len(island_mastery) else 0
+
+
+def get_min_island_mastery_from_battle():
+    if not has_battle_context() or not session["battle"][3].replaying:
+        return 0
+
+    battle_context = session["battle"][3]
+    return get_min_island_mastery(battle_context.map_name)
+
+
+def get_min_island_mastery(map_name):
+    return min(get_island_mastery(map_name, i) for i in range(len(lookup_item_by_code(map_name).get('island',[]))))
+
+
+def get_mastery_scalar():
+    mastery = get_island_mastery_from_battle()
+    #return 0.5 ** mastery if mastery < 3 else 0
+    return 1 + 0.5 * (mastery - 1) if mastery > 0 else 1 #with mastery experiment campaignMasteryScalars
+
+
+def recompress_unit_fleet(units):
+    unit_codes = [e["-code"] for e in units]
+    prev_unit = None
+    fleet = [{}]
+    for e in unit_codes:
+        if "-" + e in fleet[len(fleet)-1] and e != prev_unit:
+            fleet.append({})
+        fleet[len(fleet) - 1]["-" + e] = str(int(fleet[len(fleet) - 1].get("-" + e, '0')) + 1)
+        prev_unit = e
+    return fleet if len(fleet) > 1 else fleet[0] if len(fleet[0]) > 0 else ''
+
+
+def get_reward_multiplier():
+    if not has_battle_context() or not session["battle"][3].replaying:
+        return 1
+
+    combat_replay_reward_span = 10 #combatReplayRewardSpan
+
+    battle_context = session["battle"][3]
+
+    lead_map = get_lead_map()
+    lead_map_item = lookup_item_by_code(lead_map)
+    _, lead_island_id = get_active_island_by_map(lead_map)
+
+    current_map_item = lookup_item_by_code(battle_context.map_name)
+
+    if lead_map != battle_context.map_name or lead_island_id != battle_context.island:
+        #overleveled distance till current island
+        factor = combat_replay_reward_span - min(int(lead_map_item["island"][lead_island_id]["-globalIslandIndex"]) -
+            int(current_map_item["island"][battle_context.island]["-globalIslandIndex"]), combat_replay_reward_span)
+        return factor * (1/combat_replay_reward_span) if factor > 0 else 0.01
+    else:
+        return 1
+
+def get_lead_map():
+    initial_map = "C001"
+
+    campaign = session['user_object']['userInfo']['world']['campaign']
+    lead_map = initial_map
+
+    while True:
+        map_item = lookup_item_by_code(lead_map)
+        _, island = get_active_island_by_map(lead_map) if lead_map in campaign['active'].keys() else (None, 0)
+        if island < len(map_item.get("island", [])):
+            return lead_map
+        if "-unlocks" not in map_item:
+            return initial_map
+        lead_map = map_item["-unlocks"]
 
 
 def register_fleetname_fleet(enemy_fleet):
@@ -1020,6 +1202,8 @@ def get_unit_secondary(unit):
 def get_unit_max_strength(unit, ally, params=None):
     strength = int(unit["unit"].get("-strength", "0"))
     _, island, map_item = get_current_island(params)
+    if session["battle"][3].replaying:
+        island = session["battle"][3].island
     if not ally and island != None and "strength" in map_item["island"][island]:
         strengths = simple_list(map_item["island"][island]["strength"])
         strength = apply_map_mod_strength(unit, strength, strengths)
@@ -1040,21 +1224,22 @@ def get_current_island(params):
     # Campaign 01
     if params and 'map' in params and params['map'] and params['map'][0] == 'C':
         map_item = lookup_item_by_code(params["map"])
-        return get_active_island_by_map(params['map']) + (map_item,)
+        return get_active_island_by_map(params['map'], params.get('index')) + (map_item,)
     # Campaign 02
     if params and 'map' in params and params['map'] and params['map'][0] == 'D':
         map_item = lookup_item_by_code(params["map"])
-        return get_active_island_by_map(params['map']) + (map_item,)
+        return get_active_island_by_map(params['map'], params.get('index')) + (map_item,)
     return None, None, None
 
-def get_active_island_by_map(map_name):
+
+def get_active_island_by_map(map_name, index=-1):
     campaign = session['user_object']['userInfo']['world']['campaign']
     if map_name not in campaign['active'].keys():
         campaign['active'][map_name] = {"status": 0, "fleets": []}
 
     status = campaign['active'][map_name]["status"]
     island_id = (status & 4293918720) >> 20
-    return map_name, island_id
+    return map_name, island_id if index is None or index < 0 else index
 
 def set_active_island_by_map(map_name, island_id):
     campaign = session['user_object']['userInfo']['world']['campaign']
@@ -1130,6 +1315,15 @@ def doBattleRewards(hit_type, max_strength, damage, friendly_max_strength):
 
     rare_amount *= rare_count
 
+    mastery_scalar = get_mastery_scalar()
+    coin_amount *= mastery_scalar
+    xp *= mastery_scalar
+    rare_amount *= mastery_scalar
+    #oil ?
+
+    if mastery_scalar != 1:
+        energy = 0
+
     world = session['user_object']["userInfo"]["world"]
     resources = world['resources']
     resources['coins'] += coin_amount
@@ -1182,3 +1376,24 @@ def is_shielded(target, active_consumables):
 
 def format_player_fleet(code):
     return code + ",,,,"
+
+
+def has_battle_context():
+    return has_battle() and len(session["battle"]) > 3 and session["battle"][3] is not None \
+           and isinstance(session["battle"][3], BattleContext)
+
+
+def has_battle():
+    return "battle" in session and session["battle"] is not None
+
+
+class BattleContext:
+    def __init__(self, map_name=None, island=None, replaying=False):
+        self.map_name = map_name
+        self.island = island
+        self.replaying = replaying
+
+    def __str__(self):
+        return f"BattleContext(map_name={self.map_name}, island={self.island}, replaying={self.replaying})"
+
+    __repr__ = __str__

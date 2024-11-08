@@ -58,8 +58,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.07a.2022_04_17"
-release_date = 'Sunday, 17 April 2022'
+version = "0.07a.2024_11_08"
+release_date = 'Sunday, 08 November 2024'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -427,7 +427,7 @@ def save_savegame():
     create_backup(message)
     session['saved'] = str(session.get('saved', "")) + "edit"
     session['user_object'] = save_game['user_object']
-    if 'profilePic' in session:
+    if 'profilePic' in session and 'profilePic' in save_game :
         session['profilePic'] = save_game['profilePic']
     else:
         pass
@@ -744,20 +744,6 @@ def post_gateway():
         elif reqq.functionName == 'UserService.tutorialProgress':
             resps.append(tutorial_response(reqq.params[0], reqq.sequence, resp_msg.bodies[0][0]))
         elif reqq.functionName == 'WorldService.performAction':
-            # lastId = 0
-            # for reqq2 in resp_msg.bodies[0][1].body[1]:
-            #     if reqq2.functionName == 'WorldService.performAction' and reqq2.params[1] and reqq2.params[1].id:
-            #         lastId=reqq2.params[1].id
-            # 
-            #wr = perform_world_response(step=reqq.params[0],
-            #                            supplied_id=reqq.params[1].id,
-            #                            position=reqq.params[1].position,
-            #                            item_name=reqq.params[1].itemName,
-            #                            reference_item=reqq.params[2][0].get('referenceItem') if len(reqq.params[2]) > 0 else None,
-            #                            from_inventory=reqq.params[2][0].get('isGift') if len(reqq.params[2]) > 0 else None,
-            #                            elapsed=reqq.params[2][0].get('elapsed') if len(reqq.params[2]) > 0 else None,
-            #                            cancel=reqq.params[2][0].get('cancel') if len(reqq.params[2]) > 0 else None,
-            #                            req2=reqq.params[2][0] if len(reqq.params[2]) > 0 else None)
             wr = perform_world_response(reqq.params)
             resps.append(wr)
             report_world_log(reqq.params[0] + ' id ' + str(reqq.params[1].id) + '@' + reqq.params[1].position,
@@ -1828,9 +1814,13 @@ def perform_world_response(params):
         click_next_state(True, id, meta, step, reference_item, cancel=cancel)  # place & setstate only
 
     if step == "setState":
-        if lookup_object(id)["referenceItem"] == None and reference_item != None:
-            costs = lookup_item_by_code(reference_item.split(":")[0]).get("cost")
-            do_costs({k: v for k, v in costs.items() if k != "-cash"})
+        if lookup_object(id)["referenceItem"] is None and reference_item is not None:
+            ref_item = lookup_item_by_code(reference_item.split(":")[0])
+            if item_name == "Mastery Factory 01" and int(ref_item.get("masteryTokenCost","0"))> 0:
+                session['user_object']["userInfo"]["player"]["inventory"]["items"]["VTK"] -= int(ref_item["masteryTokenCost"])
+            else:
+                costs = ref_item.get("cost")
+                do_costs({k: v for k, v in costs.items() if k != "-cash"})
         lookup_object(id)["referenceItem"] = reference_item
 
     if step == "clear":
@@ -2656,7 +2646,7 @@ def load_survival_mode_response(param):
                                                                     "rewardRefreshCount": 0, "rewards": {},
                                                                     "rewardChanged": False}, "enemyWaveFleet": fleet, "playerFleet":get_survival_player_fleet()}}
         session["battle"] = session["last_battle"]
-        session["battle"] = ([e for e in session["battle"][0] if e != 0], None, session["battle"][2])
+        session["battle"] = ([e for e in session["battle"][0] if e != 0], None, session["battle"][2], session["battle"][3])
         register_fleetname_fleet(fleet)
     elif is_resume_survival():
         print("resume paused survival")

@@ -1,5 +1,20 @@
 upcoming
-    Fix quests with different comparison filters 17/04/2022 13:27
+    Island Mastery: replay islands & earn gold units Nat 08/11/2024 16:30
+    temp. resuming survival, update migration Willy030125* 18/01/2024 11:15
+    updated savespack Willy030125* 17/01/2024 07:23
+    Bump pyinstaller from 5.1 to 5.13.1 dependabot[bot]* 24/12/2023 18:46
+    Bump werkzeug from 2.2.1 to 2.3.8 dependabot[bot]* 24/12/2023 18:46
+    surv mode 4 Nat 11/11/2023 03:37
+    fix incompatibility with recent libs Willy030125* 07/11/2023 02:06
+    Bump flask from 2.0.3 to 2.3.2 dependabot[bot]* 02/05/2023 01:37
+    Molten Terror fixed, now it works Willy030125* 28/04/2023 12:28
+    reverted;still have errors on the latest libraries Willy030125* 28/04/2023 12:27
+    flask safe_join deprecation. AcidCaos 31/08/2022 20:10
+    enabling experimental features Willy030125* 22/05/2022 08:58
+    added one more ally Willy030125* 22/05/2022 01:25
+    Updated no-debug page AcidCaos 15/05/2022 14:14
+    Some UI changes. AcidCaos 15/05/2022 12:28
+    Fix quests with different comparison filters Nat 17/04/2022 13:27
     Trying to add a blur background Willy030125* 18/02/2022 05:45
     Added Survival Mode part 3: AI powers Nat 17/02/2022 23:21
     New UI. Web source cleaned. AcidCaos 15/02/2022 22:17

@@ -461,10 +461,10 @@ def do_quest_rewards(quest, meta):
     do_rewards("Quest", raw_rewards, meta)
 
 
-def do_rewards(label, raw_rewards, meta):
+def do_rewards(label, raw_rewards, meta, inc_modifier=lambda a: a, item_modifier=lambda a: a):
     rewards = simple_list(raw_rewards)
-    inc = {r.get("_type", r.get("-type")): int(r.get('_count', r.get('-count', 1))) for r in rewards if r.get("_type") != "item" and r.get("-type") != "item"}
-    items = {r.get("_item", r.get("-item")): int(r.get('_count', r.get('-count', 1))) for r in rewards if r.get("_type") == "item" or r.get("-type") == "item"}
+    inc = {r.get("_type", r.get("-type")): inc_modifier(int(r.get('_count', r.get('-count', 1)))) for r in rewards if r.get("_type") != "item" and r.get("-type") != "item"}
+    items = {r.get("_item", r.get("-item")): item_modifier(int(r.get('_count', r.get('-count', 1)))) for r in rewards if r.get("_type") == "item" or r.get("-type") == "item"}
 
     player = session['user_object']["userInfo"]["player"]
     player['energy'] += int(inc.get('energy', 0))
