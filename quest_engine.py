@@ -438,7 +438,7 @@ def activate_unlocked_quests(new_quests, meta):
 
 def matches_requirement(quest):
     #return "requires" in quest and quest["requires"]['_type'] =='level'
-    return ("requires" not in quest or (quest["requires"]['_type'] =='level'
+    return quest is not None and ("requires" not in quest or (quest["requires"]['_type'] =='level'
                                         and int(quest["requires"]['_count']) <= session['user_object']["userInfo"]["player"]["level"])) and \
            ("_activateExperimentNeeded" not in quest or (quest["_activateExperimentNeeded"] in session['user_object']["experiments"] and
                                                          str(session['user_object']["experiments"][quest["_activateExperimentNeeded"]]) in quest["_activateExperimentVariants"].split(','))) and \

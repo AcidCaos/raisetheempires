@@ -2520,6 +2520,74 @@
 				},
 				"sequels": {
 					"sequel": {
+						"_name": "QW190"
+					}
+				},
+				"tasks": {
+					"task": [
+						{
+							"cost": {
+								"_amount": "20"
+							},
+							"_action": "inventoryCount",
+							"_item": "B111",
+							"_total": "5",
+							"_desc": "quest_W188_task_01",
+							"_removeItemOnComplete": "true",
+							"_icon": "assets/game/buildables/Buildables_Icons_0.swf/TranquilizerDarts_01_96.png",
+							"_requestButton": "building_parts.php?requestType=part&part="
+						},
+						{
+							"cost": {
+								"_amount": "20"
+							},
+							"_action": "resourceAdded",
+							"_type": "wood",
+							"_total": "250",
+							"_desc": "quest_W188_task_02",
+							"_sticky": "true",
+							"_icon": "assets/game/contracts/Contracts_Icons_0.swf/LumberCircularSaw_96.png"
+						}
+					]
+				},
+				"reward": [
+					{
+						"_type": "item",
+						"_item": "N04",
+						"_count": "1"
+					},
+					{
+						"_type": "item",
+						"_item": "N09",
+						"_count": "1"
+					}
+				],
+				"_name": "QW188",
+				"_popup_delay": "4",
+				"_visible": "true",
+				"_introIcon": "assets/game/season/Seasons_October.swf/Unit_Land_MtnLion_96.png",
+				"_introTooltip": "quest_W188_introTooltip",
+				"_introSpeech": "Speech_Sarah_W188_01",
+				"_title": "quest_W188_title",
+				"_desc": "quest_W188_desc",
+				"_hint": "quest_W188_hint",
+				"_complete": "quest_W188_complete",
+				"_tooltip": "quest_W188_tooltip",
+				"_advisorId": "a02",
+				"_buttonIcon": "assets/game/season/Seasons_October.swf/Unit_Land_MtnLion_96.png",
+				"_forced": "true"
+			},
+			{
+				"requiredDate": {
+					"_start": "9/30/2011",
+					"_end": "10/28/2011"
+				},
+				"requires": {
+					"_type": "level",
+					"_count": "12"
+				},
+				"sequels": {
+					"sequel": {
 						"_name": "QW192"
 					}
 				},

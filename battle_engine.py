@@ -1202,7 +1202,7 @@ def get_unit_secondary(unit):
 def get_unit_max_strength(unit, ally, params=None):
     strength = int(unit["unit"].get("-strength", "0"))
     _, island, map_item = get_current_island(params)
-    if session["battle"][3].replaying:
+    if has_battle_context() and session["battle"][3].replaying:
         island = session["battle"][3].island
     if not ally and island != None and "strength" in map_item["island"][island]:
         strengths = simple_list(map_item["island"][island]["strength"])
