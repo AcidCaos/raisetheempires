@@ -1,7 +1,21 @@
 ## Support for servers
 ### Setting up a server
 
-:file_cabinet:  Download the latest game version [installer](../../releases/latest)
+:file_cabinet:  You can download the binary compiled version: [installer](../../releases/latest) <br>
+and run the executable:
+```
+empires-server.exe --host <host_IP> --port <port_number>
+```
+:file_cabinet:  Or you can clone the latest version:
+ ```bash
+ git clone https://github.com/AcidCaos/raisetheempires
+ cd raisetheempires
+ pip install -r requirements.txt
+ ```
+and run the server:
+```
+python empires-server.py --host <host_IP> --port <port_number>
+```
 
 :keyboard: Configure the server by **Command line arguments** when running the executable:
 
