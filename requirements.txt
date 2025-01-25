@@ -16,3 +16,4 @@ jsonpatch==1.22
 tqdm==4.66.3
 setuptools
 pytest==7.1.2
+wheel
