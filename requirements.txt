@@ -1,4 +1,4 @@
-pyinstaller==5.13.1
+pyinstaller==6.0.0
 tendo==0.2.15
 py3amf==0.8.10
 flask==2.3.2
