@@ -58,8 +58,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.07a.2024_11_09"
-release_date = 'Saturday, 09 November 2024'
+version = "0.08a.2025_09_26"
+release_date = 'Friday, 26 September 2025'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -112,6 +112,23 @@ def home():
                            motd=get_motd()
                            )
 
+@app.route("/ruffle.html")
+def ruffle():
+    print("ruffle")
+    if not validate_save(session, True):
+        print("Invalid save game")
+        return make_response(redirect('/save-editor')) #todo disable save editor toggle?
+    saves = get_saves()
+    return render_template("ruffle.html", time=datetime.now().timestamp(), zid=str(get_zid()),
+                           version=version,
+                           allies=json.dumps(get_allies_friend(saves),
+                                             default=lambda o: '<not serializable>', sort_keys=False, indent=2),
+                           app_friends=json.dumps(get_allies_id(saves)),
+                           worldname=session['user_object']["userInfo"]["worldName"] if 'user_object' in session else "Emperor",
+                           picture=get_avatar_pic(),
+                           dropdown_items=get_sessions_dropdown_info(saves),
+                           motd=get_motd()
+                           )
 
 def get_allies_friend(saves):
     return [ally["friend"] for ally in allies.values()

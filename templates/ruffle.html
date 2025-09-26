@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Meta -->
+	<meta charset="utf-8"/>
+	<!-- Title and Icon -->
+	<title id="pageTitle">Empires &amp; Allies</title>
+	<link rel="shortcut icon" href="img/icon.png"/>
+	<link rel="icon" type="image/png" href="img/icon.png"/>
+	<!-- CSS -->
+	<link rel="stylesheet" href="css/facebook.css"/>
+	<link rel="stylesheet" href="css/buttons.css"/>
+	<link rel="stylesheet" href="css/tooltiplink.css"/>
+	<link rel="stylesheet" href="css/zbar.css"/>
+	<!-- JS -->
+	<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+	<script src="js/flash.js"></script>
+	<script src="js/session.js"></script>
+	<script src="js/empires.js"></script>
+	<script>
+		function getUserInfo() {
+			console.log("getUserInfo called");
+			inner_getUserInfo();
+			return {
+				'zid': {{ zid | default(-1000) }},
+				'uid': {{ zid | default(-1000) }},
+				'first_name': {{ worldname | tojson }},
+				'name': {{ worldname | tojson }},
+				"sex": 'F',
+				'pic_square': '{{ picture }}'
+			};
+		}
+
+		function getFriendData() {
+			console.log("getFriendData called");
+			inner_getFriendData();
+			return {{ allies | safe | default([]) }};
+		}
+
+		function getAppFriendIds() {
+			console.log("getAppFriendIds called");
+			inner_getAppFriendIds();
+			return {{ app_friends | safe | default([]) }};
+		}
+
+		function onGameLoaded(seen, popp, canvas) {
+			console.log("Game is loaded " + seen + ", " + popp + ", " + canvas)
+			inner_onGameLoaded();
+			return;
+		}
+	</script>
+</head>
+<body class="ego_wide canvas center_fixed_width_app fbx UIPage_LoggedOut liquid hideBanner Locale_en_US">
+	<!-- TOP BANNER -->
+	<div class="-cx-PRIVATE-fbLayout__root">
+	  	<div id="pagelet_bluebar" data-referrer="pagelet_bluebar">
+	  		<div id="blueBarHolder">
+	  			<div id="blueBar">
+					<div class="loggedout_menubar_container">
+						<div class="clearfix loggedout_menubar">
+							<a class="lfloat" href="/" title="Go to Facebook Home">
+								<i class="fb_logo img sp_e2gpgs sx_584554">
+									<u>Facebook logo</u>
+								</i>
+							</a>
+							<ul class="rfloat" style="color:#fff;">
+								<li style="margin-right: 7px;">
+									<!-- CURRENT USER -->
+									<b>{% for dropdown_item in dropdown_items %}{% if dropdown_item["uid"] == zid | int %}
+										<div style="position:relative; display: inline-block; vertical-align: top; text-align: left;">
+											<p style="margin-top:8px;">{{dropdown_item["world_name"]}} </p>
+										</div>
+										<div style="position:relative; text-align:center; display: inline-block;" title="{{dropdown_item["xp"]}} xp">
+											<img src="img/xp.png" style="width:30px;"> 
+											<div style="position:absolute; top:40%; left:50%; transform: translate(-50%, -50%); color:black;">
+												{{dropdown_item["level"]}}
+											</div>
+										</div> 
+										<i class="img sp_ctntui sx_612416_new"></i>
+										{% endif %}{% endfor %}
+									</b>
+									<!-- DROPDOWN -->
+									<ul class="dropdownUser">
+										<li><a href="#" onclick="newPlayer(); return false">New player</a><li>
+										<!--
+										<li><a href="#" onclick="return false">Change ore</a>
+											<ul class="third-level-menu">
+												<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/3"><img style="width:25px;" src="img/Aluminum_60.png"></a></li>
+												<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/4"><img style="width:25px;" src="img/Copper_60.png"></a></li>
+												<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/5"><img style="width:25px;" src="img/Gold_60.png"></a></li>
+												<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/6"><img style="width:25px;" src="img/Iron_60.png"></a></li>
+												<li><a href="/patch/user_object/userInfo/player/playerResourceType/int/7"><img style="width:25px;" src="img/Uranium_60.png"></a></li>
+											</ul>
+										</li>
+										-->
+										<!-- OTHER USERS -->
+										{% for dropdown_item in dropdown_items %}{% if dropdown_item["uid"] != zid | int %}
+										<li>
+											<a href="#" onclick="changeSession(&quot;{{dropdown_item['session_id']}}&quot;); return false">
+												<div style="position:relative; display: inline-block; vertical-align: top; text-align: left;">
+													<p style="margin-top:8px;">{{dropdown_item["world_name"]}} </p>
+												</div>
+												<div style="position:relative; text-align:center; display: inline-block;" title="{{dropdown_item["xp"]}} xp">
+													<img src="img/xp.png" style="width:30px;"> 
+													<div style="position:absolute; top:40%; left:50%; transform: translate(-50%, -50%); color:black;">
+														{{dropdown_item["level"]}}
+													</div>
+												</div>
+											</a>
+										</li>
+										{% endif %}{% endfor %}
+									</ul>
+								</li>
+								<!-- Session Buttons -->
+								<a class="uiButton uiButtonConfirm" href="#" onclick="logout(); return false" role="button" name="try_again_button">
+									<span class="uiButtonText">Logout</span>
+								</a>
+								<a class="inputaux uiButton" href="save-editor" role="button">
+									<span class="uiButtonText">Edit Empire</span>
+								</a>
+								<!--<a class="inputaux uiButton" href="nodebug.html" role="button">
+									<span class="uiButtonText">No debug mode</span>
+								</a>-->
+							</ul>
+						</div>
+					</div>
+	  				<div class="signupBanner">
+	  					<div class="signup_bar_container">
+	  						<div class="signup_box clearfix">
+			  				</div>
+			  			</div>
+			  		</div>
+			  	</div>
+	  		</div>
+		</div>
+	</div>
+	<!-- PAGE BODY -->
+	<div id="globalContainer" class="uiContextualLayerParent">
+		<div id="content" class="fb_content clearfix">
+			<div>
+				<div id="mainContainer">
+					<div id="contentCol" class="clearfix">
+						<div id="contentArea" role="main" aria-describedby="pageTitle">
+							<!--<div class="uiInterstitial canvas_error_page " title="" style="margin-bottom: 20px">
+								<div class="uiInterstitialBar uiBoxGray topborder">
+									<div class="clearfix">
+										<img src="img/logo.png"><p style="display: inline">{{ version | default("UNKNOWN version")}}</p>
+										<div class="rfloat">
+											<a class="uiButton uiButtonConfirm" href="nodebug.html" role="button" name="try_again_button">
+												<span class="uiButtonText">No debug version</span>
+											</a>
+											<a class="inputaux uiButton" href="wipe_session" role="button" name="exit_button">
+												<span class="uiButtonText">Delete save game</span>
+											</a>
+											<a class="inputaux uiButton" href="save-editor" role="button" name="exit_button">
+												<span class="uiButtonText">Edit save game</span>
+											</a>
+										</div>
+										<div class="pts">
+										</div>
+									</div>
+								</div>
+							</div>-->
+							<center style="margin-top: 37px;">
+								<div class="zBar" id="zBar">
+									<div style="display: inline-block; float: left; width: 315px; height:105px;"><!-- Used for background--></div>
+									<div style="float: left; height:97px; padding: 4px;">
+										<!-- zbar column 1 content here-->
+										<a title="Empires & Allies Wiki" href="https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2" target="_blank"><div class="zBarButtons" id="zBarButtons" style="background-image: url('img/fandom.png');"></div></a>
+										<a title="Discord group" href="https://discord.gg/xrNE6Hg" target="_blank"><div class="zBarButtons" id="zBarButtons" style="background-image: url('img/discord.png');"></div></a>
+										<a title="Github repository" href="https://github.com/AcidCaos/raisetheempires#readme" target="_blank"><div class="zBarButtons" id="zBarButtons" style="background-image: url('img/github.png');"></div></a>
+										<a title="Termux/GNU/Linux version" href="https://github.com/Questandachievement7Developer/RaiseTheEmpiresPort_Native" target="_blank"><div class="zBarButtons" id="zBarButtons" style="background-image: url('img/termux.png');"></div></a>
+										<!-- VERSION -->
+										<br><br>
+										<p style="display: inline">Raise the Empires {{ version | default("UNKNOWN version")}}</p>
+									</div>
+									<div style="float: right; height:97px; padding: 4px;">
+										<!-- zbar column 3 content here-->
+										<img class="rewardVilleLogo" src="img/RewardVilleLogo.png" style="vertical-align: bottom; display: inline; margin-top: 53px;">
+									</div>
+									<div style="float: right; height:97px; padding: 4px; display: flex;">
+										<!-- zbar column 2 content here-->
+										<img src="img/Zcoins.png" style="align-self:flex-end">							
+									</div>
+								</div>
+							</center>
+							<center>
+								<div style="text-align: center; width:1010px;">
+									<div class="gameButtons" id="gameButtons" style=" margin-bottom:4px; margin-left: 5px; text-align: left; height:20px; padding-top: 4px;">
+										<a href="#" class="unsel">Free Gifts</a>
+										<a href="#" class="selec">Play</a>
+										<a href="/friends.html" class="unsel">My Neighbors</a>
+										<a href="#" class="unsel">Invite Friends</a>
+										<a title="Check the Empires & Allies Wiki" href="https://empiresandallies.fandom.com/wiki/Empires_%26_Allies_Wiki/Main_2" class="unsel">Help</a>
+										<a title="Adds 10k Empire Points" href="/gazillionaire" class="unsel">Get Empire Points</a>
+										<a href="#" class="unsel">Earn Empire Points</a>
+										<a href="#" class="unsel">GameCards</a>
+										<a href="#" style="display:inline; float:right; padding-top: 0px;"><img src="img/globe.png" style="height:25px"></a>
+									</div>
+								</div>
+								<div>
+									<div style="margin:10px"></div>
+									<div style="position: relative; width: 1000px; min-height: 750px; margin: 0; padding: 0; border: 0;">
+										<div id="game_object" style="width: 1000px; min-height: 750px; display: inline-block; margin: 0; padding: 0; border: 0;">
+											<object>
+												<div id='ruffle'></div>
+												<script>
+													window.RufflePlayer = window.RufflePlayer || {};
+													window.RufflePlayer.config = {autoplay: "on", LogLevel: "debug"};
+													const ruffle = window.RufflePlayer.newest();
+													var player = Object.assign(document.getElementById("ruffle").appendChild(ruffle.createPlayer()), {
+														width: 1000,
+														height: 750,
+														style: 'width: 1000px; height: 750px; background-color: #333399;',
+													});
+													player.load({ // https://ruffle.rs/js-docs/master/interfaces/Config.URLLoadOptions.html
+														url: "/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf",
+														backgroundColor: "#333399",
+														allowScriptAccess: false,
+														allowFullscreen: true,
+														quality: "high",
+														//autoplay: true,
+														parameters: '\
+															serverTime={{time}}\
+															&is_staging=true\
+															&debugMode=true\
+															&generateSchema=1\
+															&sn_app_url=\
+															&stats=1'
+													}).then(() => {
+														console.info("Ruffle successfully loaded the file");
+													}).catch((e) => {
+														console.error(`Ruffle failed to load the file: ${e}`);
+													});
+												</script>
+											</object>
+										</div>
+										<!-- Loading game div is rendered on top of the flash object. -->
+										<div id="loading_game" hidden="true" style="position: absolute; top: 0; left: 0; width:1000px; height:750px; background-color: white;">
+											<div name="motd" style="width:750px; height:500px; display: inline-block; margin: 0; padding: 0; border: 0;  background-image: url('{{ motd | safe }}'); background-size: cover; background-position: center; background-repeat: no-repeat; background-clip: border-box; margin-top: 100px; box-shadow: inset 0px -30px 70px 50px #000;">
+												<div name="EA_frame" style="width:750px; height:690px; display: inline-block; margin: 0; padding: 0; border: 0; background-image: url('img/loading_frame_remastered.png'); background-size: contain; background-position: center; background-repeat: no-repeat; margin-top: -100px;">
+													<center style="padding-top: 460px; width: 570px; margin: 0; border: 0; /*background-color: #e5f1fd;*/">
+														<!--<img id="loading_gif" src="img/loading.gif">-->
+														<br>
+														<p id="loading_message" style="font-size: 30px; color: white; text-shadow: 0px 0px 6px black; margin-bottom: 15px;">Detecting flash...</p>											
+														<div id="progress_bar" style="display: flex; width: 45%; height: 18px; border-radius: 10px; overflow: hidden; background-color: #6d5554; box-shadow: inset 0px 4px 9px -1px #4c4635;"> 
+															<div id="inner_progress_bar" style="width: 0%; background-color: #e6b104; box-shadow: inset 0px 4px 9px -1px #fae361; transition: width 1s linear;"></div>
+														</div>
+													</center>
+													<div style="width: 750px; position: absolute; top: 0; padding-top: 280px;">
+														<center>
+															<div id="flash_enabler" style="/*display: none;*/ width: 300px; /*border-radius: 20px; border: 1px solid #e5f1fd; overflow: hidden;*/">
+																<!-- Fake Flash object to trigger flash enable popup -->
+																<object codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" width=300>
+																	<embed id="game_embed" WMODE="transparent" bgcolor="white" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer" width=300>
+																	</embed>
+																</object>
+															</div>
+														</center>
+													</div>
+												</div>
+											</div>
+										</div>
+										<script type="text/javascript" charset="utf-8">
+											loadingScreenUpdate()
+										</script>
+									</div>
+								</div>
+							</center>
+						</div>
+						<div style="margin: 30px"></div>
+						<div class="uiInterstitialBar uiBoxGray topborder">
+							<center>
+								<a href="home.html">Back to debug mode</a>
+							</center>
+							<br>
+							<div class="clearfix">
+								<center>
+									<p style="color: #666699;"> <br>
+									The Raise the Empires team. Empires &amp; Allies {{ version | default("")}}
+									</p>
+								</center>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
