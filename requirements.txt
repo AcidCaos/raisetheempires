@@ -2,7 +2,7 @@ pyinstaller==5.13.1
 tendo==0.2.15
 py3amf==0.8.10
 flask==2.3.2
-Werkzeug==2.3.8
+Werkzeug==3.0.3
 SQLAlchemy==1.4.37
 flask_session==0.5.0
 flask_sqlalchemy==2.5.1
