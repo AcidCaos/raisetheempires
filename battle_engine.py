@@ -1,14 +1,12 @@
 import math
-
 from flask import session
-
-from game_settings import lookup_item_by_code, game_settings, get_zid, lookup_items_by_type_and_subtype
+from game_settings import lookup_item_by_code, lookup_item_by_name, game_settings, get_zid, lookup_items_by_type_and_subtype
 from logger import report_battle_log
 from quest_engine import lookup_quest, get_tasks, simple_list, get_seed_w, get_seed_z, roll_random_between, \
     handle_quest_progress, progress_action, roll_random_float, all_lambda, progress_parameter_equals, do_rewards, \
     roll_reward_random_float, progress_battle_damage_count, progress_useAOA_consumable, progress_useGeneral_consumable, \
     progress_parameter_implies
-from save_engine import get_saves, store_session
+from save_engine import get_saves, store_session, lookup_objects_by_item_name
 
 
 def battle_complete_response(params):
@@ -16,36 +14,38 @@ def battle_complete_response(params):
     meta = {"newPVE": 0}
 
     if 'id' in params:
-        [player_unit_id, enemy_unit_id] = params['id']  #player turn
+        print("PLAYER TURN")
+        [player_unit_fleet_idx, enemy_unit_fleet_idx] = params['id']  #player turn
         player_turn = True
     else:
+        print("ENEMY TURN")
         player_turn = False
-        enemy_unit_id, _, player_unit_id = ai_best_attack(friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables)
-
-    if enemy_unit_id is not None and player_unit_id is not None:
-        ally_target = ("ally", player_unit_id)
-        enemy_target = ("enemy", enemy_unit_id)
+        enemy_unit_fleet_idx, _, player_unit_fleet_idx = ai_best_attack(friendlies, friendly_strengths, baddies, baddie_strengths, active_consumables)
+    
+    if enemy_unit_fleet_idx is not None and player_unit_fleet_idx is not None:
+        ally_target = ("ally", player_unit_fleet_idx)
+        enemy_target = ("enemy", enemy_unit_fleet_idx)
         first_target = ally_target if player_turn else enemy_target
         second_target = enemy_target if player_turn else ally_target
 
         # print("repr baddies", baddies)
-        baddie_max_strength = get_unit_max_strength(baddies[enemy_unit_id], False, params)
-        baddie_weak = get_unit_weak(baddies[enemy_unit_id])
-        baddie_unit_type = get_unit_type(baddies[enemy_unit_id])
+        baddie_max_strength = get_unit_max_strength(baddies[enemy_unit_fleet_idx], False, params)
+        baddie_weak = get_unit_weak(baddies[enemy_unit_fleet_idx])
+        baddie_unit_type = get_unit_type(baddies[enemy_unit_fleet_idx])
 
-        friendly_max_strength = get_unit_max_strength(friendlies[player_unit_id], True)
-        friendly_weak = get_unit_weak(friendlies[player_unit_id])
-        friendly_unit_type = get_unit_type(friendlies[player_unit_id])
+        friendly_max_strength = get_unit_max_strength(friendlies[player_unit_fleet_idx], True)
+        friendly_weak = get_unit_weak(friendlies[player_unit_fleet_idx])
+        friendly_unit_type = get_unit_type(friendlies[player_unit_fleet_idx])
 
-        friendly_strength = friendly_strengths[player_unit_id]
-        baddie_strength = baddie_strengths[enemy_unit_id]
+        friendly_strength = friendly_strengths[player_unit_fleet_idx]
+        baddie_strength = baddie_strengths[enemy_unit_fleet_idx]
 
         init_seed = ["init seed", get_seed_w(), get_seed_z()]
         roll = unit_roll(friendly_weak if player_turn else baddie_weak, baddie_weak if player_turn else friendly_weak)
 
         crit, direct = get_hit_value(friendly_unit_type if player_turn else baddie_unit_type, baddie_unit_type if player_turn else friendly_unit_type)
         if player_turn:
-            crit, direct = handle_accurancy_upgrades(crit, direct, friendlies, player_unit_id)
+            crit, direct = handle_accurancy_upgrades(crit, direct, friendlies, player_unit_fleet_idx)
 
         accuracy = (get_consumable_accuracy(first_target, active_consumables) - get_consumable_evasion(second_target, active_consumables)) * 0.01
         crit -= accuracy
@@ -72,7 +72,7 @@ def battle_complete_response(params):
             print("Consumable extra damage", max(consumable_extra_damage, -damage))
 
         if player_turn:
-            damage = handle_damage_upgrades(damage, friendlies, player_unit_id)
+            damage = handle_damage_upgrades(damage, friendlies, player_unit_fleet_idx)
 
         damage = math.floor(damage * 10 ** 3) / 10 ** 3
 
@@ -91,51 +91,119 @@ def battle_complete_response(params):
         damage = math.ceil(damage)
 
         if player_turn:
-            baddie_strengths[enemy_unit_id] -= damage
-            if baddie_strengths[enemy_unit_id] == 1:
+            baddie_strengths[enemy_unit_fleet_idx] -= damage
+            if baddie_strengths[enemy_unit_fleet_idx] == 1:
                 damage +=1
-                baddie_strengths[enemy_unit_id] -= 1
+                baddie_strengths[enemy_unit_fleet_idx] -= 1
                 print("Enemy inced to prevent 1 strength")
-            if baddie_strengths[enemy_unit_id] <= 0:
-                baddie_strengths[enemy_unit_id] = 0 #dead
-                print("Enemy unit", enemy_unit_id, "down")
+            if baddie_strengths[enemy_unit_fleet_idx] <= 0:
+                baddie_strengths[enemy_unit_fleet_idx] = 0 #dead
+                print("Enemy unit", enemy_unit_fleet_idx, "down")
                 hit_type = "kill" if hit_type != "criticalhit" else "criticalkill"
-                handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, friendlies[player_unit_id], baddies[enemy_unit_id]))
+                handle_quest_progress(meta, progress_battle_damage_count("battleKill", 1, friendlies[player_unit_fleet_idx], baddies[enemy_unit_fleet_idx]))
                 # session["battle"] = None
-            print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
+            print("Attacking for", damage , "damage, enemy hp:", baddie_strengths[enemy_unit_fleet_idx], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
             doBattleRewards(hit_type, baddie_max_strength, damage, friendly_max_strength)
-            handle_quest_progress(meta, progress_battle_damage_count("battleDamage", damage, friendlies[player_unit_id], baddies[enemy_unit_id]))
+            handle_quest_progress(meta, progress_battle_damage_count("battleDamage", damage, friendlies[player_unit_fleet_idx], baddies[enemy_unit_fleet_idx]))
 
         elif damage > 0 and is_shielded(ally_target, active_consumables) == True:
             consume_shield(ally_target, active_consumables)
 
         else:
-            friendly_strengths[player_unit_id] -= damage
-            if friendly_strengths[player_unit_id] <= 0:
-                friendly_strengths[player_unit_id] = 0  # dead
-                print("Player unit", player_unit_id, "down")
-                # session["battle"] = None
-            print("Taken", damage, "damage, player hp:", friendly_strengths[player_unit_id], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
+            friendly_strengths[player_unit_fleet_idx] -= damage
+            if friendly_strengths[player_unit_fleet_idx] <= 0:
+                friendly_strengths[player_unit_fleet_idx] = 0  # dead
+                print("Player unit", player_unit_fleet_idx, "down")
+                
+                # Delete the dead unit
+                deadUnitCode:str = friendlies[player_unit_fleet_idx]["-code"]
+                print(f"Dead unit code: {deadUnitCode}")
+                # Get the code of the dead unit
+                remove_dead_unit_by_code(deadUnitCode)
+                
+            print("Taken", damage, "damage, player hp:", friendly_strengths[player_unit_fleet_idx], roll, "after seed", get_seed_w(),get_seed_z(), repr(init_seed))
     else:
         print("Stun skipped turn")
-        player_unit_id = next((i for strength, i in zip(friendly_strengths,range(len(friendly_strengths))) if strength > 0), None)
-        enemy_unit_id = next((i for strength, i in zip(baddie_strengths,range(len(baddie_strengths))) if strength > 0), None)
-        ally_target = ("ally", player_unit_id)
+        player_unit_fleet_idx = next((i for strength, i in zip(friendly_strengths,range(len(friendly_strengths))) if strength > 0), None)
+        enemy_unit_fleet_idx = next((i for strength, i in zip(baddie_strengths,range(len(baddie_strengths))) if strength > 0), None)
+        ally_target = ("ally", player_unit_fleet_idx)
         roll = 0
 
-    result = {"attackerStunned": None, "psh": 1 if is_shielded(ally_target, active_consumables) else 0, "esh": 0, "ps": friendly_strengths[player_unit_id], "es": baddie_strengths[enemy_unit_id], "hv": None, "ur": roll,
-     "playerUnit": player_unit_id, "enemyUnit": enemy_unit_id, "seeds": {"w": get_seed_w(), "z": get_seed_z()},
-     "energy": None}
+    result = {
+                "attackerStunned": None, 
+                "psh": 1 if is_shielded(ally_target, active_consumables) else 0, 
+                "esh": 0, 
+                "ps": friendly_strengths[player_unit_fleet_idx], 
+                "es": baddie_strengths[enemy_unit_fleet_idx], 
+                "hv": None, 
+                "ur": roll,
+                "playerUnit": player_unit_fleet_idx, 
+                "enemyUnit": enemy_unit_fleet_idx, 
+                "seeds": {
+                    "w": get_seed_w(), 
+                    "z": get_seed_z()
+                    },
+                "energy": None
+            }
 
     process_consumable_end_turn(active_consumables, baddie_strengths, friendly_strengths, player_turn)
     handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths)
     handle_loss(friendly_strengths)
 
-    report_battle_log(friendly_strengths, baddie_strengths, player_turn, player_unit_id, enemy_unit_id, active_consumables)
+    report_battle_log(friendly_strengths, baddie_strengths, player_turn, player_unit_fleet_idx, enemy_unit_fleet_idx, active_consumables)
     if not player_turn:
         consume_consumables(active_consumables)
     battle_complete_response = {"errorType": 0, "userId": 1, "metadata": meta, "data": result}
     return battle_complete_response
+
+
+def remove_dead_unit_by_code(dead_unit_code):
+    """
+    Removes a unit based on its code.
+
+    1. It first checks if the unit exists in the player's inventory with a quantity > 0.
+       If so, it subtracts 1 from the inventory and finishes.
+    2. If the unit is not in inventory, it assumes the unit was on the map. It then
+       looks up the unit's name (e.g., 'ship06') and removes the first matching
+       object from the world.
+    """
+    print(f"--- Processing removal for unit code: {dead_unit_code} ---")
+
+    try:
+        inventory = session['user_object']['userInfo']['player']['inventory']['items']
+        world_objects = session['user_object']['userInfo']['world']['objects']
+    except KeyError as e:
+        print(f"Error: Missing a key in the session data structure: {e}")
+        return
+
+    # --- Path 1: Attempt to remove from inventory first ---
+    inventory_quantity = inventory.get(dead_unit_code, 0)
+
+    if inventory_quantity > 0:
+        inventory[dead_unit_code] -= 1
+        print(f"Found in inventory. Decrementing count for '{dead_unit_code}'.")
+        print(f"New quantity: {inventory[dead_unit_code]}")
+        return # Success, function is done.
+
+    # --- Path 2: If not in inventory, remove from the world ---
+    print(f"Unit '{dead_unit_code}' not in inventory or quantity is zero. Searching world objects.")
+
+    # We need the 'itemName' to find it in the world list.
+    item_name = lookup_item_by_code(dead_unit_code).get("-name","Unknown unit")
+    print(f"itemName: {item_name}")
+    if item_name == "Unknown unit":
+        print(f"Error: Could not find an item name for code '{dead_unit_code}'. Cannot remove from world.")
+        return
+
+    # Find and delete the first object with a matching itemName
+    for i, game_object in enumerate(world_objects):
+        if game_object.get('itemName') == item_name:
+            print(f"Found matching placed object '{item_name}' at index {i}. Deleting...")
+            del world_objects[i]
+            print("Successfully deleted object from the world.")
+            return # Success, function is done.
+
+    print(f"Warning: Could not find any placed object with name '{item_name}' to delete.")
 
 #             "-disable": "stun",
 # "-attack": "-99", accurancy debuff
@@ -193,6 +261,8 @@ def apply_dot_damage(consumable, selected_unit, strengths, target_description):
 def handle_loss(friendly_strengths):
     if sum(friendly_strengths) == 0:
         print("Player defeated")
+        # Make sure any pending changes (like unit deletions) are saved before clearing battle
+        session.modified = True
         session["battle"] = None
 
 
@@ -267,6 +337,8 @@ def handle_win(baddie_strengths, meta, params, friendlies, friendly_strengths):
             else:
                 print("challenge with consumable won")
                 invasion_complete(enemy_fleet['uid'], params, friendlies, friendly_strengths)
+        # Make sure any pending changes (like unit deletions) are saved before clearing battle
+        session.modified = True
         session["battle"] = None
 
 
@@ -296,9 +368,9 @@ def get_next_fleet(fleet_name):
     return session['fleets'][get_next_fleet_name(fleet_name)]
 
 
-def handle_damage_upgrades(damage, friendlies, player_unit_id):
+def handle_damage_upgrades(damage, friendlies, player_unit_fleet_idx):
     research = session['user_object']["userInfo"]["world"]["research"]
-    upgrades = research.get(friendlies[player_unit_id]["-code"], [])
+    upgrades = research.get(friendlies[player_unit_fleet_idx]["-code"], [])
     for upgrade in upgrades:
         upgrade_item = lookup_item_by_code(upgrade)
         mod_damage = upgrade_item["modifier"].get("-damage")
@@ -312,9 +384,9 @@ def handle_damage_upgrades(damage, friendlies, player_unit_id):
     return damage
 
 
-def handle_accurancy_upgrades(crit, direct, friendlies, player_unit_id):
+def handle_accurancy_upgrades(crit, direct, friendlies, player_unit_fleet_idx):
     research = session['user_object']["userInfo"]["world"]["research"]
-    upgrades = research.get(friendlies[player_unit_id]["-code"], [])
+    upgrades = research.get(friendlies[player_unit_fleet_idx]["-code"], [])
     for upgrade in upgrades:
         upgrade_item = lookup_item_by_code(upgrade)
         mod_accuracy = upgrade_item["modifier"].get("-accuracy")
@@ -342,9 +414,9 @@ def handle_strength_upgrades(strength, unit):
     return strength
 
 
-def handle_shield_upgrades(friendlies, player_unit_id):
+def handle_shield_upgrades(friendlies, player_unit_fleet_idx):
     research = session['user_object']["userInfo"]["world"]["research"]
-    upgrades = research.get(friendlies[player_unit_id]["-code"], [])
+    upgrades = research.get(friendlies[player_unit_fleet_idx]["-code"], [])
     for upgrade in upgrades:
         upgrade_item = lookup_item_by_code(upgrade)
         mod_shield = upgrade_item["modifier"].get("-shields")
