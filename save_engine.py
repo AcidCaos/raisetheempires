@@ -2,23 +2,29 @@ import copy
 import configparser
 import json
 import os
+import shutil
 import sys
 from datetime import datetime
 from functools import reduce
+from pathlib import Path
 
 import daiquiri
 import editor
 from flask import session,current_app
 import logging
 
-from flask_session import SqlAlchemySessionInterface
+from flask_session.sqlalchemy import SqlAlchemySessionInterface
+from flask_sqlalchemy import SQLAlchemy
 from itsdangerous import want_bytes
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
 
+
 crash_log = True
+
+db = SQLAlchemy()
 
 def lookup_object(id):
     [game_object] = [e for e in session['user_object']["userInfo"]["world"]["objects"] if e['id'] == id]
@@ -49,14 +55,36 @@ def create_backup(message):
     session["backup"]['replaced_on'] = timestamp
     session["backup"]['message'] = message
 
-def save_database_uri():
+def save_database_uri(root_path, instance_path):
     save_db_path = os.path.join(my_games_path(), "save.db")
-    print(save_db_path)
-    print(os.path.exists(save_db_path))
-    if not os.path.exists(save_db_path):
-        print("ERROR: save.db cannot be found on '" + str(save_db_path) + "'. Uninstall and re-install if possible.")
-        raise Exception("ERROR: save.db cannot be found on '" + str(save_db_path) + "'. Uninstall and re-install if possible.")
-    return 'sqlite:///' + save_db_path
+    # print(save_db_path)
+    # print(os.path.exists(save_db_path))
+    # no longer needed save.db is made automatically
+    # if not os.path.exists(save_db_path):
+    #     print("ERROR: save.db cannot be found on '" + str(save_db_path) + "'. Uninstall and re-install if possible.")
+    #     raise Exception("ERROR: save.db cannot be found on '" + str(save_db_path) + "'. Uninstall and re-install if possible.")
+    if os.path.samefile(my_games_path(), root_path):
+        new_save_db_path = os.path.join(instance_path, "save.db")
+        if os.path.exists(save_db_path):
+            if not os.path.exists(new_save_db_path):
+                print("INFORMATION: You're running from source, and because of Flask update save.db has to be moved to the instance folder. Installs out of folder should be unaffected")
+                if not os.path.exists(instance_path):
+                    os.makedirs(instance_path)
+                backup_save_dir_path = os.path.join(my_games_path(), "backup-save-db")
+                if not os.path.exists(backup_save_dir_path):
+                    os.makedirs(backup_save_dir_path)
+                shutil.copy(save_db_path, backup_save_dir_path)
+                shutil.move(save_db_path, new_save_db_path)
+                print("Moved your save.db to", instance_path, "and a backup can be found at", backup_save_dir_path)
+            else:
+                print("WARNING: You have a save.db in both the root as the instance folder (when running from source), only the instance one will be used!")
+        save_db_path = new_save_db_path
+
+    # print("abs", Path(save_db_path).absolute())
+    # print("URI",Path(save_db_path).absolute().as_uri())
+    print("SQLITE",Path(save_db_path).absolute().as_uri().replace("file://","sqlite://"))
+
+    return Path(save_db_path).as_uri().replace("file://","sqlite://")
 
 
 def my_games_path():
@@ -115,9 +143,18 @@ def get_all_sessions():
     records = sess_model.query.all()
     return records
 
+def decode_save(serialized_save):
+    try:
+        sess_int: SqlAlchemySessionInterface = current_app.session_interface
+        return sess_int.serializer.decode(serialized_save)
+    except Exception as e:
+        print("Skipping corrupt save")
+        print(e)
+        return None
+
 
 def get_saves():
-    return [enrich_save(save, record) for record in get_all_sessions() for save in [pickle.loads(want_bytes(record.data))] if 'user_object' in save]
+    return [enrich_save(save, record) for record in get_all_sessions() for save in [decode_save(want_bytes(record.data))] if save is not None and 'user_object' in save]
 
 
 def enrich_save(save, record):
@@ -157,3 +194,4 @@ def get_dict(*args):
 class InvalidSaveException(Exception):
     """Exception when save is invalid while loading."""
     pass
+
