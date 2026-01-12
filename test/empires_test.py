@@ -6,9 +6,12 @@ from pyamf import remoting
 
 empires_server = __import__('empires-server')
 import quest_engine
+from pathlib import Path
 
 app = Flask(__name__)
 app.secret_key = 'test'
+
+TEST_DIR = Path(__file__).parent
 
 
 def test_add_fleet():
@@ -328,9 +331,12 @@ def test_init_user(monkeypatch):
         session['profilePic'] = "assets/game/GeneralAssetGroup_UI.swf/TheVille_50.png"
         user = empires_server.init_user()
 
-        with open('init_user.json', 'r') as f:
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
             user["userInfo"]["player"]["lastEnergyCheck"] = 0
-            assert user == json.load(f)
+            user["neighbors"].sort(key=lambda x: x["uid"])
+            expected_json = json.load(f)
+            expected_json["neighbors"].sort(key=lambda x: x["uid"])
+            assert user == expected_json
 
 
 # def test_index():
@@ -384,4 +390,4 @@ def test_post_gateway(monkeypatch):
 
 
 # pytest.main(['-rPA'])
-pytest.main(['-rPA', '-vv'])
+#pytest.main(['-rPA', '-vv'])

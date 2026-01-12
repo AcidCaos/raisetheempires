@@ -4,7 +4,8 @@ from pathlib import Path
 from save_engine import my_games_path, install_path
 from xmldiff.main import patch_text
 from jsonpatch import apply_patch
-from init_settings import *
+import init_settings as settings
+import sys
 from tqdm import tqdm
 from base64 import b32encode
 
@@ -90,7 +91,7 @@ for mod_folder in mod_folders:
         print("mods.conf not found.")
 
 cache_path = os.path.join(my_games_path(), 'cache')
-if caching:
+if settings.caching:
     try:
         os.mkdir(cache_path)
     except FileExistsError:
@@ -106,7 +107,7 @@ config_raw = repr({section: dict(config[section]) for section in config.sections
 # for path in sorted(mod):
 #     print(repr(os.stat(path)))
 
-if caching:
+if settings.caching:
 
     if not os.path.exists(os.path.join(cache_path, 'mods.config.cache')) \
             or read_file(os.path.join(cache_path, 'mods.config.cache')) != config_raw.encode() or \
@@ -123,24 +124,24 @@ if caching:
             except Exception as e:
                 print('ERROR: Failed to delete %s. Reason: %s' % (filename, e))
                 print("Cache can't update, caching deactivated, this may decrease performance and increase loading times.")
-                caching = False
+                settings.caching = False
         # Write cache
-        if caching:
+        if settings.caching:
             for path in tqdm(sorted(mod), file=sys.stdout):
                 try:
                     write_file(os.path.join(cache_path, get_cache_filename(path)), mod[path]())
                 except Exception as e:
                     print('ERROR: Failed to write cache file %s. Reason: %s' % (get_cache_filename(path), e))
                     print("Cache can't update, caching deactivated, this may decrease performance and increase loading times.")
-                    caching = False
-            if caching:
+                    settings.caching = False
+            if settings.caching:
                 write_file(os.path.join(cache_path, 'mods.config.cache'), config_raw.encode())
                 write_file(os.path.join(cache_path, 'directory.cache'), "\n".join(mod_stats).encode())
                 print("Cache creation complete")
     else:
         print("Cache up to date")
     # Swap modded files with cache
-    if caching:
+    if settings.caching:
         for path in sorted(mod):
             if os.path.exists(os.path.join(cache_path, get_cache_filename(path))):
                 mod[path] = lambda: read_file(os.path.join(cache_path, get_cache_filename(path)))
