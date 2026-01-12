@@ -38,4 +38,4 @@ jobs:
       working-directory: ./test
       run: |
         #pytest
-        python empires-test.py
+        python empires_test.py
