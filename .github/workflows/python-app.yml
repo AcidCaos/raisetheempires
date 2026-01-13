@@ -95,7 +95,7 @@ jobs:
           path: coverage
 
       - name: Display structure of downloaded files
-        run: ls -R path/to/artifacts
+        run: ls -R .
 
       - name: Coverage comment
         id: coverage_comment
