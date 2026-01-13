@@ -119,27 +119,27 @@ jobs:
           name: python-coverage-comment-action
           path: python-coverage-comment-action.txt
 
-    build-windows-x64:
-      runs-on: windows-latest
-      needs: run_tests
-      steps:
-        - uses: actions/checkout@v4
-        - name: Set up Python 3.14
-          uses: actions/setup-python@v3
-          with:
-            python-version: "3.14"
+  build-windows-x64:
+    runs-on: windows-latest
+    needs: run_tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.14"
 
-        - name: build exe
-          run: |
-            if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-            pip install --upgrade pyinstaller
-            copy build-tools\empires-server.spec . 
-            pyinstaller empires-server.spec --distpath ..\dist_mini_x64 --clean
+      - name: build exe
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install --upgrade pyinstaller
+          copy build-tools\empires-server.spec . 
+          pyinstaller empires-server.spec --distpath ..\dist_mini_x64 --clean
 
-        - name: Upload artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: binary_windows_x64
-            path: dist_mini_x64
-            include-hidden-files: true
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary_windows_x64
+          path: dist_mini_x64
+          include-hidden-files: true
 
