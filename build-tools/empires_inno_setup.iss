@@ -79,7 +79,7 @@ Source: "redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Components: required; Chec
 Source: "dist_mini_x64\empires-server.exe"; DestDir: "{app}"; Components: required; Check: Is64BitInstallMode; Flags: ignoreversion
 Source: "chromium_x64\chrome-win\*"; DestDir: "{app}\chromium"; Components: chromium; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
 ;x86
-Source: "\redist\vc_redist.x86.exe"; DestDir: "{tmp}"; Components: required; Check: not Is64BitInstallMode; Flags: solidbreak deleteafterinstall
+Source: "redist\vc_redist.x86.exe"; DestDir: "{tmp}"; Components: required; Check: not Is64BitInstallMode; Flags: solidbreak deleteafterinstall
 Source: "dist_mini_x86\empires-server.exe"; DestDir: "{app}"; Components: required; Check: not Is64BitInstallMode; Flags: ignoreversion
 Source: "chromium_x86\chrome-win\*"; DestDir: "{app}\chromium"; Components: chromium; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
 ;common
