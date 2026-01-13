@@ -195,13 +195,13 @@ jobs:
           rmdir /s /q assets\sol_assets_unknown
 
       - uses: actions/download-artifact@v4
-        id: download
+        id: download_x64
         with:
           name: binary_windows_x64
           path: dist_mini_x64
 
       - uses: actions/download-artifact@v4
-        id: download
+        id: download_x86
         with:
           name: binary_windows_x86
           path: dist_mini_x86
