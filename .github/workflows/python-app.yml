@@ -119,7 +119,7 @@ jobs:
           name: python-coverage-comment-action
           path: python-coverage-comment-action.txt
 
-  build-windows-x64:
+  build_windows_x64:
     runs-on: windows-latest
     needs: run_tests
     steps:
@@ -149,7 +149,7 @@ jobs:
           include-hidden-files: true
 
 
-  build-windows-x86:
+  build_windows_x86:
     runs-on: windows-latest
     needs: run_tests
     steps:
@@ -181,8 +181,8 @@ jobs:
   inno_setup:
     name: Build the Inno Setup Installer
     needs:
-      - binary_windows_x64
-      - binary_windows_x86
+      - build_windows_x64
+      - build_windows_x86
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -193,6 +193,18 @@ jobs:
           rmdir /s /q assets\sol_assets_old
           rmdir /s /q assets\sol_assets_dict1_only
           rmdir /s /q assets\sol_assets_unknown
+
+      - uses: actions/download-artifact@v4
+        id: download
+        with:
+          name: binary_windows_x64
+          path: dist_mini_x64
+
+      - uses: actions/download-artifact@v4
+        id: download
+        with:
+          name: binary_windows_x86
+          path: dist_mini_x86
 
       - name: Compile .ISS to .EXE Installer
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
