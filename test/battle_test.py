@@ -5,11 +5,13 @@ import json
 import battle_engine
 import pytest
 from flask import Flask, session
+from pathlib import Path
 
 
 app = Flask(__name__)
 app.secret_key = 'test'
 
+TEST_DIR = Path(__file__).parent
 
 def test_init_battle():
     run_init_battle({'id': [0, 0], 'fleet': 'fleet14_2341959767162880', 'target': 'fleet15_2341959767162880', 'ch': 4858,
@@ -201,10 +203,10 @@ def assert_result(active_consumables, baddie_strengths, baddies, friendlies, fri
 def assert_dynamic_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths,
                           expected_friendlies_json, expected_friendly_strengths, expected_baddies_json,
                           expected_baddie_strengths, expected_active_consumables):
-    with open(expected_friendlies_json, 'r') as f:
+    with open(TEST_DIR / expected_friendlies_json, 'r') as f:
         assert friendlies == json.load(f)
     assert friendly_strengths == expected_friendly_strengths
-    with open(expected_baddies_json, 'r') as f:
+    with open(TEST_DIR / expected_baddies_json, 'r') as f:
         assert baddies == json.load(f)
     assert baddie_strengths == expected_baddie_strengths
     assert active_consumables == expected_active_consumables
