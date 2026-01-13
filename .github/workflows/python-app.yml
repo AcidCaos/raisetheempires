@@ -225,6 +225,12 @@ jobs:
       - name: Display structure of files
         if: always()
         run: dir
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary_windows_installer
+          path: empires-installer\empires-setup.exe
+          include-hidden-files: true
 
   create_release:
     name: Create Release
@@ -232,11 +238,16 @@ jobs:
     # if: !always()
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        id: download_installer
+        with:
+          name: binary_windows_installer
+          path: setup
       - name: Create Release
         id: create_release
-        uses: comnoco/create-release@v2
+        uses: comnoco/create-release-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
@@ -245,8 +256,22 @@ jobs:
           body: |
             ONLY A TEST
             
+            BACKUP your saves! Nightly releases may or may not corrupt your saves.
+            Nightly releases can be untested and could be buggy, download a stable release instead if you have issues.
+            
             Changes in this Release
             - First Change
             - Second Change
           draft: true
           prerelease: true
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./setup/empires-setup.exe
+          asset_name: empires-setup.exe
+          asset_content_type: application/octet-stream

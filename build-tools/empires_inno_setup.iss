@@ -27,7 +27,7 @@ PrivilegesRequired=lowest
 ; License file
 LicenseFile=build-tools\License.txt
 ;PrivilegesRequiredOverridesAllowed=dialog
-OutputDir=C:\empires-installer
+OutputDir=empires-installer
 OutputBaseFilename=empires-setup
 SetupIconFile=build-tools\icon.ico
 Compression=lzma
