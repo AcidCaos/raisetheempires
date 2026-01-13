@@ -44,6 +44,9 @@ jobs:
       env:
         COVERAGE_FILE: .coverage
 
+    - name: Display structure of test files
+      run: ls -laR test/
+
     - name: Publish test results
       if: always()
       uses: actions/upload-artifact@v4
@@ -97,7 +100,7 @@ jobs:
           #path: coverage
 
       - name: Display structure of downloaded files
-        run: ls -lR .
+        run: ls -laR .
 
       - name: Coverage comment
         id: coverage_comment
