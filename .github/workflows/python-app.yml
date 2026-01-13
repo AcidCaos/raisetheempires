@@ -137,11 +137,15 @@ jobs:
           copy build-tools\empires-server.spec . 
           pyinstaller empires-server.spec --distpath ..\dist_mini_x64 --clean
 
+      - name: Display structure of files
+        if: always()
+        run: dir
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: binary_windows_x64
-          path: dist_mini_x64/empires-server.exe
+          path: dist_mini_x64\empires-server.exe
           include-hidden-files: true
 
 
@@ -163,10 +167,28 @@ jobs:
           copy build-tools\empires-server.spec . 
           pyinstaller empires-server.spec --distpath ..\dist_mini_x86 --clean
 
+      - name: Display structure of files
+        if: always()
+        run: dir
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: binary_windows_x86
-          path: dist_mini_x86/empires-server.exe
+          path: dist_mini_x86\empires-server.exe
           include-hidden-files: true
 
+  inno_setup:
+    name: Build the Inno Setup Installer
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile .ISS to .EXE Installer
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with:
+          path: build-tools/empires_inno_setup.iss
+          #options: /O+
+      - name: Display structure of files
+        if: always()
+        run: dir
