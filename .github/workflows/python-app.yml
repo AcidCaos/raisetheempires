@@ -203,6 +203,20 @@ jobs:
           name: binary_windows_x86
           path: dist_mini_x86
 
+      - name: Download Chromium 82 x86
+        run: |
+          mkdir chromium_x86
+          curl -L -o chromium_x86.zip https://commondatastorage.googleapis.com/chromium-browser-snapshots/Win/740177/chrome-win.zip
+          tar -xf chromium_x86.zip -C chromium_x86
+        shell: bash
+
+      - name: Download Chromium 82 x64
+        run: |
+          mkdir chromium_x64
+          curl -L -o chromium_x64.zip https://commondatastorage.googleapis.com/chromium-browser-snapshots/Win_x64/740173/chrome-win.zip
+          tar -xf chromium_x64.zip -C chromium_x64
+        shell: bash
+
       - name: Compile .ISS to .EXE Installer
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
         with:

@@ -77,11 +77,11 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 ;x64
 Source: "redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Components: required; Check: Is64BitInstallMode; Flags: deleteafterinstall
 Source: "dist_mini_x64\empires-server.exe"; DestDir: "{app}"; Components: required; Check: Is64BitInstallMode; Flags: ignoreversion
-Source: "chromium-x64\*"; DestDir: "{app}\chromium"; Components: chromium; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "chromium-x64\chrome-win\*"; DestDir: "{app}\chromium"; Components: chromium; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
 ;x86
 Source: "\redist\vc_redist.x86.exe"; DestDir: "{tmp}"; Components: required; Check: not Is64BitInstallMode; Flags: solidbreak deleteafterinstall
 Source: "dist_mini_x86\empires-server.exe"; DestDir: "{app}"; Components: required; Check: not Is64BitInstallMode; Flags: ignoreversion
-Source: "chromium-x86\*"; DestDir: "{app}\chromium"; Components: chromium; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "chromium-x86\chrome-win\*"; DestDir: "{app}\chromium"; Components: chromium; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
 ;common
 Source: "build-tools\master_preferences"; DestDir: "{app}\chromium"; Components: chromium; Flags: solidbreak ignoreversion
 Source: "redist\flashplayer32_0r0_371_winpep.exe"; DestDir: "{tmp}"; Components: chromium; Flags: deleteafterinstall
