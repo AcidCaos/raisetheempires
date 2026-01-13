@@ -6,6 +6,7 @@ import battle_engine
 import pytest
 from flask import Flask, session
 
+
 app = Flask(__name__)
 app.secret_key = 'test'
 
@@ -328,7 +329,7 @@ def test_assign_consumable_response_shrapnel_removed_dead(monkeypatch):
                                    {'id': 2, 'ch': 3207, 'level': 0, 'name': 'fleet15_2341959767162880',
                                     'fleet': None,
                                     'map': 'C037', 'code': 'N80'}, None, [300, 300], None, [116, 0, 120], [],
-                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=([300, 300], [120, 0, 150], []))])
+                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=([300, 300], [120, 0, 150], [], battle_engine.BattleContext()))])
 
 
 def test_assign_consumable_response_shrapnel_unit_dead(monkeypatch):
@@ -336,7 +337,7 @@ def test_assign_consumable_response_shrapnel_unit_dead(monkeypatch):
                                    {'id': 1, 'ch': 3207, 'level': 0, 'name': 'fleet15_2341959767162880',
                                     'fleet': None,
                                     'map': 'C037', 'code': 'N80'}, None, [300, 300], None, [116, 0, 147], [],
-                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=([300, 300], [120, 30, 150], []))])
+                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=([300, 300], [120, 30, 150], [], battle_engine.BattleContext()))])
 
 
 def run_assign_consumable_response(monkeypatch, params, expected_player_unit_id, expected_friendly_strengths, expected_enemy_unit_id,

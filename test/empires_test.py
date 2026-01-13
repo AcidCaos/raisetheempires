@@ -330,7 +330,10 @@ def test_init_user(monkeypatch):
 
         with open('init_user.json', 'r') as f:
             user["userInfo"]["player"]["lastEnergyCheck"] = 0
-            assert user == json.load(f)
+            user["neighbors"].sort(key=lambda x: x["uid"])
+            expected_json = json.load(f)
+            expected_json["neighbors"].sort(key=lambda x: x["uid"])
+            assert user == expected_json
 
 
 # def test_index():

@@ -45,6 +45,7 @@ jobs:
         COVERAGE_FILE: .coverage
 
     - name: Display structure of test files
+      if: always()
       run: ls -laR test/
 
     - name: Publish test results
