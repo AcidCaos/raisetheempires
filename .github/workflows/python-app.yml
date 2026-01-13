@@ -141,7 +141,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: binary_windows_x64
-          path: dist_mini_x64\empires-server.exe
+          path: ..\dist_mini_x64\empires-server.exe
           include-hidden-files: true
 
 
@@ -171,7 +171,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: binary_windows_x86
-          path: dist_mini_x86\empires-server.exe
+          path: ..\dist_mini_x86\empires-server.exe
           include-hidden-files: true
 
   inno_setup:
