@@ -13,10 +13,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
+  run_tests:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.14
@@ -66,23 +64,44 @@ jobs:
         # patterns to process.
         # See @actions/glob for supported patterns.
         path: test/test-results.xml
-
         # (Optional) Add a summary of the results at the top of the report
         summary: true
-
         # (Optional) Select which results should be included in the report.
         # Follows the same syntax as `pytest -r`
         display-options: fEX
-
         # (Optional) Fail the workflow if no JUnit XML was found.
         fail-on-empty: true
-
         # (Optional) Title of the test results section in the workflow summary
         title: Test results
+  coverage:
+    runs-on: ubuntu-latest
+    needs: run-tests
+    if: '!cancelled()'
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # This is optional since by default it's to true. The git
+          # operations in python-coverage-comment-action utilize the token
+          # stored by actions/checkout.
+          persist-credentials: true
 
-    - name: Coverage comment
-      if: always()
-      uses: py-cov-action/python-coverage-comment-action@v3
-      with:
-        GITHUB_TOKEN: ${{ github.token }}
-        COVERAGE_XML: test/coverage.xml
+      - uses: actions/download-artifact@v4
+        id: download
+        with:
+          pattern: coverage-xml
+
+      - name: Coverage comment
+        id: coverage_comment
+        uses: py-cov-action/python-coverage-comment-action@v3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Store Pull Request comment to be posted
+        uses: actions/upload-artifact@v4
+        if: steps.coverage_comment.outputs.COMMENT_FILE_WRITTEN == 'true'
+        with:
+          name: python-coverage-comment-action
+          path: python-coverage-comment-action.txt
