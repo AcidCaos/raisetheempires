@@ -45,12 +45,14 @@ jobs:
       run: pytest -rPA -vv --cov  --junitxml=test-results.xml --cov=. --cov-report=xml
 
     - name: Publish test results
+      if: always()
       uses: actions/upload-artifact@v4
       with:
        name: pytest-results
        path: test/test-results.xml
 
     - name: Upload coverage report
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: coverage-xml
