@@ -40,7 +40,9 @@ jobs:
 
     - name: Test with pytest
       working-directory: ./test
-      run: pytest -rPA -vv --cov  --junitxml=test-results.xml --cov=.. --cov-report=xml --cov-report=term
+      run: pytest -rPA -vv --junitxml=test-results.xml --cov=.. --cov-report=xml
+      env:
+        COVERAGE_FILE: .coverage
 
     - name: Publish test results
       if: always()
