@@ -25,11 +25,11 @@ UsedUserAreasWarning=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 PrivilegesRequired=lowest
 ; License file
-LicenseFile=C:\empires\build-tools\License.txt
+LicenseFile=build-tools\License.txt
 ;PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=C:\empires-installer
 OutputBaseFilename=empires-setup
-SetupIconFile=C:\empires\build-tools\icon.ico
+SetupIconFile=build-tools\icon.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -76,25 +76,25 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 
 [Files]
 ;x64
-Source: "C:\empires\redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Components: required; Check: Is64BitInstallMode; Flags: deleteafterinstall
-Source: "C:\dist_mini008_x64\empires-server.exe"; DestDir: "{app}"; Components: required; Check: Is64BitInstallMode; Flags: ignoreversion
-Source: "C:\empires\chromium-x64\*"; DestDir: "{app}\chromium"; Components: chromium; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Components: required; Check: Is64BitInstallMode; Flags: deleteafterinstall
+Source: "dist_mini_x64\empires-server.exe"; DestDir: "{app}"; Components: required; Check: Is64BitInstallMode; Flags: ignoreversion
+Source: "chromium-x64\*"; DestDir: "{app}\chromium"; Components: chromium; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
 ;x86
-Source: "C:\empires\\redist\vc_redist.x86.exe"; DestDir: "{tmp}"; Components: required; Check: not Is64BitInstallMode; Flags: solidbreak deleteafterinstall
-Source: "C:\dist_mini008_x86\empires-server.exe"; DestDir: "{app}"; Components: required; Check: not Is64BitInstallMode; Flags: ignoreversion
-Source: "C:\empires\chromium-x86\*"; DestDir: "{app}\chromium"; Components: chromium; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "\redist\vc_redist.x86.exe"; DestDir: "{tmp}"; Components: required; Check: not Is64BitInstallMode; Flags: solidbreak deleteafterinstall
+Source: "dist_mini_x86\empires-server.exe"; DestDir: "{app}"; Components: required; Check: not Is64BitInstallMode; Flags: ignoreversion
+Source: "chromium-x86\*"; DestDir: "{app}\chromium"; Components: chromium; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
 ;common
-Source: "C:\empires\build-tools\master_preferences"; DestDir: "{app}\chromium"; Components: chromium; Flags: solidbreak ignoreversion
-Source: "C:\empires\redist\flashplayer32_0r0_371_winpep.exe"; DestDir: "{tmp}"; Components: chromium; Flags: deleteafterinstall
-Source: "C:\empires\allies\*"; DestDir: "{userdocs}\My Games\{#MyAppName}\allies"; Components: required; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
-Source: "C:\empires\mods\*"; DestDir: "{userdocs}\My Games\{#MyAppName}\mods"; Components: required; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\empires\mods\README.MD"; DestDir: "{app}\mods"; Components: required; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
-Source: "C:\empires\assets\*"; DestDir: "{app}\assets"; Components: required; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\empires\templates\*"; DestDir: "{app}\templates"; Components: required; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\empires\gamesettings-converted.json"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Components: required; Flags: ignoreversion
-Source: "C:\empires\questsettings-converted.json"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Components: required; Flags: ignoreversion
-Source: "C:\empires\savespack\save.db"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Components: savespack; Flags: solidbreak uninsneveruninstall
-Source: "C:\empires\save.db"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Components: required; Flags: solidbreak onlyifdoesntexist uninsneveruninstall
+Source: "build-tools\master_preferences"; DestDir: "{app}\chromium"; Components: chromium; Flags: solidbreak ignoreversion
+Source: "redist\flashplayer32_0r0_371_winpep.exe"; DestDir: "{tmp}"; Components: chromium; Flags: deleteafterinstall
+Source: "allies\*"; DestDir: "{userdocs}\My Games\{#MyAppName}\allies"; Components: required; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
+Source: "mods\*"; DestDir: "{userdocs}\My Games\{#MyAppName}\mods"; Components: required; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "mods\README.MD"; DestDir: "{app}\mods"; Components: required; Flags: solidbreak ignoreversion recursesubdirs createallsubdirs
+Source: "assets\*"; DestDir: "{app}\assets"; Components: required; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "templates\*"; DestDir: "{app}\templates"; Components: required; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "gamesettings-converted.json"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Components: required; Flags: ignoreversion
+Source: "questsettings-converted.json"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Components: required; Flags: ignoreversion
+Source: "savespack\save.db"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Components: savespack; Flags: solidbreak uninsneveruninstall
+; Not needed Source: "save.db"; DestDir: "{userdocs}\My Games\{#MyAppName}"; Components: required; Flags: solidbreak onlyifdoesntexist uninsneveruninstall
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

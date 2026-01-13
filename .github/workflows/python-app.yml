@@ -40,7 +40,7 @@ jobs:
 
     - name: Test with pytest
       working-directory: ./test
-      run: pytest -rPA -vv --junitxml=test-results.xml --cov=.. --cov-report=xml
+      run: pytest -rPA -vv --junitxml=test-results.xml --cov=.. --cov-report=xml --cov-config=.coveragerc
       env:
         COVERAGE_FILE: .coverage
         COVERAGE_RUN_RELATIVE_FILES: True
@@ -180,14 +180,24 @@ jobs:
 
   inno_setup:
     name: Build the Inno Setup Installer
+    needs:
+      - binary_windows_x64
+      - binary_windows_x86
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up workspace
+        run: |
+          copy build-tools\empires_inno_setup.iss .
+          rmdir /s /q assets\sol_assets_old
+          rmdir /s /q assets\sol_assets_dict1_only
+          rmdir /s /q assets\sol_assets_unknown
+
       - name: Compile .ISS to .EXE Installer
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
         with:
-          path: build-tools/empires_inno_setup.iss
+          path: empires_inno_setup.iss
           #options: /O+
       - name: Display structure of files
         if: always()
