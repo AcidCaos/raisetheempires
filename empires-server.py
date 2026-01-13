@@ -12,9 +12,13 @@ if not os.environ.get('EDITOR'):
 
 import editor
 from tendo import singleton
-from init_settings import *
+import init_settings as settings
 
-if not debug:
+
+if __name__ == '__main__':
+    settings.read_ops()
+
+if not settings.debug:
     me = singleton.SingleInstance()
 
 if os.name == 'nt':
@@ -73,7 +77,7 @@ COMPRESS_MIN_SIZE = 500
 rand_seed_w = 5445  # very random
 rand_seed_z = 844
 
-compress = Compress() if compression else None
+compress = Compress() if settings.compression else None
 sess = Session()
 
 
@@ -2768,7 +2772,7 @@ def delete_save(message):
 
 @app.errorhandler(500)
 def server_error_page(error):
-    if crash_log:
+    if settings.crash_log:
         text = editor.edit(filename=os.path.join(log_path(), "log.txt"))
     return 'It went wrong'
 
@@ -2818,16 +2822,16 @@ MsgSpecSerializer.__init__ = serializer_init_patch
 
 
 if __name__ == '__main__':
-    if 'WERKZEUG_RUN_MAIN' not in os.environ and open_browser:
+    if 'WERKZEUG_RUN_MAIN' not in os.environ and settings.open_browser:
         if os.path.exists(os.path.join("chromium", "chrome.exe")):
-            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome.exe") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --allow-outdated-plugins " + ("--app=" if app_mode else "") + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome.exe") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --allow-outdated-plugins " + ("--app=" if settings.app_mode else "") + "http://" + settings.http_host + ":" + str(settings.port) + "/" + settings.http_path)).start()
         elif os.path.exists(os.path.join("chromium", "chrome")):
-            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --–allow-outdated-plugins " + ("--app=" if app_mode else "") + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --–allow-outdated-plugins " + ("--app=" if settings.app_mode else "") + "http://" + settings.http_host + ":" + str(settings.port) + "/" + settings.http_path)).start()
         else:
-            threading.Timer(1.25, lambda: webbrowser.open("http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+            threading.Timer(1.25, lambda: webbrowser.open("http://" + settings.http_host + ":" + str(settings.port) + "/" + settings.http_path)).start()
     # init_db(app, db)
-    set_crash_log(crash_log)
-    if compression:
+    set_crash_log(settings.crash_log)
+    if settings.compression:
         compress.init_app(app)
     socketio.init_app(app)
     db.init_app(app)
@@ -2836,7 +2840,7 @@ if __name__ == '__main__':
     # app.session_interface.db.create_all()
     # db.create_all()
 
-    socketio.run(app, host=host, port=port, debug=debug, allow_unsafe_werkzeug=True)
+    socketio.run(app, host=settings.host, port=settings.port, debug=settings.debug, allow_unsafe_werkzeug=True)
     # app.run(host='127.0.0.1', port=5005, debug=True)
     # logging.getLogger('socketio').setLevel(logging.ERROR)
     # logging.getLogger('engineio').setLevel(logging.ERROR)
