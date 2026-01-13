@@ -225,3 +225,28 @@ jobs:
       - name: Display structure of files
         if: always()
         run: dir
+
+  create_release:
+    name: Create Release
+    needs: inno_setup
+    # if: !always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Create Release
+        id: create_release
+        uses: comnoco/create-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ONLY A TEST
+            
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: true
+          prerelease: true
