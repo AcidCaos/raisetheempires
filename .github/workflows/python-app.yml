@@ -92,12 +92,17 @@ jobs:
         id: download
         with:
           pattern: coverage-xml
+          path: coverage
+
+      - name: Display structure of downloaded files
+        run: ls -R path/to/artifacts
 
       - name: Coverage comment
         id: coverage_comment
         uses: py-cov-action/python-coverage-comment-action@v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERAGE_PATH: coverage
 
       - name: Store Pull Request comment to be posted
         uses: actions/upload-artifact@v4
