@@ -131,7 +131,7 @@ jobs:
 
       - name: build exe
         run: |
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -r requirements.txt
           pip install --upgrade pyinstaller
           copy build-tools\empires-server.spec . 
           pyinstaller empires-server.spec --distpath ..\dist_mini_x64 --clean
