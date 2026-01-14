@@ -252,17 +252,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          release_name: Release ${{ github.ref }} ${GITHUB_SHA::8}
           body: |
-            ONLY A TEST
+            :city_sunset: :rocket: Nightly releases 🦇🌃𜱤       
             
             BACKUP your saves! Nightly releases may or may not corrupt your saves.
             Nightly releases can be untested and could be buggy, download a stable release instead if you have issues.
+            Or it might not work at all...
             
             Changes in this Release
-            - First Change
-            - Second Change
-          draft: true
+            - Here a list of changes could be listed
+            - since 0.08a
+          draft: false
           prerelease: true
 
       - name: Upload Release Asset
