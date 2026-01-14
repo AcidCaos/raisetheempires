@@ -238,21 +238,25 @@ jobs:
     # if: !always()
     runs-on: ubuntu-latest
     steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         id: download_installer
         with:
           name: binary_windows_installer
           path: setup
+      - name: Update nightly tag
+        run: |
+          git tag -f nightly
+          git push origin nightly --force
       - name: Create Release
         id: create_release
         uses: comnoco/create-release-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }} ${GITHUB_SHA::8}
+          tag_name: nightly
+          release_name: Nightly Release ${GITHUB_SHA::8}
           body: |
             :city_sunset: :rocket: Nightly releases 🦇🌃𜱤       
             
