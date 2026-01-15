@@ -249,6 +249,7 @@ jobs:
         run: |
           git tag -f nightly
           git push origin nightly --force
+          echo "SHORT_SHA=${GITHUB_SHA::8}" >> $GITHUB_ENV
       - name: Create Release
         id: create_release
         uses: comnoco/create-release-action@v2
@@ -256,7 +257,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
           tag_name: nightly
-          release_name: Nightly Release ${GITHUB_SHA::8}
+          release_name: Nightly Release ${{ env.SHORT_SHA }}
           body: |
             :city_sunset: :rocket: Nightly releases 🦇🌃𜱤       
             

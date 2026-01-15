@@ -57,12 +57,7 @@ def create_backup(message):
 
 def save_database_uri(root_path, instance_path):
     save_db_path = os.path.join(my_games_path(), "save.db")
-    # print(save_db_path)
-    # print(os.path.exists(save_db_path))
-    # no longer needed save.db is made automatically
-    # if not os.path.exists(save_db_path):
-    #     print("ERROR: save.db cannot be found on '" + str(save_db_path) + "'. Uninstall and re-install if possible.")
-    #     raise Exception("ERROR: save.db cannot be found on '" + str(save_db_path) + "'. Uninstall and re-install if possible.")
+
     if os.path.samefile(my_games_path(), root_path):
         new_save_db_path = os.path.join(instance_path, "save.db")
         if os.path.exists(save_db_path):
@@ -80,11 +75,9 @@ def save_database_uri(root_path, instance_path):
                 print("WARNING: You have a save.db in both the root as the instance folder (when running from source), only the instance one will be used!")
         save_db_path = new_save_db_path
 
-    # print("abs", Path(save_db_path).absolute())
-    # print("URI",Path(save_db_path).absolute().as_uri())
-    print("SQLITE",Path(save_db_path).absolute().as_uri().replace("file://","sqlite://"))
+    print("SQLITE", f"sqlite:///{save_db_path}")
 
-    return Path(save_db_path).as_uri().replace("file://","sqlite://")
+    return f"sqlite:///{save_db_path}"
 
 
 def my_games_path():

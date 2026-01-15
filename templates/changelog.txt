@@ -1,4 +1,14 @@
 upcoming
+    Fix database path Nat 14/01/2026 18:50
+    Nightly tagging Nat 14/01/2026 02:09
+    Enable github nightly preleases Nat 14/01/2026 01:54
+    Creating automatic nightly standalone releases Nat 12/01/2026 19:54
+    Github test process without lint Nat 12/01/2026 19:26
+    Setup github actions test process Natlies* 12/01/2026 19:16
+    Create github-actions-demo.yml Natlies* 12/01/2026 18:30
+    Bump jinja2 from 3.1.4 to 3.1.6 dependabot[bot]* 12/01/2026 17:19
+    Bump flask from 3.1.0 to 3.1.1 dependabot[bot]* 12/01/2026 17:17
+    Bump werkzeug from 3.0.3 to 3.1.5 dependabot[bot]* 09/01/2026 01:38
     Upgrade to Python 3.14 Nat 09/01/2026 01:35
     No longer tracking save.db Nat 09/01/2026 00:39
     Ruffle initial work AcidCaos 26/09/2025 12:46
