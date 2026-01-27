@@ -331,7 +331,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create nightly ./setup/empires-setup.exe \
+          gh release create $PREVIEW_TAG ./setup/empires-setup.exe \
             --title "Nightly $SHORT_SHA" \
             --notes-file preview-release-notes.md \
             --prerelease
