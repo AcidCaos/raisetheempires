@@ -290,19 +290,24 @@ jobs:
           VERSION=$(grep "version =" empires-server.py  | sed -E 's/^.*\"(.*)\".*$/\1/')
           VERSION_DATE=$(echo $VERSION | sed -nE 's/^.*([0-9]{4}_[0-9]{2}_[0-9]{2}).*$/\1/p')
           COMMIT_DATE=$(git show -s --format=%cd --date=format:%Y_%m_%d)
-          if [ -n $VERSION_DATE ] && [ VERSION_DATE != COMMIT_DATE ]; then
+          if [ -n "$VERSION_DATE" ] && [ "VERSION_DATE" != "COMMIT_DATE" ]; then
             VERSION="${VERSION}_commit_date_${COMMIT_DATE}"
           fi
           CHANGES=$(git log "$PREV_TAG"..HEAD \
             --no-merges \
             --pretty=format:'- %s (%an)')
           sed \
-            -e "s/{{VERSION}}/$VERSION/g" \
-            -e "s/{{PREV_TAG}}/$PREV_TAG/g" \
-            -e "s/{{CHANGES}}/$CHANGES/g" \
-            -e "s/{{SHA}}/${GITHUB_SHA::8}/g" \
-            -e "s/{{BRANCH}}/$BRANCH/g" \
-            build-tools/.nightly-release-notes.md > nightly-release-notes.md
+            -e "s|{{VERSION}}|$VERSION/|" \
+            -e "s|{{PREV_TAG}}|$PREV_TAG|g" \
+            -e "s|{{SHA}}|${GITHUB_SHA::8}|g" \
+            -e "s|{{BRANCH}}|$BRANCH|g" \
+            build-tools/.nightly-release-notes.md > build-tools/.nightly-release-notes-tmp.md
+          
+          awk -v changes="$CHANGES" '
+            { sub(/{{CHANGES}}/, changes) }
+            { print }
+            ' build-tools/.nightly-release-notes-tmp.md > nightly-release-notes.md
+          rm build-tools/.nightly-release-notes-tmp.md
 
 
       - name: Create preview branch release notes
@@ -312,19 +317,25 @@ jobs:
           VERSION=$(grep "version =" empires-server.py  | sed -E 's/^.*\"(.*)\".*$/\1/')
           VERSION_DATE=$(echo $VERSION | sed -nE 's/^.*([0-9]{4}_[0-9]{2}_[0-9]{2}).*$/\1/p')
           COMMIT_DATE=$(git show -s --format=%cd --date=format:%Y_%m_%d)
-          if [ -n $VERSION_DATE ] && [ VERSION_DATE != COMMIT_DATE ]; then
+          if [ -n "$VERSION_DATE" ] && [ "VERSION_DATE" != "COMMIT_DATE" ]; then
             VERSION="${VERSION}_commit_date_${COMMIT_DATE}"
           fi
           CHANGES=$(git log "$PREV_TAG"..HEAD \
             --no-merges \
             --pretty=format:'- %s (%an)')
-          sed \
-            -e "s/{{VERSION}}/$VERSION/g" \
-            -e "s/{{PREV_TAG}}/$PREV_TAG/g" \
-            -e "s/{{CHANGES}}/$CHANGES/g" \
-            -e "s/{{SHA}}/${GITHUB_SHA::8}/g" \
-            -e "s/{{BRANCH}}/$BRANCH/g" \
-            build-tools/.preview-release-notes.md > preview-release-notes.md
+                   sed \
+            -e "s|{{VERSION}}|$VERSION/|" \
+            -e "s|{{PREV_TAG}}|$PREV_TAG|g" \
+            -e "s|{{SHA}}|${GITHUB_SHA::8}|g" \
+            -e "s|{{BRANCH}}|$BRANCH|g" \
+            build-tools/.preview-release-notes.md > build-tools/.preview-release-notes-tmp.md
+          
+          awk -v changes="$CHANGES" '
+            { sub(/{{CHANGES}}/, changes) }
+            { print }
+            ' build-tools/.preview-release-notes-tmp.md > preview-release-notes.md
+          rm build-tools/.preview-release-notes-tmp.md
+
               
 
       - name: Create nightly release
