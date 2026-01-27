@@ -286,7 +286,7 @@ jobs:
         if: env.BRANCH == 'main' || env.BRANCH == 'master'
         run: |
           PREV_TAG=$(git tag --list '[0-9].[0123456789][0123456789]*' --sort=-version:refname | head -n 1)
-          VERSION=version(todo)
+          VERSION="version(todo)"
           CHANGES=$(git log "$PREV_TAG"..HEAD \
             --no-merges \
             --pretty=format:'- %s (%an)')
@@ -303,7 +303,7 @@ jobs:
         if: env.BRANCH != 'main' && env.BRANCH != 'master'
         run: |
           PREV_TAG=$(git tag --list '[0-9].[0123456789][0123456789]*' --sort=-version:refname | head -n 1)
-          VERSION=version(todo)
+          VERSION="version(todo)"
           CHANGES=$(git log "$PREV_TAG"..HEAD \
             --no-merges \
             --pretty=format:'- %s (%an)')
