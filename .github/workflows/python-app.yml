@@ -262,6 +262,8 @@ jobs:
 
       - name: Delete existing preview branch release
         if: env.BRANCH != 'main' && env.BRANCH != 'master'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release delete preview-${BRANCH} -y || true
           PREVIEW_TAG="preview-${BRANCH}"
