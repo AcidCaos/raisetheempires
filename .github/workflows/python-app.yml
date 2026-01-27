@@ -8,7 +8,6 @@ permissions:
 
 on:
   push:
-    branches: [ "master", "gh-actions-test" ]
   pull_request:
     branches: [ "master" ]
 
@@ -240,44 +239,172 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/download-artifact@v4
         id: download_installer
         with:
           name: binary_windows_installer
           path: setup
-      - name: Update nightly tag
+
+      - name: Detect branch
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+
+      - name: Delete existing nightly release
+        if: env.BRANCH == 'main' || env.BRANCH == 'master'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete nightly -y || true
+          
+
+      - name: Delete existing preview branch release
+        if: env.BRANCH != 'main' && env.BRANCH != 'master'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete preview-${BRANCH} -y || true
+          PREVIEW_TAG="preview-${BRANCH}"
+          
+
+      - name: Update nightly tag (main only)
+        if: env.BRANCH == 'main' || env.BRANCH == 'master'
         run: |
           git tag -f nightly
           git push origin nightly --force
-          echo "SHORT_SHA=${GITHUB_SHA::8}" >> $GITHUB_ENV
-      - name: Create Release
-        id: create_release
-        uses: comnoco/create-release-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: nightly
-          release_name: Nightly Release ${{ env.SHORT_SHA }}
-          body: |
-            :city_sunset: :rocket: Nightly releases 🦇🌃𜱤       
-            
-            BACKUP your saves! Nightly releases may or may not corrupt your saves.
-            Nightly releases can be untested and could be buggy, download a stable release instead if you have issues.
-            Or it might not work at all...
-            
-            Changes in this Release
-            - Here a list of changes could be listed
-            - since 0.08a
-          draft: false
-          prerelease: true
+      
 
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
+      - name: Update preview tag
+        if: env.BRANCH != 'main' && env.BRANCH != 'master'
+        run: |
+          PREVIEW_TAG="preview-${BRANCH}"
+          echo "PREVIEW_TAG=$PREVIEW_TAG" >> $GITHUB_ENV
+          git tag -f "$PREVIEW_TAG"
+          git push origin "$PREVIEW_TAG" --force
+
+
+      - name: Create nightly release notes
+        if: env.BRANCH == 'main' || env.BRANCH == 'master'
+        run: |
+          PREV_TAG=$(git tag --list '[0-9].[0-9][0-9]*' --sort=-version:refname | head -n 1)
+          VERSION=$(grep "version =" empires-server.py  | sed -E 's/^.*\"(.*)\".*$/\1/')
+          VERSION_DATE=$(echo $VERSION | sed -nE 's/^.*([0-9]{4}_[0-9]{2}_[0-9]{2}).*$/\1/p')
+          COMMIT_DATE=$(git show -s --format=%cd --date=format:%Y_%m_%d)
+          if [ -n "$VERSION_DATE" ] && [ "VERSION_DATE" != "COMMIT_DATE" ]; then
+            VERSION="${VERSION}_commit_date_${COMMIT_DATE}"
+          fi
+          CHANGES=$(git log "$PREV_TAG"..HEAD \
+            --no-merges \
+            --pretty=format:'- %s (%an)')
+          sed \
+            -e "s|{{VERSION}}|$VERSION/|" \
+            -e "s|{{PREV_TAG}}|$PREV_TAG|g" \
+            -e "s|{{SHA}}|${GITHUB_SHA::8}|g" \
+            -e "s|{{BRANCH}}|$BRANCH|g" \
+            build-tools/.nightly-release-notes.md > build-tools/.nightly-release-notes-tmp.md
+          
+          awk -v changes="$CHANGES" '
+            BEGIN {
+              gsub(/&/, "\\\\&", changes)
+            }
+            { 
+              sub(/{{CHANGES}}/, changes)
+              print
+            }
+            ' build-tools/.nightly-release-notes-tmp.md > nightly-release-notes.md
+          rm build-tools/.nightly-release-notes-tmp.md
+
+
+      - name: Create preview branch release notes
+        if: env.BRANCH != 'main' && env.BRANCH != 'master'
+        run: |
+          PREV_TAG=$(git tag --list '[0-9].[0-9][0-9]*' --sort=-version:refname | head -n 1)
+          VERSION=$(grep "version =" empires-server.py  | sed -E 's/^.*\"(.*)\".*$/\1/')
+          VERSION_DATE=$(echo $VERSION | sed -nE 's/^.*([0-9]{4}_[0-9]{2}_[0-9]{2}).*$/\1/p')
+          COMMIT_DATE=$(git show -s --format=%cd --date=format:%Y_%m_%d)
+          if [ -n "$VERSION_DATE" ] && [ "VERSION_DATE" != "COMMIT_DATE" ]; then
+            VERSION="${VERSION}_commit_date_${COMMIT_DATE}"
+          fi
+          CHANGES=$(git log "$PREV_TAG"..HEAD \
+            --no-merges \
+            --pretty=format:'- %s (%an)')
+                   sed \
+            -e "s|{{VERSION}}|$VERSION/|" \
+            -e "s|{{PREV_TAG}}|$PREV_TAG|g" \
+            -e "s|{{SHA}}|${GITHUB_SHA::8}|g" \
+            -e "s|{{BRANCH}}|$BRANCH|g" \
+            build-tools/.preview-release-notes.md > build-tools/.preview-release-notes-tmp.md
+          
+          awk -v changes="$CHANGES" '
+            BEGIN {
+              gsub(/&/, "\\\\&", changes)
+            }
+            { 
+              sub(/{{CHANGES}}/, changes)
+              print
+            }
+            ' build-tools/.preview-release-notes-tmp.md > preview-release-notes.md
+          rm build-tools/.preview-release-notes-tmp.md
+
+              
+
+      - name: Create nightly release
+        if: env.BRANCH == 'main' || env.BRANCH == 'master'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./setup/empires-setup.exe
-          asset_name: empires-setup.exe
-          asset_content_type: application/octet-stream
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create nightly ./setup/empires-setup.exe \
+            --title "Nightly ${GITHUB_SHA::8}" \
+            --notes-file nightly-release-notes.md \
+            --prerelease   
+
+      - name: Create preview branch release
+        if: env.BRANCH != 'main' && env.BRANCH != 'master'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create $PREVIEW_TAG ./setup/empires-setup.exe \
+            --title "Preview branch release ${GITHUB_SHA::8}" \
+            --notes-file preview-release-notes.md \
+            --prerelease
+                
+
+#      - name: Update nightly tag
+#        run: |
+#          git tag -f nightly
+#          git push origin nightly --force
+#          echo "SHORT_SHA=${GITHUB_SHA::8}" >> $GITHUB_ENV
+#      - name: Create Release
+#        id: create_release
+#        uses: comnoco/create-release-action@v2
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+#        with:
+#          tag_name: nightly
+#          release_name: Nightly Release ${{ env.SHORT_SHA }}
+#          body: |
+#            :city_sunset: :rocket: Nightly releases 🦇🌃𜱤
+#
+#            BACKUP your saves! Nightly releases may or may not corrupt your saves.
+#            Nightly releases can be untested and could be buggy, download a stable release instead if you have issues.
+#            Or it might not work at all...
+#
+#            Changes in this Release
+#            - Here a list of changes could be listed
+#            - since 0.08a
+#          draft: false
+#          prerelease: true
+#
+#      - name: Upload Release Asset
+#        id: upload-release-asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+#          asset_path: ./setup/empires-setup.exe
+#          asset_name: empires-setup.exe
+#          asset_content_type: application/octet-stream
+
