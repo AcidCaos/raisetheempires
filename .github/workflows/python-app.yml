@@ -306,8 +306,13 @@ jobs:
             build-tools/.nightly-release-notes.md > build-tools/.nightly-release-notes-tmp.md
           
           awk -v changes="$CHANGES" '
-            { sub(/{{CHANGES}}/, changes) }
-            { print }
+            BEGIN {
+              gsub(/&/, "\\\\&", changes)
+            }
+            { 
+              sub(/{{CHANGES}}/, changes)
+              print
+            }
             ' build-tools/.nightly-release-notes-tmp.md > nightly-release-notes.md
           rm build-tools/.nightly-release-notes-tmp.md
 
@@ -333,8 +338,13 @@ jobs:
             build-tools/.preview-release-notes.md > build-tools/.preview-release-notes-tmp.md
           
           awk -v changes="$CHANGES" '
-            { sub(/{{CHANGES}}/, changes) }
-            { print }
+            BEGIN {
+              gsub(/&/, "\\\\&", changes)
+            }
+            { 
+              sub(/{{CHANGES}}/, changes)
+              print
+            }
             ' build-tools/.preview-release-notes-tmp.md > preview-release-notes.md
           rm build-tools/.preview-release-notes-tmp.md
 
