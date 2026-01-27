@@ -285,7 +285,7 @@ jobs:
       - name: Create nightly release notes
         if: env.BRANCH == 'main' || env.BRANCH == 'master'
         run: |
-          PREV_TAG= $(git tag --list '[0-9].[0123456789][0123456789]*' --sort=-version:refname | head -n 1)
+          PREV_TAG=$(git tag --list '[0-9].[0123456789][0123456789]*' --sort=-version:refname | head -n 1)
           VERSION=version(todo)
           CHANGES=$(git log "$PREV_TAG"..HEAD \
             --no-merges \
@@ -302,7 +302,7 @@ jobs:
       - name: Create preview branch release notes
         if: env.BRANCH != 'main' && env.BRANCH != 'master'
         run: |
-          PREV_TAG= $(git tag --list '[0-9].[0123456789][0123456789]*' --sort=-version:refname | head -n 1)
+          PREV_TAG=$(git tag --list '[0-9].[0123456789][0123456789]*' --sort=-version:refname | head -n 1)
           VERSION=version(todo)
           CHANGES=$(git log "$PREV_TAG"..HEAD \
             --no-merges \
