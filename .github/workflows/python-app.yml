@@ -5,10 +5,10 @@ name: Build & Release Python application
 
 permissions:
   contents: write
-
+  pull-requests: write
+  issues: write
 on:
   push:
-    branches: [ "master", "gh-actions-test" ]
   pull_request:
     branches: [ "master" ]
 
@@ -236,48 +236,317 @@ jobs:
     name: Create Release
     needs: inno_setup
     # if: !always()
+    #if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/download-artifact@v4
         id: download_installer
         with:
           name: binary_windows_installer
           path: setup
-      - name: Update nightly tag
+
+      - name: Detect branch
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          CURRENT_TAG="$(git tag --points-at HEAD | head -n 1)"
+          echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
+          [[ "$CURRENT_TAG" =~ ^[0-9]+\.[0-9]+(a|b)?$ ]] && TAG_SEMANTIC_RELEASE=true || TAG_SEMANTIC_RELEASE=false
+          echo "TAG_SEMANTIC_RELEASE=$TAG_SEMANTIC_RELEASE" >> $GITHUB_ENV
+
+      - name: Do release checks
+        if: env.TAG_SEMANTIC_RELEASE == true
+        run: |
+          VERSION=$(grep "version =" empires-server.py  | sed -E 's/^.*\"(.*)\".*$/\1/')
+          if [ -z "$VERSION"]; then
+            echo No version found in empires-server.py
+            echo Fix your error, remove the tag on this commit and retag the new commit with the release number
+            exit 1
+          fi
+          if [ "$CURRENT_TAG" != "$VERSION" ]; then
+            echo Version $VERSION in empires-server.py does not match the current tag $CURRENT_TAG, no date should be added to a full release version
+            echo Fix your error, remove the tag on this commit and retag the new commit with the release number
+            exit 1
+          fi
+          if gh release view "$CURRENT_TAG" >/dev/null 2>&1; then
+              echo "Release with tag $CURRENT_TAG already exists."
+              echo Fix your error, see why this tag is triggered again (did you force push it?)
+              exit 1
+          else
+              echo "No release $CURRENT_TAG exists, release can continue."
+          fi
+           if [ ! -f "build-tools/.${CURRENT_TAG}-release-snippet.md" ]; then
+              echo Make a build-tools/.${CURRENT_TAG}-release-snippet.md for this release 
+              echo Fix your error, remove the tag on this commit and retag the new commit with the release number
+              exit 1
+          fi 
+
+      - name: Post PR preview comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+      
+            const body = `
+            :rocket: 🦇 **Feature preview build for this pull request** :fire_engine:
+            
+            Test your installer, in some cases errors can happen that only happen installed. 
+
+            BACKUP your saves! Feature previews might even be more unstable than Nightly releases, it may or may not corrupt your saves.           
+            
+            **PR:** #${pr.number} – ${pr.title}
+            **Branch:** \`${pr.head.ref}\`
+            **Commit:** \`${context.sha.substring(0, 8)}\`
+            
+            ### Download
+            **[Download the installer from here](${runUrl})**
+            
+            Builds might get pruned after a time
+            `;
+
+            // Find existing comment
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+            });
+    
+            const botComment = comments.data.find(c =>
+              c.user.type === "Bot" &&
+              c.body.includes("Feature preview build for this pull request")
+            );
+      
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body,
+              });
+            }
+
+
+      - name: Delete existing nightly release
+        if: github.event_name == 'push' && (env.BRANCH == 'main' || env.BRANCH == 'master') && env.TAG_SEMANTIC_RELEASE != true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete nightly -y || true
+          
+
+      - name: Delete existing preview branch release
+        if: github.event_name == 'push' && (env.BRANCH != 'main' && env.BRANCH != 'master') && env.TAG_SEMANTIC_RELEASE != true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete preview-${BRANCH} -y || true
+          PREVIEW_TAG="preview-${BRANCH}"
+          
+
+      - name: Update nightly tag (main only)
+        if:  github.event_name == 'push' && (env.BRANCH == 'main' || env.BRANCH == 'master') && env.TAG_SEMANTIC_RELEASE != true
         run: |
           git tag -f nightly
           git push origin nightly --force
-          echo "SHORT_SHA=${GITHUB_SHA::8}" >> $GITHUB_ENV
-      - name: Create Release
-        id: create_release
-        uses: comnoco/create-release-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: nightly
-          release_name: Nightly Release ${{ env.SHORT_SHA }}
-          body: |
-            :city_sunset: :rocket: Nightly releases 🦇🌃𜱤       
-            
-            BACKUP your saves! Nightly releases may or may not corrupt your saves.
-            Nightly releases can be untested and could be buggy, download a stable release instead if you have issues.
-            Or it might not work at all...
-            
-            Changes in this Release
-            - Here a list of changes could be listed
-            - since 0.08a
-          draft: false
-          prerelease: true
+      
 
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
+      - name: Update preview tag
+        if:  github.event_name == 'push' && (env.BRANCH != 'main' && env.BRANCH != 'master') && env.TAG_SEMANTIC_RELEASE != true
+        run: |
+          PREVIEW_TAG="preview-${BRANCH}"
+          echo "PREVIEW_TAG=$PREVIEW_TAG" >> $GITHUB_ENV
+          git tag -f "$PREVIEW_TAG"
+          git push origin "$PREVIEW_TAG" --force
+
+
+      - name: Create full release notes
+        if:  github.event_name == 'push' && (env.BRANCH == 'main' || env.BRANCH == 'master') && env.TAG_SEMANTIC_RELEASE == true
+        run: |
+          PREV_TAG=$(git tag --list '[0-9].[0-9][0-9]*' -q-sort=-version:refname | head -n 1)
+          VERSION=$(grep "version =" empires-server.py  | sed -E 's/^.*\"(.*)\".*$/\1/')
+          CHANGES=$(git log "$PREV_TAG"..HEAD \
+            --no-merges \
+            --pretty=format:'- %s (%an)')
+          SNIPPET=$(cat build-tools/.${CURRENT_TAG}-release-snippet.md)
+          sed \
+            -e "s|{{VERSION}}|$VERSION/|" \
+            -e "s|{{PREV_TAG}}|$PREV_TAG|g" \
+            -e "s|{{SHA}}|${GITHUB_SHA::8}|g" \
+            -e "s|{{BRANCH}}|$BRANCH|g" \
+            build-tools/.release-notes.md > build-tools/.release-notes-tmp.md
+          
+          awk -v changes="$CHANGES" '
+            BEGIN {
+              gsub(/&/, "\\\\&", changes)
+            }
+            { 
+              sub(/{{CHANGES}}/, changes)
+              IGNORECASE = 1
+              $0 = gensub(/(\154\157\163\163.*)\(/, "\\1~~:.|:;~~ :window: \(", "1")
+              print
+            }
+            ' build-tools/.release-notes-tmp.md > build-tools/.release-notes-tmp2.md 
+          
+          gawk -v snippet="SNIPPET" '
+            BEGIN {
+              gsub(/&/, "\\\\&", snippet)
+            }
+            { 
+              sub(/{{SNIPPET}}/, snippet)
+              print
+            }
+            ' build-tools/.release-notes-tmp2.md > release-notes.md
+          rm build-tools/.release-notes-tmp.md
+          rm build-tools/.release-notes-tmp2.md
+
+      - name: Create nightly release notes
+        if:  github.event_name == 'push' && (env.BRANCH == 'main' || env.BRANCH == 'master')  && env.TAG_SEMANTIC_RELEASE != true
+        run: |
+          PREV_TAG=$(git tag --list '[0-9].[0-9][0-9]*' --sort=-version:refname | head -n 1)
+          VERSION=$(grep "version =" empires-server.py  | sed -E 's/^.*\"(.*)\".*$/\1/')
+          VERSION_DATE=$(echo $VERSION | sed -nE 's/^.*([0-9]{4}_[0-9]{2}_[0-9]{2}).*$/\1/p')
+          COMMIT_DATE=$(git show -s --format=%cd --date=format:%Y_%m_%d)
+          if [ -n "$VERSION_DATE" ] && [ "$VERSION_DATE" != "$COMMIT_DATE" ]; then
+            VERSION="${VERSION}_commit_date_${COMMIT_DATE}"
+          fi
+          CHANGES=$(git log "$PREV_TAG"..HEAD \
+            --no-merges \
+            --pretty=format:'- %s (%an)')
+          sed \
+            -e "s|{{VERSION}}|$VERSION/|" \
+            -e "s|{{PREV_TAG}}|$PREV_TAG|g" \
+            -e "s|{{SHA}}|${GITHUB_SHA::8}|g" \
+            -e "s|{{BRANCH}}|$BRANCH|g" \
+            build-tools/.nightly-release-notes.md > build-tools/.nightly-release-notes-tmp.md
+          
+          gawk -v changes="$CHANGES" '
+            BEGIN {
+              gsub(/&/, "\\\\&", changes)
+            }
+            { 
+              sub(/{{CHANGES}}/, changes)
+              IGNORECASE = 1
+              $0 = gensub(/(\154\157\163\163.*)\(/, "\\1~~:.|:;~~ :window: \(", "1")
+              print
+            }
+            ' build-tools/.nightly-release-notes-tmp.md > nightly-release-notes.md
+          rm build-tools/.nightly-release-notes-tmp.md
+
+
+      - name: Create preview branch release notes
+        if:  github.event_name == 'push' && (env.BRANCH != 'main' && env.BRANCH != 'master')  && env.TAG_SEMANTIC_RELEASE != true
+        run: |
+          PREV_TAG=$(git tag --list '[0-9].[0-9][0-9]*' --sort=-version:refname | head -n 1)
+          VERSION=$(grep "version =" empires-server.py  | sed -E 's/^.*\"(.*)\".*$/\1/')
+          VERSION_DATE=$(echo $VERSION | sed -nE 's/^.*([0-9]{4}_[0-9]{2}_[0-9]{2}).*$/\1/p')
+          COMMIT_DATE=$(git show -s --format=%cd --date=format:%Y_%m_%d)
+          if [ -n "$VERSION_DATE" ] && [ "$VERSION_DATE" != "$COMMIT_DATE" ]; then
+            VERSION="${VERSION}_commit_date_${COMMIT_DATE}"
+          fi
+          CHANGES=$(git log "$PREV_TAG"..HEAD \
+            --no-merges \
+            --pretty=format:'- %s (%an)')
+                   sed \
+            -e "s|{{VERSION}}|$VERSION/|" \
+            -e "s|{{PREV_TAG}}|$PREV_TAG|g" \
+            -e "s|{{SHA}}|${GITHUB_SHA::8}|g" \
+            -e "s|{{BRANCH}}|$BRANCH|g" \
+            build-tools/.preview-release-notes.md > build-tools/.preview-release-notes-tmp.md
+          
+          gawk -v changes="$CHANGES" '
+            BEGIN {
+              gsub(/&/, "\\\\&", changes)
+            }
+            { 
+              sub(/{{CHANGES}}/, changes)
+              IGNORECASE = 1
+              $0 = gensub(/(\154\157\163\163.*)\(/, "\\1~~:.|:;~~ :window: \(", "1")
+              print
+            }
+            ' build-tools/.preview-release-notes-tmp.md > preview-release-notes.md
+          rm build-tools/.preview-release-notes-tmp.md
+
+              
+
+      - name: Create full release draft
+        if: github.event_name == 'push' && (env.BRANCH == 'main' || env.BRANCH == 'master') && env.TAG_SEMANTIC_RELEASE == true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./setup/empires-setup.exe
-          asset_name: empires-setup.exe
-          asset_content_type: application/octet-stream
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create $CURRENT_TAG ./setup/empires-setup.exe \
+            --title "$VERSION" \
+            --notes-file release-notes.md \
+            --draft   
+
+      - name: Create nightly release
+        if: github.event_name == 'push' && (env.BRANCH == 'main' || env.BRANCH == 'master')  && env.TAG_SEMANTIC_RELEASE != true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create nightly ./setup/empires-setup.exe \
+            --title "Nightly ${GITHUB_SHA::8}" \
+            --notes-file nightly-release-notes.md \
+            --prerelease    
+
+      - name: Create preview branch release
+        if: github.event_name == 'push' && (env.BRANCH != 'main' && env.BRANCH != 'master')  && env.TAG_SEMANTIC_RELEASE != true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create $PREVIEW_TAG ./setup/empires-setup.exe \
+            --title "Preview branch release ${GITHUB_SHA::8}" \
+            --notes-file preview-release-notes.md \
+            --prerelease
+                
+
+#      - name: Update nightly tag
+#        run: |
+#          git tag -f nightly
+#          git push origin nightly --force
+#          echo "SHORT_SHA=${GITHUB_SHA::8}" >> $GITHUB_ENV
+#      - name: Create Release
+#        id: create_release
+#        uses: comnoco/create-release-action@v2
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+#        with:
+#          tag_name: nightly
+#          release_name: Nightly Release ${{ env.SHORT_SHA }}
+#          body: |
+#            :city_sunset: :rocket: Nightly releases 🦇🌃𜱤
+#
+#            BACKUP your saves! Nightly releases may or may not corrupt your saves.
+#            Nightly releases can be untested and could be buggy, download a stable release instead if you have issues.
+#            Or it might not work at all...
+#
+#            Changes in this Release
+#            - Here a list of changes could be listed
+#            - since 0.08a
+#          draft: false
+#          prerelease: true
+#
+#      - name: Upload Release Asset
+#        id: upload-release-asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+#          asset_path: ./setup/empires-setup.exe
+#          asset_name: empires-setup.exe
+#          asset_content_type: application/octet-stream
+
