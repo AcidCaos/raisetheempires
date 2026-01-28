@@ -5,7 +5,8 @@ name: Build & Release Python application
 
 permissions:
   contents: write
-
+  pull-requests: write
+  issues: write
 on:
   push:
   pull_request:
