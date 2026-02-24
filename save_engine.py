@@ -88,6 +88,10 @@ def install_path():
     return config['InstallFolders']['InstallPath']
 
 
+def base_path():
+    return Path(sys.executable).parent if getattr(sys, 'frozen', False) else Path(__file__).parent
+
+
 def log_path():
     if os.path.exists(my_games_path()):
         return my_games_path()

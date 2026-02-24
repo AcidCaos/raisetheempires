@@ -24,8 +24,8 @@ if not settings.debug:
 if os.name == 'nt':
     os.system('color')
 
-from save_engine import db,  save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
-    store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path
+from save_engine import db, save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
+    store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path, base_path
 from save_migration import migrate, is_0_08a_preview
 from builtins import print
 from time import sleep
@@ -65,8 +65,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.08a.2026_01_15"
-release_date = 'Friday, 15 January 2026'
+version = "0.08a.2026_02_24"
+release_date = 'Friday, 24 February 2026'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -82,8 +82,8 @@ sess = Session()
 
 
 start = datetime.now()
-
-app: Flask = Flask(__name__)
+app_base_path = base_path()
+app: Flask = Flask(__name__, root_path=app_base_path)
 
 print("Root folder", app.root_path)
 print("Instance folder", app.instance_path)
