@@ -54,8 +54,8 @@
             </div>
         </aside>
         <h2>
-            <span class="text">1435 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">368<span class="text"> run</span></button>
+            <span class="text">1436 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">369<span class="text"> run</span></button>
             <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">1067<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="game_settings_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.1">coverage.py v7.13.1</a>,
-            created at 2026-01-28 22:58 +0000
+            created at 2026-02-24 19:25 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -106,8 +106,8 @@
     <p class="run"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t"><span class="key">if</span> <span class="nam">os</span><span class="op">.</span><span class="nam">name</span> <span class="op">==</span> <span class="str">'nt'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">    <span class="nam">os</span><span class="op">.</span><span class="nam">system</span><span class="op">(</span><span class="str">'color'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t"><span class="key">from</span> <span class="nam">save_engine</span> <span class="key">import</span> <span class="nam">db</span><span class="op">,</span>  <span class="nam">save_database_uri</span><span class="op">,</span> <span class="nam">log_path</span><span class="op">,</span> <span class="nam">lookup_objects_save_by_position</span><span class="op">,</span> <span class="nam">get_all_sessions</span><span class="op">,</span> <span class="xx">\</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run run2"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t">    <span class="nam">store_session</span><span class="op">,</span> <span class="nam">validate_save</span><span class="op">,</span> <span class="nam">InvalidSaveException</span><span class="op">,</span> <span class="nam">set_crash_log</span><span class="op">,</span> <span class="nam">my_games_path</span><span class="op">,</span> <span class="nam">install_path</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t"><span class="key">from</span> <span class="nam">save_engine</span> <span class="key">import</span> <span class="nam">db</span><span class="op">,</span> <span class="nam">save_database_uri</span><span class="op">,</span> <span class="nam">log_path</span><span class="op">,</span> <span class="nam">lookup_objects_save_by_position</span><span class="op">,</span> <span class="nam">get_all_sessions</span><span class="op">,</span> <span class="xx">\</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t">    <span class="nam">store_session</span><span class="op">,</span> <span class="nam">validate_save</span><span class="op">,</span> <span class="nam">InvalidSaveException</span><span class="op">,</span> <span class="nam">set_crash_log</span><span class="op">,</span> <span class="nam">my_games_path</span><span class="op">,</span> <span class="nam">install_path</span><span class="op">,</span> <span class="nam">base_path</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t"><span class="key">from</span> <span class="nam">save_migration</span> <span class="key">import</span> <span class="nam">migrate</span><span class="op">,</span> <span class="nam">is_0_08a_preview</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t"><span class="key">from</span> <span class="nam">builtins</span> <span class="key">import</span> <span class="nam">print</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t"><span class="key">from</span> <span class="nam">time</span> <span class="key">import</span> <span class="nam">sleep</span>&nbsp;</span><span class="r"></span></p>
@@ -147,8 +147,8 @@
     <p class="pln"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t"><span class="com"># import logging.config</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t"><span class="nam">version</span> <span class="op">=</span> <span class="str">"0.08a.2026_01_15"</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t"><span class="nam">release_date</span> <span class="op">=</span> <span class="str">'Friday, 15 January 2026'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t"><span class="nam">version</span> <span class="op">=</span> <span class="str">"0.08a.2026_02_24"</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t"><span class="nam">release_date</span> <span class="op">=</span> <span class="str">'Friday, 24 February 2026'</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t"><span class="nam">COMPRESS_MIMETYPES</span> <span class="op">=</span> <span class="op">[</span><span class="str">'text/html'</span><span class="op">,</span> <span class="str">'text/css'</span><span class="op">,</span> <span class="str">'text/xml'</span><span class="op">,</span> <span class="str">'application/json'</span><span class="op">,</span> <span class="str">'application/javascript'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">                      <span class="str">'application/x-amf'</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
@@ -164,8 +164,8 @@
     <p class="pln"><span class="n"><a id="t82" href="#t82">82</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t84" href="#t84">84</a></span><span class="t"><span class="nam">start</span> <span class="op">=</span> <span class="nam">datetime</span><span class="op">.</span><span class="nam">now</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t"><span class="nam">app</span><span class="op">:</span> <span class="nam">Flask</span> <span class="op">=</span> <span class="nam">Flask</span><span class="op">(</span><span class="nam">__name__</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t"><span class="nam">app_base_path</span> <span class="op">=</span> <span class="nam">base_path</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t"><span class="nam">app</span><span class="op">:</span> <span class="nam">Flask</span> <span class="op">=</span> <span class="nam">Flask</span><span class="op">(</span><span class="nam">__name__</span><span class="op">,</span> <span class="nam">root_path</span><span class="op">=</span><span class="nam">app_base_path</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t88" href="#t88">88</a></span><span class="t"><span class="nam">print</span><span class="op">(</span><span class="str">"Root folder"</span><span class="op">,</span> <span class="nam">app</span><span class="op">.</span><span class="nam">root_path</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t89" href="#t89">89</a></span><span class="t"><span class="nam">print</span><span class="op">(</span><span class="str">"Instance folder"</span><span class="op">,</span> <span class="nam">app</span><span class="op">.</span><span class="nam">instance_path</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -2936,7 +2936,7 @@
             <a class="nav" href="game_settings_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.1">coverage.py v7.13.1</a>,
-            created at 2026-01-28 22:58 +0000
+            created at 2026-02-24 19:25 +0000
         </p>
     </div>
 </footer>
