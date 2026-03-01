@@ -1,4 +1,6 @@
 import math
+
+import msgspec
 from flask import session
 from game_settings import lookup_item_by_code, lookup_item_by_name, game_settings, get_zid, lookup_items_by_type_and_subtype
 from logger import report_battle_log
@@ -1459,11 +1461,10 @@ def has_battle():
     return "battle" in session and session["battle"] is not None
 
 
-class BattleContext:
-    def __init__(self, map_name=None, island=None, replaying=False):
-        self.map_name = map_name
-        self.island = island
-        self.replaying = replaying
+class BattleContext(msgspec.Struct, tag=True):
+    map_name: str | None = None
+    island: int | None = None
+    replaying: bool = False
 
     def __str__(self):
         return f"BattleContext(map_name={self.map_name}, island={self.island}, replaying={self.replaying})"

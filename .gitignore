@@ -7,3 +7,9 @@
 /chromium
 /chromium-profile
 /cache
+/save.db
+/instance
+/backup-save-db
+.coverage
+coverage.xml
+test-results.xml

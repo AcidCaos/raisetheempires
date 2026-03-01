@@ -1,4 +1,8 @@
 import os
+import webbrowser
+
+import msgspec
+from flask_session.base import MsgSpecSerializer
 
 from quest_settings import quest_titles
 
@@ -8,16 +12,20 @@ if not os.environ.get('EDITOR'):
 
 import editor
 from tendo import singleton
-from init_settings import *
+import init_settings as settings
 
-if not debug:
+
+if __name__ == '__main__':
+    settings.read_ops()
+
+if not settings.debug:
     me = singleton.SingleInstance()
 
 if os.name == 'nt':
     os.system('color')
 
-from save_engine import save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
-    store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path
+from save_engine import db, save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
+    store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path, base_path
 from save_migration import migrate, is_0_08a_preview
 from builtins import print
 from time import sleep
@@ -36,14 +44,13 @@ import mod_engine
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
     get_active_island_by_map, set_active_island_by_map, format_player_fleet, \
     cancel_unstarted_invasions, register_fleetname_fleet, get_last_fleet_name, is_shielded, decode_unit_count_list, \
-    encode_unit_strings, get_survival_player_fleet, encode_unit_string
+    encode_unit_strings, get_survival_player_fleet, encode_unit_string, BattleContext
 from game_settings import get_zid, initial_island, random_image, randomReward, get_sessions_id, unlock_expansion, \
     lookup_wave, lookup_crew_template
-import threading, webbrowser
+import threading #, webbrowaser
 import pyamf.amf0
 import json
 import xml.etree.ElementTree as ET
-from flask_sqlalchemy import SQLAlchemy
 from quest_engine import *
 from state_machine import *
 from logger import socketio, report_tutorial_step, report_world_log, report_other_log
@@ -58,8 +65,8 @@ except ImportError as error:
 
 # import logging.config
 
-version = "0.08a.2025_09_26"
-release_date = 'Friday, 26 September 2025'
+version = "0.08a.2026_02_24"
+release_date = 'Friday, 24 February 2026'
 
 COMPRESS_MIMETYPES = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript',
                       'application/x-amf']
@@ -70,19 +77,22 @@ COMPRESS_MIN_SIZE = 500
 rand_seed_w = 5445  # very random
 rand_seed_z = 844
 
-compress = Compress() if compression else None
+compress = Compress() if settings.compression else None
 sess = Session()
-db = SQLAlchemy()
+
 
 start = datetime.now()
+app_base_path = base_path()
+app: Flask = Flask(__name__, root_path=app_base_path)
 
-app: Flask = Flask(__name__)
-
+print("Root folder", app.root_path)
+print("Instance folder", app.instance_path)
 app.config['SESSION_TYPE'] = 'sqlalchemy'
-app.config['SQLALCHEMY_DATABASE_URI'] = save_database_uri()
+app.config['SQLALCHEMY_DATABASE_URI'] = save_database_uri(app.root_path, app.instance_path)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Flask-SQLAlchemy has its own event notification system that gets layered on top of SQLAlchemy. To do this, it tracks modifications to the SQLAlchemy session. This option disables the modification tracking system.
 app.config['SESSION_SQLALCHEMY'] = db
 app.config['SESSION_COOKIE_HTTPONLY'] = False
+#app.config['SESSION_SERIALIZATION_FORMAT '] = 'json' # flask-session uses msgspec by default now which makes it undepickleable
 app.permanent_session_lifetime = timedelta(weeks=520)
 
 MIN_ADMIN_ID = -1
@@ -2762,31 +2772,75 @@ def delete_save(message):
 
 @app.errorhandler(500)
 def server_error_page(error):
-    if crash_log:
+    if settings.crash_log:
         text = editor.edit(filename=os.path.join(log_path(), "log.txt"))
     return 'It went wrong'
 
 
+def enc_hook(obj):
+    if isinstance(obj, BattleContext):
+        return {
+            "__type__": "BattleContext",
+            "__v__": 1,
+            "map_name": obj.map_name,
+            "island": obj.island,
+            "replaying": obj.replaying,
+        }
+    raise TypeError
+
+def decode_objects(obj):
+    if isinstance(obj, dict) and (obj.get("__type__") == "BattleContext" or obj.get("type") == "BattleContext"): #something odd going on
+        return BattleContext(
+            map_name=obj.get("map_name"),
+            island=obj.get("island"),
+            replaying=obj.get("replaying", False),
+        )
+
+    if isinstance(obj, list):
+        return [decode_objects(x) for x in obj]
+
+    if isinstance(obj, dict):
+        return {k: decode_objects(v) for k, v in obj.items()}
+
+    return obj
+
+_original_init = MsgSpecSerializer.__init__
+
+def serializer_init_patch(self, app, format):
+    _original_init(self, app, format)
+
+    self.encoder = msgspec.msgpack.Encoder(enc_hook=enc_hook)
+    original_decode = self.decode
+
+    def decode_wrapper(data):
+        return decode_objects(original_decode(data))
+
+    self.decode = decode_wrapper
+
+MsgSpecSerializer.__init__ = serializer_init_patch
+
+
+
 if __name__ == '__main__':
-    if 'WERKZEUG_RUN_MAIN' not in os.environ and open_browser:
+    if 'WERKZEUG_RUN_MAIN' not in os.environ and settings.open_browser:
         if os.path.exists(os.path.join("chromium", "chrome.exe")):
-            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome.exe") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --allow-outdated-plugins " + ("--app=" if app_mode else "") + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome.exe") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --allow-outdated-plugins " + ("--app=" if settings.app_mode else "") + "http://" + settings.http_host + ":" + str(settings.port) + "/" + settings.http_path)).start()
         elif os.path.exists(os.path.join("chromium", "chrome")):
-            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --–allow-outdated-plugins " + ("--app=" if app_mode else "") + "http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+            threading.Timer(1.25, lambda: os.system(os.path.join("chromium", "chrome") + " --user-data-dir=\"" + os.path.join(my_games_path(), "chromium-profile") + "\"" + " --–allow-outdated-plugins " + ("--app=" if settings.app_mode else "") + "http://" + settings.http_host + ":" + str(settings.port) + "/" + settings.http_path)).start()
         else:
-            threading.Timer(1.25, lambda: webbrowser.open("http://" + http_host + ":" + str(port) + "/" + http_path)).start()
+            threading.Timer(1.25, lambda: webbrowser.open("http://" + settings.http_host + ":" + str(settings.port) + "/" + settings.http_path)).start()
     # init_db(app, db)
-    set_crash_log(crash_log)
-    if compression:
+    set_crash_log(settings.crash_log)
+    if settings.compression:
         compress.init_app(app)
     socketio.init_app(app)
-    sess.init_app(app)
     db.init_app(app)
+    sess.init_app(app)
     # session.app.session_interface.db.create_all()
     # app.session_interface.db.create_all()
     # db.create_all()
 
-    socketio.run(app, host=host, port=port, debug=debug)
+    socketio.run(app, host=settings.host, port=settings.port, debug=settings.debug, allow_unsafe_werkzeug=True)
     # app.run(host='127.0.0.1', port=5005, debug=True)
     # logging.getLogger('socketio').setLevel(logging.ERROR)
     # logging.getLogger('engineio').setLevel(logging.ERROR)

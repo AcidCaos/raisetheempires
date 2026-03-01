@@ -5,10 +5,13 @@ import json
 import battle_engine
 import pytest
 from flask import Flask, session
+from pathlib import Path
+
 
 app = Flask(__name__)
 app.secret_key = 'test'
 
+TEST_DIR = Path(__file__).parent
 
 def test_init_battle():
     run_init_battle({'id': [0, 0], 'fleet': 'fleet14_2341959767162880', 'target': 'fleet15_2341959767162880', 'ch': 4858,
@@ -200,10 +203,10 @@ def assert_result(active_consumables, baddie_strengths, baddies, friendlies, fri
 def assert_dynamic_result(active_consumables, baddie_strengths, baddies, friendlies, friendly_strengths,
                           expected_friendlies_json, expected_friendly_strengths, expected_baddies_json,
                           expected_baddie_strengths, expected_active_consumables):
-    with open(expected_friendlies_json, 'r') as f:
+    with open(TEST_DIR / expected_friendlies_json, 'r') as f:
         assert friendlies == json.load(f)
     assert friendly_strengths == expected_friendly_strengths
-    with open(expected_baddies_json, 'r') as f:
+    with open(TEST_DIR / expected_baddies_json, 'r') as f:
         assert baddies == json.load(f)
     assert baddie_strengths == expected_baddie_strengths
     assert active_consumables == expected_active_consumables
@@ -328,7 +331,7 @@ def test_assign_consumable_response_shrapnel_removed_dead(monkeypatch):
                                    {'id': 2, 'ch': 3207, 'level': 0, 'name': 'fleet15_2341959767162880',
                                     'fleet': None,
                                     'map': 'C037', 'code': 'N80'}, None, [300, 300], None, [116, 0, 120], [],
-                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=([300, 300], [120, 0, 150], []))])
+                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=([300, 300], [120, 0, 150], [], battle_engine.BattleContext()))])
 
 
 def test_assign_consumable_response_shrapnel_unit_dead(monkeypatch):
@@ -336,7 +339,7 @@ def test_assign_consumable_response_shrapnel_unit_dead(monkeypatch):
                                    {'id': 1, 'ch': 3207, 'level': 0, 'name': 'fleet15_2341959767162880',
                                     'fleet': None,
                                     'map': 'C037', 'code': 'N80'}, None, [300, 300], None, [116, 0, 147], [],
-                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=([300, 300], [120, 30, 150], []))])
+                                   True,  setup_session_funcs= [lambda s: s.setdefault('battle', default=([300, 300], [120, 30, 150], [], battle_engine.BattleContext()))])
 
 
 def run_assign_consumable_response(monkeypatch, params, expected_player_unit_id, expected_friendly_strengths, expected_enemy_unit_id,

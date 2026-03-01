@@ -1,0 +1,7 @@
+[run]
+relative_files = true
+source = .
+
+[report]
+omit =
+    test/*
