@@ -39,7 +39,7 @@ This project is dedicated to preserving this Flash game so that it's not lost to
 
 :minidisc: [Empires & Allies Servers Support](SERVERS.md)
 
-:classical_building: [Emipres & Allies Revision History](https://github.com/AcidCaos/empires-revision-history#readme)
+:classical_building: [Empires & Allies Revision History](https://github.com/AcidCaos/empires-revision-history#readme)
 
 :world_map: [Empires & Allies Empire Map Editor](https://github.com/AcidCaos/ea-empire-editor#readme)
 
