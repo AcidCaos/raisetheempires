@@ -144,7 +144,7 @@ if settings.caching:
     if settings.caching:
         for path in sorted(mod):
             if os.path.exists(os.path.join(cache_path, get_cache_filename(path))):
-                mod[path] = lambda: read_file(os.path.join(cache_path, get_cache_filename(path)))
+                mod[path] = lambda path=path: read_file(os.path.join(cache_path, get_cache_filename(path)))
             else:
                 print('ERROR: Cache miss, Cache file %s missing for original %s. ' % (get_cache_filename(path), path))
                 print("This may decrease performance and increase loading times.")

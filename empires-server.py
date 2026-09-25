@@ -1,5 +1,6 @@
 import os
 import webbrowser
+from pathlib import Path
 
 import msgspec
 from flask_session.base import MsgSpecSerializer
@@ -37,6 +38,7 @@ try:
 except ImportError:
     from werkzeug.utils import safe_join
 from flask_session import Session
+from flask.sessions import SessionInterface, SecureCookieSession
 from pyamf import remoting
 import pyamf
 
@@ -79,6 +81,30 @@ rand_seed_z = 844
 
 compress = Compress() if settings.compression else None
 sess = Session()
+
+# Requests for static game assets never use the save game, but a server side session is loaded from and
+# written back to the database on every request. With a save of several MB that makes each image/swf
+# request take up to a second and they queue up behind each other.
+ASSET_PATH_PREFIXES = ("/img/", "/js/", "/css/", "/nullassets/", "/assets/", "/127.0.0.1", "/gameSettings.xml",
+                       "/changelog.txt", "/favicon.ico", "/files/empire-s.assets.zgncdn.com/assets/109338/ZGame")
+
+
+class AssetSkippingSessionInterface(SessionInterface):
+    def __init__(self, inner):
+        self.inner = inner
+
+    def __getattr__(self, name):
+        return getattr(self.inner, name)
+
+    def open_session(self, app, request):
+        if request.path.startswith(ASSET_PATH_PREFIXES):
+            return SecureCookieSession()
+        return self.inner.open_session(app, request)
+
+    def save_session(self, app, session, response):
+        if request.path.startswith(ASSET_PATH_PREFIXES):
+            return
+        self.inner.save_session(app, session, response)
 
 
 start = datetime.now()
@@ -735,8 +761,9 @@ def send_from_directory_mod(directory, filename, **options):
     absolute_directory = os.path.join(install_path(), directory)
     path = safe_join(os.fspath(absolute_directory), os.fspath(filename))
     print(path)
+    mod_path = Path(directory, filename).as_posix()  # mods are keyed relative to the install folder
 
-    return mod_engine.mod.get(path)() if path in mod_engine.mod else send_from_directory(absolute_directory, filename, **options)
+    return mod_engine.mod.get(mod_path)() if mod_path in mod_engine.mod else send_from_directory(absolute_directory, filename, **options)
 
 
 @app.route('/files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php', methods=['POST'])
@@ -1846,6 +1873,11 @@ def perform_world_response(params):
     # print("next_click_state:", repr(next_click_state))
     meta = {"newPVE": 0}
     print(step)
+    if step in ["setState", "clear", "move", "speedUp", "add", "list", "remove", "staffPosition"] and \
+            not any(e['id'] == id for e in session['user_object']["userInfo"]["world"]["objects"]):
+        # client can refer to an object that is already gone (e.g. double click); don't crash the request
+        print("WARNING: Object", id, "not found for", step + ". Ignoring.")
+        return {"errorType": 0, "userId": 1, "metadata": meta, "data": {"id": id}}
     if step in ["place", "setState"]:
         click_next_state(True, id, meta, step, reference_item, cancel=cancel)  # place & setstate only
 
@@ -2449,7 +2481,11 @@ def buy_item(meta, code, amount):
         # param["useCash"]
         item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
         item_inventory[code] = item_inventory.get(code, 0) + 1
-    player['cash'] -= get_cash_cost(item, amount)
+    costs = item.get("cost", {})
+    if "-cash" in costs:
+        player['cash'] -= get_cash_cost(item, amount)
+    else:  # e.g. rare resources bought with coins (RS11-RS15)
+        do_costs({k: str(int(v.split('|')[0]) * amount) for k, v in costs.items()})
     handle_quest_progress(meta, progress_buy_consumable(item))
 
 
@@ -2845,6 +2881,7 @@ if __name__ == '__main__':
     socketio.init_app(app)
     db.init_app(app)
     sess.init_app(app)
+    app.session_interface = AssetSkippingSessionInterface(app.session_interface)
     # session.app.session_interface.db.create_all()
     # app.session_interface.db.create_all()
     # db.create_all()
