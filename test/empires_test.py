@@ -373,6 +373,23 @@ def backup_chain_length(save):
     return n
 
 
+def test_cross_site_requests_to_save_changing_routes_are_blocked():
+    client = empires_server.app.test_client()
+    for headers in ({"Referer": "https://evil.example/page"}, {"Origin": "null"}):
+        assert client.get("/wipe_session", headers=headers).status_code == 403
+        assert client.post("/save-editor", headers=headers).status_code == 403
+
+
+def test_same_site_requests_to_save_changing_routes_are_allowed():
+    for headers in ({"Referer": "http://localhost/home.html"}, {}):
+        with empires_server.app.test_request_context("/wipe_session", headers=headers):
+            assert empires_server.reject_cross_site_save_changes() is None
+
+
+def test_session_cookie_is_same_site_strict():
+    assert empires_server.app.config['SESSION_COOKIE_SAMESITE'] == 'Strict'
+
+
 def test_move_nested_backups_keeps_order(backup_db):
     save = {"session_id": "session:abc", "message": "now"}
     node = save

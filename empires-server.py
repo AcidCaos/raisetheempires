@@ -1,6 +1,7 @@
 import os
 import webbrowser
 from pathlib import Path
+from urllib.parse import urlparse
 
 import msgspec
 from flask_session.base import MsgSpecSerializer
@@ -119,9 +120,28 @@ app.config['SQLALCHEMY_DATABASE_URI'] = save_database_uri(app.root_path, app.ins
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Flask-SQLAlchemy has its own event notification system that gets layered on top of SQLAlchemy. To do this, it tracks modifications to the SQLAlchemy session. This option disables the modification tracking system.
 app.config['SESSION_SQLALCHEMY'] = db
 app.config['SESSION_COOKIE_HTTPONLY'] = False
+# The save game is only ever used by this server's own pages and the game, so never send it along with requests
+# started by other sites (e.g. <img src="http://127.0.0.1:5005/wipe_session"> on any page opened in the browser).
+app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
 #app.config['SESSION_SERIALIZATION_FORMAT '] = 'json' # flask-session uses msgspec by default now which makes it undepickleable
 app.config['MAX_FORM_MEMORY_SIZE'] = 5 * 1024 * 1024  # 5 MB
 app.permanent_session_lifetime = timedelta(weeks=520)
+
+# Routes that change or replace the save game. They are plain links on this server's own pages, so a request
+# coming from another site is never legitimate.
+SAVE_CHANGING_PATH_PREFIXES = ("/wipe_session", "/list_session", "/gazillionaire", "/deprogress", "/seed/", "/patch/",
+                               "/unlock_quest/", "/complete_quest/", "/remove_quest/", "/save-editor",
+                               "/chooseavatar/", "/login.html", "/new.html")
+
+
+@app.before_request
+def reject_cross_site_save_changes():
+    if request.path.startswith(SAVE_CHANGING_PATH_PREFIXES):
+        source = request.headers.get("Origin") or request.headers.get("Referer")
+        if source and urlparse(source).netloc != request.host:
+            print("Blocked cross-site request to", request.path, "from", source)
+            return "Cross-site request blocked", 403
+
 
 MIN_ADMIN_ID = -1
 STEELE_ID = -1
