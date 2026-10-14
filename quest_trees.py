@@ -26,7 +26,7 @@ from flask import session
 import mod_engine
 from game_settings import game_settings, lookup_item_by_code
 from quest_engine import lookup_quest, new_quest_with_sequels
-from save_engine import install_path
+from save_engine import install_path, my_games_path
 
 ASSET_ROOT = "assets/sol_assets_octdict/assets"
 MAX_ACTIVE_TREES = 1
@@ -185,6 +185,7 @@ def update_quest_trees(user, new_quests, meta):
             if tree_id not in player["questTreesFinished"]:
                 player["questTreesFinished"].append(tree_id)
             print("Mini series", tree_id, "finished")
+    remember_hook_spots(user["userInfo"]["world"])
     active = [t for t in player["questTrees"] if t in TREES]
     for tree_id in PLAYABLE:
         if len(active) >= MAX_ACTIVE_TREES:
@@ -320,10 +321,34 @@ def hook_spots(world, count=HOOK_SPOTS):
     return spots
 
 
-def patch_settings_xml(xml, world):
+def _spots_file():
+    return os.path.join(my_games_path(), "quest_tree_spots.json")
+
+
+def remember_hook_spots(world):
+    """The client fetches gameSettings.xml before it logs in and without the session cookie, so the free spots of
+    the island played last are kept in a file for the next time the settings are served."""
+    spots = hook_spots(world)
+    try:
+        with open(_spots_file(), "w") as f:
+            json.dump(spots, f)
+    except OSError as error:
+        print("Could not store mini series spots", error)
+    return spots
+
+
+def remembered_hook_spots():
+    try:
+        with open(_spots_file()) as f:
+            return [tuple(spot) for spot in json.load(f)]
+    except (OSError, ValueError):
+        return []
+
+
+def patch_settings_xml(xml, spots):
     """Put free spots of the player's island in front of the fixed hook positions of every offered tree."""
-    spots = "".join("<pos>%d,%d</pos>" % spot for spot in hook_spots(world))
-    if not spots:
+    positions = "".join("<pos>%d,%d</pos>" % tuple(spot) for spot in spots)
+    if not positions:
         return xml
     for tree_id in PLAYABLE:
         hook = TREES[tree_id].get('hook', {}).get('-item')
@@ -334,5 +359,5 @@ def patch_settings_xml(xml, world):
         at = xml.find(tag, start, xml.find('</questTree>', start))
         if at >= 0:
             at += len(tag)
-            xml = xml[:at] + spots + xml[at:]
+            xml = xml[:at] + positions + xml[at:]
     return xml

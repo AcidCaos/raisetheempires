@@ -4,6 +4,8 @@ import os
 
 from flask import Flask, session
 
+import pytest
+
 import quest_trees
 
 app = Flask(__name__)
@@ -13,6 +15,11 @@ with open(os.path.join(os.path.dirname(__file__), "init_user.json")) as f:
     INIT_USER = json.load(f)
 
 TREE = quest_trees.PLAYABLE[0]
+
+
+@pytest.fixture(autouse=True)
+def spots_file(monkeypatch, tmp_path):
+    monkeypatch.setattr(quest_trees, "_spots_file", lambda: str(tmp_path / "quest_tree_spots.json"))
 FIRST = quest_trees.first_quest(quest_trees.TREES[TREE])
 
 
@@ -173,9 +180,17 @@ def test_patch_settings_puts_free_spots_first():
     xml = '<questTrees><questTree id="%s"><hook item="%s"><pos>1,1</pos></hook></questTree></questTrees>' % (TREE, hook)
     world = {"sizeX": 30, "sizeY": 30, "roadData": ["5,5|5,20", "9,5|9,20"], "objects": []}
 
-    patched = quest_trees.patch_settings_xml(xml, world)
-
     spots = quest_trees.hook_spots(world)
     assert spots
+    patched = quest_trees.patch_settings_xml(xml, spots)
     assert '<hook item="%s"><pos>%d,%d</pos>' % ((hook,) + spots[0]) in patched
     assert patched.endswith('<pos>1,1</pos></hook></questTree></questTrees>')
+
+
+def test_login_remembers_spots_for_the_next_settings_request():
+    with app.test_request_context():
+        user = setup_session()
+        user["userInfo"]["world"] = {"sizeX": 30, "sizeY": 30, "roadData": ["5,5|5,20", "9,5|9,20"], "objects": []}
+        offer_trees()
+
+        assert quest_trees.remembered_hook_spots() == quest_trees.hook_spots(user["userInfo"]["world"])
