@@ -365,6 +365,30 @@ def test_send_from_directory_mod_serves_mod(monkeypatch):
         assert empires_server.send_from_directory_mod("assets/29oct2012", "en_US.xml") == b"modded"
 
 
+def test_lookup_energy_cap_beyond_defined_levels():
+    from game_settings import lookup_energy_cap
+    assert lookup_energy_cap(1) == 25
+    assert lookup_energy_cap("66") == 46
+    assert lookup_energy_cap(85) == 46
+
+
+def test_quest_reward_levels_up_past_level_66():
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        session['quests'] = []
+        player = session['user_object']["userInfo"]["player"]
+        player["lastEnergyCheck"] = 0
+        player["level"] = 66
+        levels = empires_server.game_settings['settings']['levels']['level']
+        player["xp"] = int(next(l for l in levels if l["-num"] == "70")["-requiredXP"])
+
+        quest_engine.do_rewards("Quest", [{"_type": "xp", "_count": "1"}], {"newPVE": 0})
+
+        assert player["level"] == 70
+        assert player["energyMax"] == 46
+
+
 def test_asset_requests_skip_server_side_session():
     class Inner:
         opened = saved = 0

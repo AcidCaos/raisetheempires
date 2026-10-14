@@ -3,7 +3,7 @@ from quest_engine import handle_world_state_change, roll_reward_random_float, ha
 from datetime import datetime
 from flask import session
 from game_settings import game_settings, lookup_item_by_name, lookup_state_machine, lookup_reference_item, \
-    lookup_item_by_code, lookup_visitor_reward
+    lookup_item_by_code, lookup_visitor_reward, lookup_energy_cap
 from save_engine import lookup_object, create_backup, lookup_object_save
 
 
@@ -208,7 +208,7 @@ def do_state_rewards(state, reference_item, meta, playback_tend=False):
     levels = [level for level in game_settings['settings']['levels']['level'] if
               int(level["-num"]) > player['level'] and int(level["-requiredXP"]) <= player['xp']]
     for level in levels:
-        energy_cap = ([e['-cap'] for e in game_settings['settings']['energycaps']['energycap'] if e['-level'] == level["-num"]] + [46])[0]
+        energy_cap = lookup_energy_cap(level["-num"])
         print("Level increased to", level["-num"], "New energy:", energy_cap)
         player['level'] = int(level["-num"])
         player['energy'] = int(energy_cap)
