@@ -47,6 +47,7 @@ from pyamf import remoting
 import pyamf
 
 import mod_engine
+import quest_trees
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
     get_active_island_by_map, set_active_island_by_map, format_player_fleet, \
     cancel_unstarted_invasions, register_fleetname_fleet, get_last_fleet_name, is_shielded, decode_unit_count_list, \
@@ -1117,13 +1118,13 @@ def post_gateway():
         elif reqq.functionName == 'UserService.doSeenQuestNotification':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.questTreeReset':
-            resps.append(dummy_response())
+            resps.append(quest_trees.reset_response(reqq.params))
         elif reqq.functionName == 'UserService.questTreeSetMode':
-            resps.append(dummy_response())
+            resps.append(quest_trees.set_mode_response(reqq.params))
         elif reqq.functionName == 'UserService.questTreeStartQuest':
-            resps.append(dummy_response())
+            resps.append(quest_trees.start_quest_response(reqq.params))
         elif reqq.functionName == 'UserService.questTreeUnlockQuest':
-            resps.append(dummy_response())
+            resps.append(quest_trees.unlock_quest_response(reqq.params))
         elif reqq.functionName == 'PVPService.rejectDecoBuildableRepel':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.rejectDefenseTowerRepel':
@@ -1666,6 +1667,7 @@ def user_response():
     handle_quest_progress(meta, progress_upgrades_count())
 
     activate_unlocked_quests(new_quests, meta)
+    quest_trees.update_quest_trees(user, new_quests, meta)
 
     for neighbor in user["neighbors"]:
         if neighbor["uid"] in [MIN_ADMIN_ID, MAX_ADMIN_ID]:
