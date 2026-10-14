@@ -46,6 +46,7 @@ from flask.sessions import SessionInterface, SecureCookieSession
 from pyamf import remoting
 import pyamf
 
+import client_patches
 import mod_engine
 import quest_trees
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
@@ -533,7 +534,12 @@ def record_stats():
 @app.route("/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf")
 def flashFile():
     # return send_from_directory_mod("assets", "ZGame.109338.swf")
-    return send_from_directory_mod("assets", "ZGame.109338_tracer2.swf")  # regular one
+    response = send_from_directory_mod("assets", "ZGame.109338_tracer2.swf", conditional=False)  # regular one
+    if isinstance(response, Response):
+        response.direct_passthrough = False
+        response = response.get_data()
+    return Response(client_patches.patch_client(response), mimetype="application/x-shockwave-flash",
+                    headers={"Cache-Control": "no-cache"})
     # return send_from_directory_mod("assets", "ZGame.109338_tracer2a.swf")  # with extra debug logging
 
 
