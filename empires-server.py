@@ -90,7 +90,7 @@ sess = Session()
 # Requests for static game assets never use the save game, but a server side session is loaded from and
 # written back to the database on every request. With a save of several MB that makes each image/swf
 # request take up to a second and they queue up behind each other.
-ASSET_PATH_PREFIXES = ("/img/", "/js/", "/css/", "/nullassets/", "/assets/", "/127.0.0.1", "/gameSettings.xml",
+ASSET_PATH_PREFIXES = ("/img/", "/js/", "/css/", "/nullassets/", "/assets/", "/127.0.0.1",
                        "/changelog.txt", "/favicon.ico", "/files/empire-s.assets.zgncdn.com/assets/109338/ZGame")
 
 
@@ -543,7 +543,13 @@ def game_settings_file():
     # return send_from_directory_mod("assets/32995", "gameSettings.xml")
     # return send_from_directory_mod("assets/29oct2012", "gameSettings.xml")
     # return send_from_directory_mod("assets/29oct2012", "gameSettings_placeholders.xml")
-    return send_from_directory_mod("assets/29oct2012", "gameSettings_with_fixes.xml")
+    response = send_from_directory_mod("assets/29oct2012", "gameSettings_with_fixes.xml")
+    if 'user_object' not in session:
+        return response
+    # mini series buildings need free spots on this player's island, see quest_trees.patch_settings_xml
+    response.direct_passthrough = False
+    xml = quest_trees.patch_settings_xml(response.get_data(as_text=True), session['user_object']["userInfo"]["world"])
+    return Response(xml, mimetype="text/xml", headers={"Cache-Control": "no-store"})
 
 
 @app.route("/127.0.0.1en_US.xml")

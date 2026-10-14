@@ -153,3 +153,29 @@ def test_set_mode_stores_mode_and_restarts():
 
         assert player["questTreeData"][TREE]["difficultyMode"] == "hard"
         assert player["questTreesRestarts"][TREE] == 1
+
+
+def test_hook_spots_are_free_land_next_to_buildings():
+    world = {"sizeX": 30, "sizeY": 30, "roadData": ["5,5|5,20", "9,5|9,20"],
+             "objects": [{"itemName": "Market", "position": "10,5,0"}, {"itemName": "Market", "position": "10,12,0"}]}
+    spots = quest_trees.hook_spots(world)
+
+    assert spots
+    taken = {(x, y) for x in (5, 9) for y in range(5, 21)}
+    for x, y in spots:
+        cells = {(x + i, y + j) for i in range(3) for j in range(3)}
+        assert not cells & taken
+
+
+def test_patch_settings_puts_free_spots_first():
+    tree = quest_trees.TREES[TREE]
+    hook = tree["hook"]["-item"]
+    xml = '<questTrees><questTree id="%s"><hook item="%s"><pos>1,1</pos></hook></questTree></questTrees>' % (TREE, hook)
+    world = {"sizeX": 30, "sizeY": 30, "roadData": ["5,5|5,20", "9,5|9,20"], "objects": []}
+
+    patched = quest_trees.patch_settings_xml(xml, world)
+
+    spots = quest_trees.hook_spots(world)
+    assert spots
+    assert '<hook item="%s"><pos>%d,%d</pos>' % ((hook,) + spots[0]) in patched
+    assert patched.endswith('<pos>1,1</pos></hook></questTree></questTrees>')
