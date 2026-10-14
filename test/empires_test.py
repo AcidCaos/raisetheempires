@@ -478,6 +478,36 @@ def test_perform_world_response_missing_object():
             assert res == {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0}, "data": data}, step
 
 
+def test_failed_gateway_request_restores_session():
+    def failing_batch():
+        session['user_object']["userInfo"]["player"]["cash"] += 100  # first call succeeds
+        session['quests'].append({"name": "Q1"})
+        raise KeyError("second call fails")
+
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        session['quests'] = []
+        cash = session['user_object']["userInfo"]["player"]["cash"]
+
+        with pytest.raises(KeyError):
+            empires_server.transactional_session(failing_batch)()
+
+        assert session['user_object']["userInfo"]["player"]["cash"] == cash
+        assert session['quests'] == []
+
+
+def test_successful_gateway_request_keeps_changes():
+    def batch():
+        session['quests'].append({"name": "Q1"})
+        return "ok"
+
+    with app.test_request_context():
+        session['quests'] = []
+        assert empires_server.transactional_session(batch)() == "ok"
+        assert session['quests'] == [{"name": "Q1"}]
+
+
 def test_place_item_without_cost():
     with app.test_request_context():
         with open(TEST_DIR / 'init_user.json', 'r') as f:

@@ -1,5 +1,7 @@
 import os
 import webbrowser
+import functools
+import pickle
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -785,7 +787,30 @@ def send_from_directory_mod(directory, filename, **options):
     return mod_engine.mod.get(mod_path)() if mod_path in mod_engine.mod else send_from_directory(absolute_directory, filename, **options)
 
 
+def transactional_session(view):
+    """The client sends several calls per request. If one of them fails, the error page is returned but the session
+    was still saved with the changes of the calls before it, so client and server got out of sync. Restore the
+    session to how it was before the request instead."""
+    @functools.wraps(view)
+    def wrapper(*args, **kwargs):
+        try:
+            snapshot = pickle.dumps(dict(session), pickle.HIGHEST_PROTOCOL)
+        except Exception as error:
+            print("WARNING: could not snapshot the session:", error)
+            snapshot = None
+        try:
+            return view(*args, **kwargs)
+        except Exception:
+            if snapshot is not None:
+                session.clear()
+                session.update(pickle.loads(snapshot))
+                print("Request failed, the save game was restored to its state before the request")
+            raise
+    return wrapper
+
+
 @app.route('/files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php', methods=['POST'])
+@transactional_session
 def post_gateway():
     print("Gateway:")
     print(repr(request))
