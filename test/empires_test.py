@@ -365,6 +365,43 @@ def test_send_from_directory_mod_serves_mod(monkeypatch):
         assert empires_server.send_from_directory_mod("assets/29oct2012", "en_US.xml") == b"modded"
 
 
+def backup_chain_length(save):
+    n = 0
+    while "backup" in save:
+        save = save["backup"]
+        n += 1
+    return n
+
+
+def test_move_nested_backups_keeps_order(backup_db):
+    save = {"session_id": "session:abc", "message": "now"}
+    node = save
+    for i in range(3):
+        node["backup"] = {"message": "backup %d" % i, "user_object": {"n": i}}
+        node = node["backup"]
+
+    assert backup_db.move_nested_backups(save) is True
+    assert "backup" not in save
+    assert [info["message"] for _, info in backup_db.list_backups(save)] == ["backup 0", "backup 1", "backup 2"]
+    newest_id = backup_db.list_backups(save)[0][0]
+    assert backup_db.load_backup(save, newest_id)["user_object"] == {"n": 0}
+    assert backup_db.move_nested_backups(save) is False
+
+
+def test_create_backup_keeps_save_small_and_bounded(backup_db):
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        for i in range(backup_db.MAX_BACKUPS + 4):
+            backup_db.create_backup("Level %d" % i)
+
+        assert backup_chain_length(dict(session)) == 0
+        backups = backup_db.list_backups(session)
+        assert len(backups) == backup_db.MAX_BACKUPS
+        assert backups[0][1]["message"] == "Level %d" % (backup_db.MAX_BACKUPS + 3)
+        assert backup_db.load_backup(session, backups[0][0])["user_object"] == session['user_object']
+
+
 def test_lookup_energy_cap_beyond_defined_levels():
     from game_settings import lookup_energy_cap
     assert lookup_energy_cap(1) == 25
@@ -372,7 +409,7 @@ def test_lookup_energy_cap_beyond_defined_levels():
     assert lookup_energy_cap(85) == 46
 
 
-def test_quest_reward_levels_up_past_level_66():
+def test_quest_reward_levels_up_past_level_66(backup_db):
     with app.test_request_context():
         with open(TEST_DIR / 'init_user.json', 'r') as f:
             session['user_object'] = json.load(f)

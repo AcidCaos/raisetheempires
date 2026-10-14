@@ -26,7 +26,8 @@ if os.name == 'nt':
     os.system('color')
 
 from save_engine import db, save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
-    store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path, base_path
+    store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path, base_path, \
+    move_nested_backups, list_backups, load_backup
 from save_migration import migrate, is_0_08a_preview
 from builtins import print
 from time import sleep
@@ -428,14 +429,10 @@ def remove_quest(value):
 
 @app.route("/save-editor", methods=['GET'])
 def save_editor():
-    backups = []
-    s = session
-    backup_count = 0
-    while "backup" in s:
-        backups.append(format_backup_message(s["backup"]))
-        s = s["backup"]
-        backup_count += 1
-    print("Backups present", backup_count)
+    if move_nested_backups(session):
+        session.modified = True
+    backups = [format_backup_message(info) for _, info in list_backups(session)]
+    print("Backups present", len(backups))
 
     incomplete_quests = [e["name"] for e in session['quests'] if e["complete"] == False]
     complete_quests = [e["name"] for e in session['quests'] if e["complete"]]
@@ -466,10 +463,12 @@ def save_savegame():
     restores = [int(key[7:]) for key in request.form.keys() if "restore" in key]
 
     if restores:
-        save_game = session["backup"]
-        for i in range(restores[0]):
-            save_game = save_game["backup"]
-        save_game = copy.deepcopy(save_game)
+        if move_nested_backups(session):
+            session.modified = True
+        backup_ids = [backup_id for backup_id, _ in list_backups(session)]
+        if restores[0] >= len(backup_ids):
+            return ("Backup not found", 404)
+        save_game = load_backup(session, backup_ids[restores[0]])
         print("restoring backup")
         message = "Revert to backup \"" + format_backup_message(save_game) + "\""
     else:
@@ -1515,6 +1514,9 @@ def user_response():
         if not validate_save(session):
             print("invalid save file")
             raise InvalidSaveException
+        if move_nested_backups(session):
+            session.modified = True
+            print("Moved save game backups to the backup database")
         user = session['user_object']
         user["userInfo"]["player"]["uid"] = get_zid()
         if session.get('save_version') != version:
