@@ -53,10 +53,12 @@ def click_next_state(do_click, id, meta, step, reference_item, speed_up=False, t
                 break
 
         if (do_click or tend):
-            try:
-               next_state_id = state['-clickNext'] if not cancel else state['-cancelNext']
-            except:
-                next_state_id = state['-clickNext']
+            next_state_id = state.get('-cancelNext') if cancel and '-cancelNext' in state else state.get('-clickNext')
+            if next_state_id is None:
+                # e.g. a second click on a tree that was just cut and is now dormant: nothing to do
+                print("WARNING: state", state.get('-stateName'), "of", cur_object['itemName'], cur_object['id'],
+                      "has no click transition. Ignoring click.")
+                return
             if reference_item != cur_object.get('referenceItem'):
                 state_machine = lookup_state_machine(game_item['stateMachineValues']['-stateMachineName'],
                                                      game_item['stateMachineValues'].get('define', []),

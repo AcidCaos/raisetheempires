@@ -508,6 +508,25 @@ def test_successful_gateway_request_keeps_changes():
         assert session['quests'] == [{"name": "Q1"}]
 
 
+def test_click_on_dormant_tree_is_ignored():
+    import time
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        session['quests'] = []
+        session['user_object']["userInfo"]["player"]["lastEnergyCheck"] = 0
+        objects = session['user_object']["userInfo"]["world"]["objects"]
+        tree_id = max([e['id'] for e in objects], default=0) + 1
+        objects.append({"id": tree_id, "itemName": "tree43", "position": "52,62,0", "referenceItem": None,
+                        "state": "3", "lastUpdated": time.time() * 1000})  # just cut, dormant for 1-4 days
+        world_object = types.SimpleNamespace(id=tree_id, position="52,62,0", itemName="tree43")
+
+        res = empires_server.perform_world_response(["setState", world_object, []])
+
+        assert res["errorType"] == 0
+        assert objects[-1]["state"] == "3"
+
+
 def test_place_item_without_cost():
     with app.test_request_context():
         with open(TEST_DIR / 'init_user.json', 'r') as f:
