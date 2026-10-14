@@ -245,7 +245,7 @@ def wipe_session():
 
 @app.route("/list_session", methods=['GET', 'POST'])
 def list_session():
-    response = get_sessions_dropdown_info(get_all_sessions())
+    response = get_sessions_dropdown_info(get_saves())
 
     dump = json.dumps(response,
                       default=lambda o: '<not serializable>', sort_keys=False, indent=2)
@@ -1895,11 +1895,13 @@ def perform_world_response(params):
     # print("next_click_state:", repr(next_click_state))
     meta = {"newPVE": 0}
     print(step)
-    if step in ["setState", "clear", "move", "speedUp", "add", "list", "remove", "staffPosition"] and \
+    if step in ["setState", "clear", "move", "speedUp", "add", "list", "remove", "staffPosition",
+                "decoCrewBuyOnce"] and \
             not any(e['id'] == id for e in session['user_object']["userInfo"]["world"]["objects"]):
         # client can refer to an object that is already gone (e.g. double click); don't crash the request
         print("WARNING: Object", id, "not found for", step + ". Ignoring.")
-        return {"errorType": 0, "userId": 1, "metadata": meta, "data": {"id": id}}
+        data = [] if step in ["list", "remove"] else {"id": id}  # same shape as the normal response for the step
+        return {"errorType": 0, "userId": 1, "metadata": meta, "data": data}
     if step in ["place", "setState"]:
         click_next_state(True, id, meta, step, reference_item, cancel=cancel)  # place & setstate only
 
@@ -1909,7 +1911,7 @@ def perform_world_response(params):
             if item_name == "Mastery Factory 01" and int(ref_item.get("masteryTokenCost","0"))> 0:
                 session['user_object']["userInfo"]["player"]["inventory"]["items"]["VTK"] -= int(ref_item["masteryTokenCost"])
             else:
-                costs = ref_item.get("cost")
+                costs = ref_item.get("cost") or {}
                 do_costs({k: v for k, v in costs.items() if k != "-cash"})
         lookup_object(id)["referenceItem"] = reference_item
 
@@ -1923,7 +1925,7 @@ def perform_world_response(params):
 
     if step == "place":
         if not from_inventory:
-            costs = lookup_item_by_name(item_name).get("cost")
+            costs = lookup_item_by_name(item_name).get("cost") or {}
             if "-unitClass" in lookup_item_by_name(item_name):
                 do_costs({k: v for k, v in costs.items() if k == "-cash"})
             else:

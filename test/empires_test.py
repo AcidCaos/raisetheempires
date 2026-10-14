@@ -472,9 +472,26 @@ def test_perform_world_response_missing_object():
         missing_id = max([e['id'] for e in objects], default=0) + 1
         world_object = types.SimpleNamespace(id=missing_id, position="0,0,0", itemName="Market")
 
-        res = empires_server.perform_world_response(["list", world_object, []])
+        for step, data in (("list", []), ("remove", []), ("move", {"id": missing_id}),
+                           ("decoCrewBuyOnce", {"id": missing_id})):
+            res = empires_server.perform_world_response([step, world_object, []])
+            assert res == {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0}, "data": data}, step
 
-        assert res == {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0}, "data": {"id": missing_id}}
+
+def test_place_item_without_cost():
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        session['quests'] = []
+        session['user_object']["userInfo"]["player"]["lastEnergyCheck"] = 0
+        resources = dict(session['user_object']["userInfo"]["world"]["resources"])
+        world_object = types.SimpleNamespace(id=0, position="10,10,0", itemName="Attack_Dog_Deco")
+
+        res = empires_server.perform_world_response(["place", world_object, []])
+
+        assert res["errorType"] == 0
+        assert session['user_object']["userInfo"]["world"]["objects"][-1]["itemName"] == "Attack_Dog_Deco"
+        assert session['user_object']["userInfo"]["world"]["resources"]["coins"] == resources["coins"]
 
 
 # def test_index():
