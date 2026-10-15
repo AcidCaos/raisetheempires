@@ -1111,7 +1111,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.purchaseManaRefill':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.purchaseUnlock':
-            resps.append(dummy_response())
+            resps.append(purchase_unlock_response(reqq.params[0]))
         elif reqq.functionName == 'PVPService.globalPVPOptInOut':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.slotMachineSpin':
@@ -1221,15 +1221,15 @@ def post_gateway():
         elif reqq.functionName == 'UserService.unitDropSwitchUnit':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.unitUnlock':
-            resps.append(dummy_response())
+            resps.append(unit_unlock_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyUnlimitedEnergy':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.unlockResource':
-            resps.append(dummy_response())
+            resps.append(unlock_resource_response(reqq.params[0], reqq.params[1]))
         elif reqq.functionName == 'DominationModeService.updateDefenseForce':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.upgradeResearchBuilding':
-            resps.append(dummy_response())
+            resps.append(upgrade_research_building_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.upgradeState':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.useItem':
@@ -2827,6 +2827,52 @@ def is_resume_survival():
 
 
 # def unit_encode
+
+
+def unit_unlock_response(unit_code):
+    """Unit research finished with parts (UnitPartsGather): the client adds the unit to player.unlockedUnits."""
+    unlocked = session['user_object']["userInfo"]["player"].setdefault("unlockedUnits", [])
+    if unit_code not in unlocked:
+        unlocked.append(unit_code)
+    return dummy_response()
+
+
+def purchase_unlock_response(param):
+    """Unlocking a market item: the client adds its code to player.unlockedItems and pays its unlockCost in cash."""
+    try:
+        item = lookup_item_by_code(param["itemCode"])
+    except ValueError:
+        item = None
+    player = session['user_object']["userInfo"]["player"]
+    unlocked = player.setdefault("unlockedItems", [])
+    if item is None or param["itemCode"] in unlocked:
+        return dummy_response()
+    unlocked.append(param["itemCode"])
+    try:
+        cost = int(item.get("unlockCost", item.get("-unlockCost", 0)))
+    except (TypeError, ValueError):
+        cost = 0
+    if cost > 0:  # without an own cost the client asks EarlyUnitUnlockManager, which the server does not know
+        player["cash"] -= cost
+    return dummy_response()
+
+
+def unlock_resource_response(resource_type, multiplier):
+    """Super ore mine: the client raises unlockedResource[type] to the new multiplier, never lowers it."""
+    unlocked = session['user_object'].setdefault("unlockedResource", {})
+    if int(multiplier) > int(unlocked.get(resource_type) or 0):
+        unlocked[resource_type] = int(multiplier)
+    return dummy_response()
+
+
+def upgrade_research_building_response(building_type):
+    """Research building upgrade: the client remembers the type in research2.buildingTypesUpgraded."""
+    research2 = session['user_object']["userInfo"]["world"].setdefault("research2", {})
+    upgraded = research2.get("buildingTypesUpgraded") or []
+    if building_type not in upgraded:
+        upgraded.append(building_type)
+    research2["buildingTypesUpgraded"] = upgraded
+    return dummy_response()
 
 
 def dummy_response():
