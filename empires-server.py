@@ -993,7 +993,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.buyExpansion':
             resps.append(buy_expansion_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyFullHeal':
-            resps.append(dummy_response())
+            resps.append(buy_full_heal_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyItem':
             resps.append(buy_item_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyItems':
@@ -1003,11 +1003,11 @@ def post_gateway():
         elif reqq.functionName == 'UserService.buyMOTDItem':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.buyQuestRestartTask':
-            resps.append(dummy_response())
+            resps.append(buy_quest_restart_task_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyQuestTask':
             resps.append(buy_quest_task_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyRewardItem':
-            resps.append(dummy_response())
+            resps.append(buy_reward_item_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.calculateRansom':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.cancelUnstartedChallenge':
@@ -1095,7 +1095,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.motdAction':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.multiHarvest':
-            resps.append(dummy_response())
+            resps.append(multi_harvest_response(reqq.params))
         elif reqq.functionName == 'DataServicesService.getRecommendedNeighbors':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.openDialog':
@@ -1145,7 +1145,7 @@ def post_gateway():
         elif reqq.functionName == 'PVPService.rejectFriendRepel':
             resps.append(reject_friend_repel_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.removeExpiredInventory':
-            resps.append(dummy_response())
+            resps.append(remove_expired_inventory_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.removeExtraInventoryBuildings':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.removeExtraWorldBuildings':
@@ -1199,7 +1199,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.setTag':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.spend':
-            resps.append(dummy_response())
+            resps.append(spend_response(reqq.params[0]))
         elif reqq.functionName == 'DeathMatchService.loadBattle':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.startMayhemEvent':
@@ -1231,7 +1231,7 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.upgradeResearchBuilding':
             resps.append(upgrade_research_building_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.upgradeState':
-            resps.append(dummy_response())
+            resps.append(upgrade_state_response(reqq.params))
         elif reqq.functionName == 'UserService.useItem':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.useStrikeTeam':
@@ -2873,6 +2873,103 @@ def upgrade_research_building_response(building_type):
         upgraded.append(building_type)
     research2["buildingTypesUpgraded"] = upgraded
     return dummy_response()
+
+
+def _param(obj, key, default=None):
+    """AMF parameters arrive as dicts or as typed objects."""
+    return obj.get(key, default) if isinstance(obj, dict) else getattr(obj, key, default)
+
+
+def _response(meta=None):
+    return {"errorType": 0, "userId": 1, "metadata": meta or {"newPVE": 0}, "data": []}
+
+
+def buy_full_heal_response(param):
+    """Combat bar full heal: the client pays the heal price in cash (the heal item itself comes via buyItem)."""
+    session['user_object']["userInfo"]["player"]["cash"] -= int(_param(param, "cost", 0) or 0)
+    return _response()
+
+
+def multi_harvest_response(params):
+    """Harvest several objects at once: the client pays the discounted energy once and then sends a setState per
+    object, for which the server charges each object's full energy. Give back the discount."""
+    cost, discounted_cost = int(params[3] or 0), int(params[4] or 0)
+    refund = cost - discounted_cost
+    if refund > 0:
+        session['user_object']["userInfo"]["player"]["energy"] += refund
+        session['user_object']["userInfo"]["world"]["resources"]["energy"] += refund
+    return _response()
+
+
+def buy_reward_item_response(param):
+    """Buying a quest or mini series reward: one item to the inventory, paid with its cash price."""
+    code = _param(param, "code")
+    try:
+        item = lookup_item_by_code(code)
+    except ValueError:
+        return _response()
+    player = session['user_object']["userInfo"]["player"]
+    player["cash"] -= int((item.get("cost") or {}).get("-cash", 0) or 0)
+    inventory = player["inventory"]["items"]
+    inventory[code] = inventory.get(code, 0) + 1
+    return _response()
+
+
+def spend_response(param):
+    """Paying for a quest task ("spend" button): take the resource or item and complete the matching spend task."""
+    spend_type, code, amount = _param(param, "type"), _param(param, "code"), int(_param(param, "amount", 0) or 0)
+    if spend_type == "item":
+        inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
+        inventory[code] = inventory.get(code, 0) - amount
+        if inventory[code] <= 0:
+            del inventory[code]
+    else:
+        do_costs({"-" + spend_type: str(amount)})
+
+    def complete_task(task, progress, i, extra, *args):
+        extra["total"] = int(task["_total"])
+        return True
+
+    meta = {"newPVE": 0}
+    handle_quest_progress(meta, all_lambda(progress_action("spend"), progress_parameter_equals("_type", spend_type),
+                                           progress_parameter_implies("_item", code), complete_task))
+    return _response(meta)
+
+
+def buy_quest_restart_task_response(param):
+    """Restarting an expired timed quest for cash."""
+    name = _param(param, "name")
+    quest = lookup_quest(name)
+    if quest is None:
+        return _response()
+    session['user_object']["userInfo"]["player"]["cash"] -= int(quest.get("_restartCost", 0) or 0)
+    for session_quest in session['quests']:
+        if session_quest["name"] == name:
+            session_quest["expired"] = False
+    return _response()
+
+
+def upgrade_state_response(params):
+    """Parliament upgrade from matchmaking: the client switches the building to the given state."""
+    object_id = _param(params[0], "id")
+    try:
+        game_object = lookup_object(object_id)
+    except ValueError:
+        return _response()
+    game_object["state"] = params[2]
+    game_object["lastUpdated"] = datetime.now().timestamp() * 1000
+    return _response()
+
+
+def remove_expired_inventory_response(param):
+    """Items whose date has passed are taken out of the inventory by the client, one at a time."""
+    code = _param(param, "code")
+    inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
+    if code in inventory:
+        inventory[code] -= 1
+        if inventory[code] <= 0:
+            del inventory[code]
+    return _response()
 
 
 def dummy_response():
