@@ -47,6 +47,7 @@ from pyamf import remoting
 import pyamf
 
 import client_patches
+import megaseries
 import mod_engine
 import quest_trees
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
@@ -1087,7 +1088,7 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.mechlabStatus':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.megaSeriesReset':
-            resps.append(dummy_response())
+            resps.append(megaseries.reset_response(reqq.params))
         elif reqq.functionName == 'ZlingshotService.fetch':
             resps.append(dummy_response())
         elif reqq.functionName == 'MFSService.collectReward':
@@ -1681,6 +1682,7 @@ def user_response():
 
     activate_unlocked_quests(new_quests, meta)
     quest_trees.update_quest_trees(user, new_quests, meta)
+    megaseries.update_megaseries(user, new_quests, meta)
 
     for neighbor in user["neighbors"]:
         if neighbor["uid"] in [MIN_ADMIN_ID, MAX_ADMIN_ID]:
