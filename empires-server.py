@@ -1,5 +1,9 @@
 import os
 import webbrowser
+import functools
+import pickle
+from pathlib import Path
+from urllib.parse import urlparse
 
 import msgspec
 from flask_session.base import MsgSpecSerializer
@@ -25,7 +29,8 @@ if os.name == 'nt':
     os.system('color')
 
 from save_engine import db, save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
-    store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path, base_path
+    store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path, base_path, \
+    move_nested_backups, list_backups, load_backup
 from save_migration import migrate, is_0_08a_preview
 from builtins import print
 from time import sleep
@@ -37,10 +42,14 @@ try:
 except ImportError:
     from werkzeug.utils import safe_join
 from flask_session import Session
+from flask.sessions import SessionInterface, SecureCookieSession
 from pyamf import remoting
 import pyamf
 
+import client_patches
+import megaseries
 import mod_engine
+import quest_trees
 from battle_engine import battle_complete_response, spawn_fleet, next_campaign_response, assign_consumable_response, \
     get_active_island_by_map, set_active_island_by_map, format_player_fleet, \
     cancel_unstarted_invasions, register_fleetname_fleet, get_last_fleet_name, is_shielded, decode_unit_count_list, \
@@ -80,6 +89,30 @@ rand_seed_z = 844
 compress = Compress() if settings.compression else None
 sess = Session()
 
+# Requests for static game assets never use the save game, but a server side session is loaded from and
+# written back to the database on every request. With a save of several MB that makes each image/swf
+# request take up to a second and they queue up behind each other.
+ASSET_PATH_PREFIXES = ("/img/", "/js/", "/css/", "/nullassets/", "/assets/", "/127.0.0.1", "/gameSettings.xml",
+                       "/changelog.txt", "/favicon.ico", "/files/empire-s.assets.zgncdn.com/assets/109338/ZGame")
+
+
+class AssetSkippingSessionInterface(SessionInterface):
+    def __init__(self, inner):
+        self.inner = inner
+
+    def __getattr__(self, name):
+        return getattr(self.inner, name)
+
+    def open_session(self, app, request):
+        if request.path.startswith(ASSET_PATH_PREFIXES):
+            return SecureCookieSession()
+        return self.inner.open_session(app, request)
+
+    def save_session(self, app, session, response):
+        if request.path.startswith(ASSET_PATH_PREFIXES):
+            return
+        self.inner.save_session(app, session, response)
+
 
 start = datetime.now()
 app_base_path = base_path()
@@ -92,9 +125,28 @@ app.config['SQLALCHEMY_DATABASE_URI'] = save_database_uri(app.root_path, app.ins
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Flask-SQLAlchemy has its own event notification system that gets layered on top of SQLAlchemy. To do this, it tracks modifications to the SQLAlchemy session. This option disables the modification tracking system.
 app.config['SESSION_SQLALCHEMY'] = db
 app.config['SESSION_COOKIE_HTTPONLY'] = False
+# The save game is only ever used by this server's own pages and the game, so never send it along with requests
+# started by other sites (e.g. <img src="http://127.0.0.1:5005/wipe_session"> on any page opened in the browser).
+app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
 #app.config['SESSION_SERIALIZATION_FORMAT '] = 'json' # flask-session uses msgspec by default now which makes it undepickleable
 app.config['MAX_FORM_MEMORY_SIZE'] = 5 * 1024 * 1024  # 5 MB
 app.permanent_session_lifetime = timedelta(weeks=520)
+
+# Routes that change or replace the save game. They are plain links on this server's own pages, so a request
+# coming from another site is never legitimate.
+SAVE_CHANGING_PATH_PREFIXES = ("/wipe_session", "/list_session", "/gazillionaire", "/deprogress", "/seed/", "/patch/",
+                               "/unlock_quest/", "/complete_quest/", "/remove_quest/", "/save-editor",
+                               "/chooseavatar/", "/login.html", "/new.html")
+
+
+@app.before_request
+def reject_cross_site_save_changes():
+    if request.path.startswith(SAVE_CHANGING_PATH_PREFIXES):
+        source = request.headers.get("Origin") or request.headers.get("Referer")
+        if source and urlparse(source).netloc != request.host:
+            print("Blocked cross-site request to", request.path, "from", source)
+            return "Cross-site request blocked", 403
+
 
 MIN_ADMIN_ID = -1
 STEELE_ID = -1
@@ -198,7 +250,7 @@ def wipe_session():
 
 @app.route("/list_session", methods=['GET', 'POST'])
 def list_session():
-    response = get_sessions_dropdown_info(get_all_sessions())
+    response = get_sessions_dropdown_info(get_saves())
 
     dump = json.dumps(response,
                       default=lambda o: '<not serializable>', sort_keys=False, indent=2)
@@ -402,14 +454,10 @@ def remove_quest(value):
 
 @app.route("/save-editor", methods=['GET'])
 def save_editor():
-    backups = []
-    s = session
-    backup_count = 0
-    while "backup" in s:
-        backups.append(format_backup_message(s["backup"]))
-        s = s["backup"]
-        backup_count += 1
-    print("Backups present", backup_count)
+    if move_nested_backups(session):
+        session.modified = True
+    backups = [format_backup_message(info) for _, info in list_backups(session)]
+    print("Backups present", len(backups))
 
     incomplete_quests = [e["name"] for e in session['quests'] if e["complete"] == False]
     complete_quests = [e["name"] for e in session['quests'] if e["complete"]]
@@ -440,10 +488,12 @@ def save_savegame():
     restores = [int(key[7:]) for key in request.form.keys() if "restore" in key]
 
     if restores:
-        save_game = session["backup"]
-        for i in range(restores[0]):
-            save_game = save_game["backup"]
-        save_game = copy.deepcopy(save_game)
+        if move_nested_backups(session):
+            session.modified = True
+        backup_ids = [backup_id for backup_id, _ in list_backups(session)]
+        if restores[0] >= len(backup_ids):
+            return ("Backup not found", 404)
+        save_game = load_backup(session, backup_ids[restores[0]])
         print("restoring backup")
         message = "Revert to backup \"" + format_backup_message(save_game) + "\""
     else:
@@ -485,7 +535,12 @@ def record_stats():
 @app.route("/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf")
 def flashFile():
     # return send_from_directory_mod("assets", "ZGame.109338.swf")
-    return send_from_directory_mod("assets", "ZGame.109338_tracer2.swf")  # regular one
+    response = send_from_directory_mod("assets", "ZGame.109338_tracer2.swf", conditional=False)  # regular one
+    if isinstance(response, Response):
+        response.direct_passthrough = False
+        response = response.get_data()
+    return Response(client_patches.patch_client(response), mimetype="application/x-shockwave-flash",
+                    headers={"Cache-Control": "no-cache"})
     # return send_from_directory_mod("assets", "ZGame.109338_tracer2a.swf")  # with extra debug logging
 
 
@@ -495,7 +550,14 @@ def game_settings_file():
     # return send_from_directory_mod("assets/32995", "gameSettings.xml")
     # return send_from_directory_mod("assets/29oct2012", "gameSettings.xml")
     # return send_from_directory_mod("assets/29oct2012", "gameSettings_placeholders.xml")
-    return send_from_directory_mod("assets/29oct2012", "gameSettings_with_fixes.xml")
+    # mini series buildings need free spots on the player's island, see quest_trees.remember_hook_spots
+    spots = quest_trees.remembered_hook_spots()
+    response = send_from_directory_mod("assets/29oct2012", "gameSettings_with_fixes.xml", conditional=False)
+    if not spots:
+        return response
+    response.direct_passthrough = False
+    xml = quest_trees.patch_settings_xml(response.get_data(as_text=True), spots)
+    return Response(xml, mimetype="text/xml", headers={"Cache-Control": "no-store"})
 
 
 @app.route("/127.0.0.1en_US.xml")
@@ -735,11 +797,35 @@ def send_from_directory_mod(directory, filename, **options):
     absolute_directory = os.path.join(install_path(), directory)
     path = safe_join(os.fspath(absolute_directory), os.fspath(filename))
     print(path)
+    mod_path = Path(directory, filename).as_posix()  # mods are keyed relative to the install folder
 
-    return mod_engine.mod.get(path)() if path in mod_engine.mod else send_from_directory(absolute_directory, filename, **options)
+    return mod_engine.mod.get(mod_path)() if mod_path in mod_engine.mod else send_from_directory(absolute_directory, filename, **options)
+
+
+def transactional_session(view):
+    """The client sends several calls per request. If one of them fails, the error page is returned but the session
+    was still saved with the changes of the calls before it, so client and server got out of sync. Restore the
+    session to how it was before the request instead."""
+    @functools.wraps(view)
+    def wrapper(*args, **kwargs):
+        try:
+            snapshot = pickle.dumps(dict(session), pickle.HIGHEST_PROTOCOL)
+        except Exception as error:
+            print("WARNING: could not snapshot the session:", error)
+            snapshot = None
+        try:
+            return view(*args, **kwargs)
+        except Exception:
+            if snapshot is not None:
+                session.clear()
+                session.update(pickle.loads(snapshot))
+                print("Request failed, the save game was restored to its state before the request")
+            raise
+    return wrapper
 
 
 @app.route('/files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php', methods=['POST'])
+@transactional_session
 def post_gateway():
     print("Gateway:")
     print(repr(request))
@@ -908,7 +994,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.buyExpansion':
             resps.append(buy_expansion_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyFullHeal':
-            resps.append(dummy_response())
+            resps.append(buy_full_heal_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyItem':
             resps.append(buy_item_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyItems':
@@ -918,11 +1004,11 @@ def post_gateway():
         elif reqq.functionName == 'UserService.buyMOTDItem':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.buyQuestRestartTask':
-            resps.append(dummy_response())
+            resps.append(buy_quest_restart_task_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyQuestTask':
             resps.append(buy_quest_task_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyRewardItem':
-            resps.append(dummy_response())
+            resps.append(buy_reward_item_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.calculateRansom':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.cancelUnstartedChallenge':
@@ -1002,7 +1088,7 @@ def post_gateway():
         elif reqq.functionName == 'WorldService.mechlabStatus':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.megaSeriesReset':
-            resps.append(dummy_response())
+            resps.append(megaseries.reset_response(reqq.params))
         elif reqq.functionName == 'ZlingshotService.fetch':
             resps.append(dummy_response())
         elif reqq.functionName == 'MFSService.collectReward':
@@ -1010,7 +1096,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.motdAction':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.multiHarvest':
-            resps.append(dummy_response())
+            resps.append(multi_harvest_response(reqq.params))
         elif reqq.functionName == 'DataServicesService.getRecommendedNeighbors':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.openDialog':
@@ -1026,7 +1112,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.purchaseManaRefill':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.purchaseUnlock':
-            resps.append(dummy_response())
+            resps.append(purchase_unlock_response(reqq.params[0]))
         elif reqq.functionName == 'PVPService.globalPVPOptInOut':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.slotMachineSpin':
@@ -1046,13 +1132,13 @@ def post_gateway():
         elif reqq.functionName == 'UserService.doSeenQuestNotification':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.questTreeReset':
-            resps.append(dummy_response())
+            resps.append(quest_trees.reset_response(reqq.params))
         elif reqq.functionName == 'UserService.questTreeSetMode':
-            resps.append(dummy_response())
+            resps.append(quest_trees.set_mode_response(reqq.params))
         elif reqq.functionName == 'UserService.questTreeStartQuest':
-            resps.append(dummy_response())
+            resps.append(quest_trees.start_quest_response(reqq.params))
         elif reqq.functionName == 'UserService.questTreeUnlockQuest':
-            resps.append(dummy_response())
+            resps.append(quest_trees.unlock_quest_response(reqq.params))
         elif reqq.functionName == 'PVPService.rejectDecoBuildableRepel':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.rejectDefenseTowerRepel':
@@ -1060,7 +1146,7 @@ def post_gateway():
         elif reqq.functionName == 'PVPService.rejectFriendRepel':
             resps.append(reject_friend_repel_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.removeExpiredInventory':
-            resps.append(dummy_response())
+            resps.append(remove_expired_inventory_response(reqq.params[0]))
         elif reqq.functionName == 'WorldService.removeExtraInventoryBuildings':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.removeExtraWorldBuildings':
@@ -1114,7 +1200,7 @@ def post_gateway():
         elif reqq.functionName == 'UserService.setTag':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.spend':
-            resps.append(dummy_response())
+            resps.append(spend_response(reqq.params[0]))
         elif reqq.functionName == 'DeathMatchService.loadBattle':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.startMayhemEvent':
@@ -1136,17 +1222,17 @@ def post_gateway():
         elif reqq.functionName == 'UserService.unitDropSwitchUnit':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.unitUnlock':
-            resps.append(dummy_response())
+            resps.append(unit_unlock_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.buyUnlimitedEnergy':
             resps.append(dummy_response())
         elif reqq.functionName == 'UserService.unlockResource':
-            resps.append(dummy_response())
+            resps.append(unlock_resource_response(reqq.params[0], reqq.params[1]))
         elif reqq.functionName == 'DominationModeService.updateDefenseForce':
             resps.append(dummy_response())
         elif reqq.functionName == 'WorldService.upgradeResearchBuilding':
-            resps.append(dummy_response())
+            resps.append(upgrade_research_building_response(reqq.params[0]))
         elif reqq.functionName == 'UserService.upgradeState':
-            resps.append(dummy_response())
+            resps.append(upgrade_state_response(reqq.params))
         elif reqq.functionName == 'UserService.useItem':
             resps.append(dummy_response())
         elif reqq.functionName == 'PVPService.useStrikeTeam':
@@ -1488,6 +1574,9 @@ def user_response():
         if not validate_save(session):
             print("invalid save file")
             raise InvalidSaveException
+        if move_nested_backups(session):
+            session.modified = True
+            print("Moved save game backups to the backup database")
         user = session['user_object']
         user["userInfo"]["player"]["uid"] = get_zid()
         if session.get('save_version') != version:
@@ -1592,6 +1681,8 @@ def user_response():
     handle_quest_progress(meta, progress_upgrades_count())
 
     activate_unlocked_quests(new_quests, meta)
+    quest_trees.update_quest_trees(user, new_quests, meta)
+    megaseries.update_megaseries(user, new_quests, meta)
 
     for neighbor in user["neighbors"]:
         if neighbor["uid"] in [MIN_ADMIN_ID, MAX_ADMIN_ID]:
@@ -1846,6 +1937,13 @@ def perform_world_response(params):
     # print("next_click_state:", repr(next_click_state))
     meta = {"newPVE": 0}
     print(step)
+    if step in ["setState", "clear", "move", "speedUp", "add", "list", "remove", "staffPosition",
+                "decoCrewBuyOnce"] and \
+            not any(e['id'] == id for e in session['user_object']["userInfo"]["world"]["objects"]):
+        # client can refer to an object that is already gone (e.g. double click); don't crash the request
+        print("WARNING: Object", id, "not found for", step + ". Ignoring.")
+        data = [] if step in ["list", "remove"] else {"id": id}  # same shape as the normal response for the step
+        return {"errorType": 0, "userId": 1, "metadata": meta, "data": data}
     if step in ["place", "setState"]:
         click_next_state(True, id, meta, step, reference_item, cancel=cancel)  # place & setstate only
 
@@ -1855,7 +1953,7 @@ def perform_world_response(params):
             if item_name == "Mastery Factory 01" and int(ref_item.get("masteryTokenCost","0"))> 0:
                 session['user_object']["userInfo"]["player"]["inventory"]["items"]["VTK"] -= int(ref_item["masteryTokenCost"])
             else:
-                costs = ref_item.get("cost")
+                costs = ref_item.get("cost") or {}
                 do_costs({k: v for k, v in costs.items() if k != "-cash"})
         lookup_object(id)["referenceItem"] = reference_item
 
@@ -1869,7 +1967,7 @@ def perform_world_response(params):
 
     if step == "place":
         if not from_inventory:
-            costs = lookup_item_by_name(item_name).get("cost")
+            costs = lookup_item_by_name(item_name).get("cost") or {}
             if "-unitClass" in lookup_item_by_name(item_name):
                 do_costs({k: v for k, v in costs.items() if k == "-cash"})
             else:
@@ -2449,7 +2547,11 @@ def buy_item(meta, code, amount):
         # param["useCash"]
         item_inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
         item_inventory[code] = item_inventory.get(code, 0) + 1
-    player['cash'] -= get_cash_cost(item, amount)
+    costs = item.get("cost", {})
+    if "-cash" in costs:
+        player['cash'] -= get_cash_cost(item, amount)
+    else:  # e.g. rare resources bought with coins (RS11-RS15)
+        do_costs({k: str(int(v.split('|')[0]) * amount) for k, v in costs.items()})
     handle_quest_progress(meta, progress_buy_consumable(item))
 
 
@@ -2729,6 +2831,149 @@ def is_resume_survival():
 # def unit_encode
 
 
+def unit_unlock_response(unit_code):
+    """Unit research finished with parts (UnitPartsGather): the client adds the unit to player.unlockedUnits."""
+    unlocked = session['user_object']["userInfo"]["player"].setdefault("unlockedUnits", [])
+    if unit_code not in unlocked:
+        unlocked.append(unit_code)
+    return dummy_response()
+
+
+def purchase_unlock_response(param):
+    """Unlocking a market item: the client adds its code to player.unlockedItems and pays its unlockCost in cash."""
+    try:
+        item = lookup_item_by_code(param["itemCode"])
+    except ValueError:
+        item = None
+    player = session['user_object']["userInfo"]["player"]
+    unlocked = player.setdefault("unlockedItems", [])
+    if item is None or param["itemCode"] in unlocked:
+        return dummy_response()
+    unlocked.append(param["itemCode"])
+    try:
+        cost = int(item.get("unlockCost", item.get("-unlockCost", 0)))
+    except (TypeError, ValueError):
+        cost = 0
+    if cost > 0:  # without an own cost the client asks EarlyUnitUnlockManager, which the server does not know
+        player["cash"] -= cost
+    return dummy_response()
+
+
+def unlock_resource_response(resource_type, multiplier):
+    """Super ore mine: the client raises unlockedResource[type] to the new multiplier, never lowers it."""
+    unlocked = session['user_object'].setdefault("unlockedResource", {})
+    if int(multiplier) > int(unlocked.get(resource_type) or 0):
+        unlocked[resource_type] = int(multiplier)
+    return dummy_response()
+
+
+def upgrade_research_building_response(building_type):
+    """Research building upgrade: the client remembers the type in research2.buildingTypesUpgraded."""
+    research2 = session['user_object']["userInfo"]["world"].setdefault("research2", {})
+    upgraded = research2.get("buildingTypesUpgraded") or []
+    if building_type not in upgraded:
+        upgraded.append(building_type)
+    research2["buildingTypesUpgraded"] = upgraded
+    return dummy_response()
+
+
+def _param(obj, key, default=None):
+    """AMF parameters arrive as dicts or as typed objects."""
+    return obj.get(key, default) if isinstance(obj, dict) else getattr(obj, key, default)
+
+
+def _response(meta=None):
+    return {"errorType": 0, "userId": 1, "metadata": meta or {"newPVE": 0}, "data": []}
+
+
+def buy_full_heal_response(param):
+    """Combat bar full heal: the client pays the heal price in cash (the heal item itself comes via buyItem)."""
+    session['user_object']["userInfo"]["player"]["cash"] -= int(_param(param, "cost", 0) or 0)
+    return _response()
+
+
+def multi_harvest_response(params):
+    """Harvest several objects at once: the client pays the discounted energy once and then sends a setState per
+    object, for which the server charges each object's full energy. Give back the discount."""
+    cost, discounted_cost = int(params[3] or 0), int(params[4] or 0)
+    refund = cost - discounted_cost
+    if refund > 0:
+        session['user_object']["userInfo"]["player"]["energy"] += refund
+        session['user_object']["userInfo"]["world"]["resources"]["energy"] += refund
+    return _response()
+
+
+def buy_reward_item_response(param):
+    """Buying a quest or mini series reward: one item to the inventory, paid with its cash price."""
+    code = _param(param, "code")
+    try:
+        item = lookup_item_by_code(code)
+    except ValueError:
+        return _response()
+    player = session['user_object']["userInfo"]["player"]
+    player["cash"] -= int((item.get("cost") or {}).get("-cash", 0) or 0)
+    inventory = player["inventory"]["items"]
+    inventory[code] = inventory.get(code, 0) + 1
+    return _response()
+
+
+def spend_response(param):
+    """Paying for a quest task ("spend" button): take the resource or item and complete the matching spend task."""
+    spend_type, code, amount = _param(param, "type"), _param(param, "code"), int(_param(param, "amount", 0) or 0)
+    if spend_type == "item":
+        inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
+        inventory[code] = inventory.get(code, 0) - amount
+        if inventory[code] <= 0:
+            del inventory[code]
+    else:
+        do_costs({"-" + spend_type: str(amount)})
+
+    def complete_task(task, progress, i, extra, *args):
+        extra["total"] = int(task["_total"])
+        return True
+
+    meta = {"newPVE": 0}
+    handle_quest_progress(meta, all_lambda(progress_action("spend"), progress_parameter_equals("_type", spend_type),
+                                           progress_parameter_implies("_item", code), complete_task))
+    return _response(meta)
+
+
+def buy_quest_restart_task_response(param):
+    """Restarting an expired timed quest for cash."""
+    name = _param(param, "name")
+    quest = lookup_quest(name)
+    if quest is None:
+        return _response()
+    session['user_object']["userInfo"]["player"]["cash"] -= int(quest.get("_restartCost", 0) or 0)
+    for session_quest in session['quests']:
+        if session_quest["name"] == name:
+            session_quest["expired"] = False
+    return _response()
+
+
+def upgrade_state_response(params):
+    """Parliament upgrade from matchmaking: the client switches the building to the given state."""
+    object_id = _param(params[0], "id")
+    try:
+        game_object = lookup_object(object_id)
+    except ValueError:
+        return _response()
+    game_object["state"] = params[2]
+    game_object["lastUpdated"] = datetime.now().timestamp() * 1000
+    return _response()
+
+
+def remove_expired_inventory_response(param):
+    """Items whose date has passed are taken out of the inventory by the client, one at a time."""
+    code = _param(param, "code")
+    inventory = session['user_object']["userInfo"]["player"]["inventory"]["items"]
+    if code in inventory:
+        inventory[code] -= 1
+        if inventory[code] <= 0:
+            del inventory[code]
+    return _response()
+
+
 def dummy_response():
     dummy_response = {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0},
                       "data": []}
@@ -2845,6 +3090,7 @@ if __name__ == '__main__':
     socketio.init_app(app)
     db.init_app(app)
     sess.init_app(app)
+    app.session_interface = AssetSkippingSessionInterface(app.session_interface)
     # session.app.session_interface.db.create_all()
     # app.session_interface.db.create_all()
     # db.create_all()

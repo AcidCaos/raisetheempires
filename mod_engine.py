@@ -82,7 +82,8 @@ for mod_folder in mod_folders:
                                 print(" | - source_file " + source_file)
                                 print(" | - mod_file " + mod_file)
 
-                                source = mod.get(source_file, lambda: read_file(source_file))  # lambda chaining
+                                source = mod.get(source_file, lambda source_file=source_file: read_file(
+                                    os.path.join(install_path(), source_file)))  # lambda chaining
                                 mod[source_file] = apply_mod(source, mod_file, name)
 
                                 stats = os.stat(mod_file)
@@ -144,7 +145,7 @@ if settings.caching:
     if settings.caching:
         for path in sorted(mod):
             if os.path.exists(os.path.join(cache_path, get_cache_filename(path))):
-                mod[path] = lambda: read_file(os.path.join(cache_path, get_cache_filename(path)))
+                mod[path] = lambda path=path: read_file(os.path.join(cache_path, get_cache_filename(path)))
             else:
                 print('ERROR: Cache miss, Cache file %s missing for original %s. ' % (get_cache_filename(path), path))
                 print("This may decrease performance and increase loading times.")

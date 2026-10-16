@@ -1,4 +1,5 @@
 import json
+import types
 
 import pytest
 from flask import Flask, session, request
@@ -337,6 +338,209 @@ def test_init_user(monkeypatch):
             expected_json = json.load(f)
             expected_json["neighbors"].sort(key=lambda x: x["uid"])
             assert user == expected_json
+
+
+def test_buy_item_with_coins():
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        session['quests'] = []
+        player = session['user_object']["userInfo"]["player"]
+        resources = session['user_object']["userInfo"]["world"]["resources"]
+        player["lastEnergyCheck"] = 0
+        resources["coins"] = 10000
+        cash = player["cash"]
+        aluminum = resources["aluminum"]
+
+        empires_server.buy_item({"newPVE": 0}, "RS11", 1)  # resource01a: 10 aluminum for 4000 coins
+
+        assert resources["coins"] == 6000
+        assert resources["aluminum"] == aluminum + 10
+        assert player["cash"] == cash
+
+
+def test_send_from_directory_mod_serves_mod(monkeypatch):
+    monkeypatch.setitem(empires_server.mod_engine.mod, "assets/29oct2012/en_US.xml", lambda: b"modded")
+    with app.test_request_context():
+        assert empires_server.send_from_directory_mod("assets/29oct2012", "en_US.xml") == b"modded"
+
+
+def backup_chain_length(save):
+    n = 0
+    while "backup" in save:
+        save = save["backup"]
+        n += 1
+    return n
+
+
+def test_cross_site_requests_to_save_changing_routes_are_blocked():
+    client = empires_server.app.test_client()
+    for headers in ({"Referer": "https://evil.example/page"}, {"Origin": "null"}):
+        assert client.get("/wipe_session", headers=headers).status_code == 403
+        assert client.post("/save-editor", headers=headers).status_code == 403
+
+
+def test_same_site_requests_to_save_changing_routes_are_allowed():
+    for headers in ({"Referer": "http://localhost/home.html"}, {}):
+        with empires_server.app.test_request_context("/wipe_session", headers=headers):
+            assert empires_server.reject_cross_site_save_changes() is None
+
+
+def test_session_cookie_is_same_site_strict():
+    assert empires_server.app.config['SESSION_COOKIE_SAMESITE'] == 'Strict'
+
+
+def test_move_nested_backups_keeps_order(backup_db):
+    save = {"session_id": "session:abc", "message": "now"}
+    node = save
+    for i in range(3):
+        node["backup"] = {"message": "backup %d" % i, "user_object": {"n": i}}
+        node = node["backup"]
+
+    assert backup_db.move_nested_backups(save) is True
+    assert "backup" not in save
+    assert [info["message"] for _, info in backup_db.list_backups(save)] == ["backup 0", "backup 1", "backup 2"]
+    newest_id = backup_db.list_backups(save)[0][0]
+    assert backup_db.load_backup(save, newest_id)["user_object"] == {"n": 0}
+    assert backup_db.move_nested_backups(save) is False
+
+
+def test_create_backup_keeps_save_small_and_bounded(backup_db):
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        for i in range(backup_db.MAX_BACKUPS + 4):
+            backup_db.create_backup("Level %d" % i)
+
+        assert backup_chain_length(dict(session)) == 0
+        backups = backup_db.list_backups(session)
+        assert len(backups) == backup_db.MAX_BACKUPS
+        assert backups[0][1]["message"] == "Level %d" % (backup_db.MAX_BACKUPS + 3)
+        assert backup_db.load_backup(session, backups[0][0])["user_object"] == session['user_object']
+
+
+def test_lookup_energy_cap_beyond_defined_levels():
+    from game_settings import lookup_energy_cap
+    assert lookup_energy_cap(1) == 25
+    assert lookup_energy_cap("66") == 46
+    assert lookup_energy_cap(85) == 46
+
+
+def test_quest_reward_levels_up_past_level_66(backup_db):
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        session['quests'] = []
+        player = session['user_object']["userInfo"]["player"]
+        player["lastEnergyCheck"] = 0
+        player["level"] = 66
+        levels = empires_server.game_settings['settings']['levels']['level']
+        player["xp"] = int(next(l for l in levels if l["-num"] == "70")["-requiredXP"])
+
+        quest_engine.do_rewards("Quest", [{"_type": "xp", "_count": "1"}], {"newPVE": 0})
+
+        assert player["level"] == 70
+        assert player["energyMax"] == 46
+
+
+def test_asset_requests_skip_server_side_session():
+    class Inner:
+        opened = saved = 0
+
+        def open_session(self, app, request):
+            Inner.opened += 1
+            return {"user_object": "big save"}
+
+        def save_session(self, app, session, response):
+            Inner.saved += 1
+
+    interface = empires_server.AssetSkippingSessionInterface(Inner())
+    for path, expected in (("/img/xp.png", 0), ("/nullassets/game/units/Units_Land.swf", 0),
+                           ("/files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php", 1)):
+        Inner.opened = Inner.saved = 0
+        with app.test_request_context(path):
+            session = interface.open_session(app, request)
+            interface.save_session(app, session, None)
+        assert (Inner.opened, Inner.saved) == (expected, expected), path
+
+
+def test_perform_world_response_missing_object():
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        objects = session['user_object']["userInfo"]["world"]["objects"]
+        missing_id = max([e['id'] for e in objects], default=0) + 1
+        world_object = types.SimpleNamespace(id=missing_id, position="0,0,0", itemName="Market")
+
+        for step, data in (("list", []), ("remove", []), ("move", {"id": missing_id}),
+                           ("decoCrewBuyOnce", {"id": missing_id})):
+            res = empires_server.perform_world_response([step, world_object, []])
+            assert res == {"errorType": 0, "userId": 1, "metadata": {"newPVE": 0}, "data": data}, step
+
+
+def test_failed_gateway_request_restores_session():
+    def failing_batch():
+        session['user_object']["userInfo"]["player"]["cash"] += 100  # first call succeeds
+        session['quests'].append({"name": "Q1"})
+        raise KeyError("second call fails")
+
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        session['quests'] = []
+        cash = session['user_object']["userInfo"]["player"]["cash"]
+
+        with pytest.raises(KeyError):
+            empires_server.transactional_session(failing_batch)()
+
+        assert session['user_object']["userInfo"]["player"]["cash"] == cash
+        assert session['quests'] == []
+
+
+def test_successful_gateway_request_keeps_changes():
+    def batch():
+        session['quests'].append({"name": "Q1"})
+        return "ok"
+
+    with app.test_request_context():
+        session['quests'] = []
+        assert empires_server.transactional_session(batch)() == "ok"
+        assert session['quests'] == [{"name": "Q1"}]
+
+
+def test_click_on_dormant_tree_is_ignored():
+    import time
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        session['quests'] = []
+        session['user_object']["userInfo"]["player"]["lastEnergyCheck"] = 0
+        objects = session['user_object']["userInfo"]["world"]["objects"]
+        tree_id = max([e['id'] for e in objects], default=0) + 1
+        objects.append({"id": tree_id, "itemName": "tree43", "position": "52,62,0", "referenceItem": None,
+                        "state": "3", "lastUpdated": time.time() * 1000})  # just cut, dormant for 1-4 days
+        world_object = types.SimpleNamespace(id=tree_id, position="52,62,0", itemName="tree43")
+
+        res = empires_server.perform_world_response(["setState", world_object, []])
+
+        assert res["errorType"] == 0
+        assert objects[-1]["state"] == "3"
+
+
+def test_place_item_without_cost():
+    with app.test_request_context():
+        with open(TEST_DIR / 'init_user.json', 'r') as f:
+            session['user_object'] = json.load(f)
+        session['quests'] = []
+        session['user_object']["userInfo"]["player"]["lastEnergyCheck"] = 0
+        resources = dict(session['user_object']["userInfo"]["world"]["resources"])
+        world_object = types.SimpleNamespace(id=0, position="10,10,0", itemName="Attack_Dog_Deco")
+
+        res = empires_server.perform_world_response(["place", world_object, []])
+
+        assert res["errorType"] == 0
+        assert session['user_object']["userInfo"]["world"]["objects"][-1]["itemName"] == "Attack_Dog_Deco"
+        assert session['user_object']["userInfo"]["world"]["resources"]["coins"] == resources["coins"]
 
 
 # def test_index():
