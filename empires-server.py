@@ -490,6 +490,7 @@ def flashFile():
 
 
 @app.route("/gameSettings.xml")
+@app.route("/127.0.0.1gameSettings.xml")  # Ruffle: app_url flashvar is set to an absolute URL
 def game_settings_file():
     # return send_from_directory_mod("assets/32995", "gameSettings.xml")
     # return send_from_directory_mod("assets/32995", "gameSettings.xml")
@@ -739,13 +740,30 @@ def send_from_directory_mod(directory, filename, **options):
     return mod_engine.mod.get(path)() if path in mod_engine.mod else send_from_directory(absolute_directory, filename, **options)
 
 
+def normalize_ruffle_amf(value):
+    # Ruffle sends AS3 Arrays as AMF0 ECMA arrays (int-keyed dicts), Flash Player sent them as lists
+    if isinstance(value, pyamf.MixedArray) and all(isinstance(k, int) for k in value) \
+            and sorted(value) == list(range(len(value))):
+        return [normalize_ruffle_amf(value[i]) for i in range(len(value))]
+    if isinstance(value, dict):
+        for key in value:
+            value[key] = normalize_ruffle_amf(value[key])
+        return value
+    if isinstance(value, list):
+        return [normalize_ruffle_amf(v) for v in value]
+    return value
+
+
 @app.route('/files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php', methods=['POST'])
+@app.route('/127.0.0.1flashservices/gateway.php', methods=['POST'])  # Ruffle: app_url flashvar is set to an absolute URL
 def post_gateway():
     print("Gateway:")
     print(repr(request))
     # print("Data:")
     # print(request.data)
     resp_msg = remoting.decode(request.data)
+    for _, body_request in resp_msg.bodies:
+        body_request.body = normalize_ruffle_amf(body_request.body)
     # print(resp_msg.headers)
     print(resp_msg.bodies)
     # print(resp_msg.bodies[0])

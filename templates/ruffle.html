@@ -216,7 +216,7 @@
 													player.load({ // https://ruffle.rs/js-docs/master/interfaces/Config.URLLoadOptions.html
 														url: "/files/empire-s.assets.zgncdn.com/assets/109338/ZGame.109338.swf",
 														backgroundColor: "#333399",
-														allowScriptAccess: false,
+														allowScriptAccess: true, // ExternalInterface, else Error #2067
 														allowFullscreen: true,
 														quality: "high",
 														//autoplay: true,
@@ -226,7 +226,8 @@
 															&debugMode=true\
 															&generateSchema=1\
 															&sn_app_url=\
-															&stats=1'
+															&stats=1\
+															&app_url=' + encodeURIComponent(location.origin + '/127.0.0.1') // absolute, Ruffle only connects NetConnection to http(s) URLs
 													}).then(() => {
 														console.info("Ruffle successfully loaded the file");
 													}).catch((e) => {

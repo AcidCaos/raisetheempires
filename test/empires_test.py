@@ -1,5 +1,6 @@
 import json
 
+import pyamf
 import pytest
 from flask import Flask, session, request
 from pyamf import remoting
@@ -388,6 +389,57 @@ def test_post_gateway(monkeypatch):
         assert remoting.decode(response_result.data).bodies[0][1].body['errorType'] == 0
         assert remoting.decode(response_result.data).bodies[0][1].body['data'] == [{'errorType': 0, 'userId': 1, 'metadata': {'newPVE': 0}, 'data': []}]
 
+
+
+def test_normalize_ruffle_amf():
+    ecma = pyamf.MixedArray
+    ruffle_body = ecma({0: {'flashRevision': None},
+                        1: ecma({0: pyamf.ASObject({'sequence': 1, 'params': ecma({0: 'Emperor'}), 'transaction': None,
+                                                    'functionName': 'UserService.initUser', 'stamp': 1793615928938})}),
+                        2: 0})
+
+    normalized = empires_server.normalize_ruffle_amf(ruffle_body)
+
+    assert normalized == [{'flashRevision': None},
+                          [{'sequence': 1, 'params': ['Emperor'], 'transaction': None,
+                            'functionName': 'UserService.initUser', 'stamp': 1793615928938}],
+                          0]
+    assert normalized[1][0].functionName == 'UserService.initUser'
+    assert empires_server.normalize_ruffle_amf(ecma()) == []
+    assert empires_server.normalize_ruffle_amf(ecma({1: 'a', 2: 'b'})) == {1: 'a', 2: 'b'}
+    assert empires_server.normalize_ruffle_amf({0: 'a'}) == {0: 'a'}
+
+
+def test_post_gateway_ruffle(monkeypatch):
+    reported_service = None
+    reported_req = None
+
+    def report_other_log_mock(a, b, c, d):
+        nonlocal reported_service, reported_req
+        (reported_service, reported_req) = (a, c)
+
+    monkeypatch.setattr(empires_server, "report_other_log", report_other_log_mock)
+
+    with app.test_request_context():
+        session["fleets"] = {}
+
+        # Ruffle sends AMF0 with ECMA arrays where Flash Player sent AMF3 arrays
+        ecma = pyamf.MixedArray
+        envelope = remoting.Envelope(pyamf.AMF0)
+        req = remoting.Request('BaseService.dispatchBatch', body=[{'flashRevision': None}, ecma({
+            0: {'transaction': None, 'sequence': 22, 'stamp': 1641513847112.56, 'params': ecma({
+                0: {'status': 104, 'allies': ecma({0: '-1'}), 'name': 'fleet16_3398563345700246', 'type': 'air',
+                    'uid': '3398563345700246', 'ch': 5867, 'units': ecma({0: 'UB96,300,0,0,0', 1: 'UB96,300,0,1,0'})}}),
+                'functionName': 'WorldService.addFleet'}}), 0], envelope=envelope)
+        envelope.bodies = [('/9', req)]
+
+        request.data = remoting.encode(envelope)
+        response_result = empires_server.post_gateway()
+
+        assert reported_service == 'WorldService.addFleet'
+        assert reported_req['params'][0]['units'] == ['UB96,300,0,0,0', 'UB96,300,0,1,0']
+        assert session["fleets"]["fleet16_3398563345700246"] == ['UB96,300,0,0,0', 'UB96,300,0,1,0']
+        assert remoting.decode(response_result.data).bodies[0][1].body['errorType'] == 0
 
 # pytest.main(['-rPA'])
 #pytest.main(['-rPA', '-vv'])
