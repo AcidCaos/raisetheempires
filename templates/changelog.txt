@@ -1,5 +1,7 @@
 upcoming
+    CI/CD pipeline fix Natlies 03/11/2026 11:40
     CI/CD pipeline update Natlies 03/11/2026 04:36
+    Fixed stunned units (powerup EMP, Double Shot), some TResolveBattle popups Willy030125* 23/08/2026 07:56
     Fix request entity too large & socket io upgrade Nat 13/08/2026 18:38
     Bug fix: Temp revert merge: [Implement persistent unit loss]. Updated savespack compatiblity Willy030125* 29/03/2026 12:26
     Fix frozen base path running from exe Natlies* 24/02/2026 20:23
