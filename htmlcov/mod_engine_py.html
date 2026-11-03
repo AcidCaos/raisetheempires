@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="quest_engine_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.0">coverage.py v7.17.0</a>,
-            created at 2026-11-03 17:19 +0000
+            created at 2026-11-03 18:19 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -226,7 +226,7 @@
     <p class="run"><span class="n"><a id="t144" href="#t144">144</a></span><span class="t">    <span class="key">if</span> <span class="nam">settings</span><span class="op">.</span><span class="nam">caching</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t145" href="#t145">145</a></span><span class="t">        <span class="key">for</span> <span class="nam">path</span> <span class="key">in</span> <span class="nam">sorted</span><span class="op">(</span><span class="nam">mod</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">            <span class="key">if</span> <span class="nam">os</span><span class="op">.</span><span class="nam">path</span><span class="op">.</span><span class="nam">exists</span><span class="op">(</span><span class="nam">os</span><span class="op">.</span><span class="nam">path</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">cache_path</span><span class="op">,</span> <span class="nam">get_cache_filename</span><span class="op">(</span><span class="nam">path</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t147" href="#t147">147</a></span><span class="t">                <span class="nam">mod</span><span class="op">[</span><span class="nam">path</span><span class="op">]</span> <span class="op">=</span> <span class="key">lambda</span><span class="op">:</span> <span class="nam">read_file</span><span class="op">(</span><span class="nam">os</span><span class="op">.</span><span class="nam">path</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">cache_path</span><span class="op">,</span> <span class="nam">get_cache_filename</span><span class="op">(</span><span class="nam">path</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t147" href="#t147">147</a></span><span class="t">                <span class="nam">mod</span><span class="op">[</span><span class="nam">path</span><span class="op">]</span> <span class="op">=</span> <span class="key">lambda</span> <span class="nam">path</span><span class="op">=</span><span class="nam">path</span><span class="op">:</span> <span class="nam">read_file</span><span class="op">(</span><span class="nam">os</span><span class="op">.</span><span class="nam">path</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">cache_path</span><span class="op">,</span> <span class="nam">get_cache_filename</span><span class="op">(</span><span class="nam">path</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t148" href="#t148">148</a></span><span class="t">            <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t149" href="#t149">149</a></span><span class="t">                <span class="nam">print</span><span class="op">(</span><span class="str">&#x27;ERROR: Cache miss, Cache file %s missing for original %s. &#x27;</span> <span class="op">%</span> <span class="op">(</span><span class="nam">get_cache_filename</span><span class="op">(</span><span class="nam">path</span><span class="op">)</span><span class="op">,</span> <span class="nam">path</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t150" href="#t150">150</a></span><span class="t">                <span class="nam">print</span><span class="op">(</span><span class="str">&quot;This may decrease performance and increase loading times.&quot;</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -244,7 +244,7 @@
             <a class="nav" href="quest_engine_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.0">coverage.py v7.17.0</a>,
-            created at 2026-11-03 17:19 +0000
+            created at 2026-11-03 18:19 +0000
         </p>
     </div>
 </footer>

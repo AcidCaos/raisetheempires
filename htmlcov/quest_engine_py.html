@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for quest_engine.py: 70%</title>
+    <title>Coverage for quest_engine.py: 71%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
     <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
     <script src="coverage_html_cb_54cfdca1.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>quest_engine.py</b>:
-            <span class="pc_cov">70%</span>
+            <span class="pc_cov">71%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">347 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">244<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">103<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">245<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">102<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="quest_settings_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.0">coverage.py v7.17.0</a>,
-            created at 2026-11-03 17:19 +0000
+            created at 2026-11-03 18:19 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -685,11 +685,11 @@
     <p class="pln"><span class="n"><a id="t603" href="#t603">603</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t604" href="#t604">604</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t605" href="#t605">605</a></span><span class="t"><span class="key">def</span> <span class="nam">progress_buy_consumable</span><span class="op">(</span><span class="nam">item</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t606" href="#t606">606</a></span><span class="t">    <span class="key">return</span> <span class="key">lambda</span> <span class="nam">task</span><span class="op">,</span> <span class="nam">progress</span><span class="op">,</span> <span class="nam">i</span><span class="op">,</span> <span class="op">*</span><span class="nam">args</span><span class="op">:</span> <span class="xx">\</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis mis2 show_mis"><span class="n"><a id="t607" href="#t607">607</a></span><span class="t">        <span class="nam">task</span><span class="op">[</span><span class="str">&quot;_action&quot;</span><span class="op">]</span> <span class="op">==</span> <span class="str">&quot;inventoryAdded&quot;</span> <span class="key">and</span> <span class="nam">item</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span> <span class="key">and</span> <span class="xx">\</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis mis2 show_mis"><span class="n"><a id="t608" href="#t608">608</a></span><span class="t">        <span class="nam">progress_parameter_implies</span><span class="op">(</span><span class="str">&quot;_type&quot;</span><span class="op">,</span> <span class="nam">item</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">&quot;-type&quot;</span><span class="op">,</span> <span class="str">&quot;&quot;</span><span class="op">)</span><span class="op">)</span><span class="op">(</span><span class="nam">task</span><span class="op">,</span> <span class="nam">progress</span><span class="op">,</span> <span class="nam">i</span><span class="op">,</span> <span class="op">*</span><span class="nam">args</span><span class="op">)</span> <span class="key">and</span> <span class="xx">\</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis mis2 show_mis"><span class="n"><a id="t609" href="#t609">609</a></span><span class="t">        <span class="nam">progress_parameter_implies</span><span class="op">(</span><span class="str">&quot;_subtype&quot;</span><span class="op">,</span> <span class="nam">item</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">&quot;-subtype&quot;</span><span class="op">,</span> <span class="str">&quot;&quot;</span><span class="op">)</span><span class="op">)</span><span class="op">(</span><span class="nam">task</span><span class="op">,</span> <span class="nam">progress</span><span class="op">,</span> <span class="nam">i</span><span class="op">,</span> <span class="op">*</span><span class="nam">args</span><span class="op">)</span> <span class="key">and</span> <span class="xx">\</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis mis2 show_mis"><span class="n"><a id="t610" href="#t610">610</a></span><span class="t">        <span class="nam">progress_parameter_implies_contains</span><span class="op">(</span><span class="str">&quot;_item&quot;</span><span class="op">,</span> <span class="nam">item</span><span class="op">[</span><span class="str">&quot;-code&quot;</span><span class="op">]</span><span class="op">)</span><span class="op">(</span><span class="nam">task</span><span class="op">,</span> <span class="nam">progress</span><span class="op">,</span> <span class="nam">i</span><span class="op">,</span> <span class="op">*</span><span class="nam">args</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t606" href="#t606">606</a></span><span class="t">    <span class="key">return</span> <span class="key">lambda</span> <span class="nam">task</span><span class="op">,</span> <span class="nam">progress</span><span class="op">,</span> <span class="nam">i</span><span class="op">,</span> <span class="op">*</span><span class="nam">args</span><span class="op">:</span> <span class="xx">\</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t607" href="#t607">607</a></span><span class="t">        <span class="nam">task</span><span class="op">[</span><span class="str">&quot;_action&quot;</span><span class="op">]</span> <span class="op">==</span> <span class="str">&quot;inventoryAdded&quot;</span> <span class="key">and</span> <span class="nam">item</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span> <span class="key">and</span> <span class="xx">\</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t608" href="#t608">608</a></span><span class="t">        <span class="nam">progress_parameter_implies</span><span class="op">(</span><span class="str">&quot;_type&quot;</span><span class="op">,</span> <span class="nam">item</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">&quot;-type&quot;</span><span class="op">,</span> <span class="str">&quot;&quot;</span><span class="op">)</span><span class="op">)</span><span class="op">(</span><span class="nam">task</span><span class="op">,</span> <span class="nam">progress</span><span class="op">,</span> <span class="nam">i</span><span class="op">,</span> <span class="op">*</span><span class="nam">args</span><span class="op">)</span> <span class="key">and</span> <span class="xx">\</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t609" href="#t609">609</a></span><span class="t">        <span class="nam">progress_parameter_implies</span><span class="op">(</span><span class="str">&quot;_subtype&quot;</span><span class="op">,</span> <span class="nam">item</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">&quot;-subtype&quot;</span><span class="op">,</span> <span class="str">&quot;&quot;</span><span class="op">)</span><span class="op">)</span><span class="op">(</span><span class="nam">task</span><span class="op">,</span> <span class="nam">progress</span><span class="op">,</span> <span class="nam">i</span><span class="op">,</span> <span class="op">*</span><span class="nam">args</span><span class="op">)</span> <span class="key">and</span> <span class="xx">\</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t610" href="#t610">610</a></span><span class="t">        <span class="nam">progress_parameter_implies_contains</span><span class="op">(</span><span class="str">&quot;_item&quot;</span><span class="op">,</span> <span class="nam">item</span><span class="op">[</span><span class="str">&quot;-code&quot;</span><span class="op">]</span><span class="op">)</span><span class="op">(</span><span class="nam">task</span><span class="op">,</span> <span class="nam">progress</span><span class="op">,</span> <span class="nam">i</span><span class="op">,</span> <span class="op">*</span><span class="nam">args</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t611" href="#t611">611</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t612" href="#t612">612</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t613" href="#t613">613</a></span><span class="t"><span class="key">def</span> <span class="nam">progress_gifted_parts</span><span class="op">(</span><span class="nam">item</span><span class="op">,</span> <span class="nam">count</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -733,7 +733,7 @@
             <a class="nav" href="quest_settings_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.17.0">coverage.py v7.17.0</a>,
-            created at 2026-11-03 17:19 +0000
+            created at 2026-11-03 18:19 +0000
         </p>
     </div>
 </footer>
