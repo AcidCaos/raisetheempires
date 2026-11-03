@@ -1,5 +1,8 @@
 import copy
 import configparser
+import sqlite3
+import zlib
+from contextlib import closing
 import json
 import os
 import shutil
@@ -46,14 +49,82 @@ def lookup_objects_save_by_position(save, x, y, r):
             y <= int(e["position"].split(",")[1]) <= (y + r)]
 
 
+# Backups used to be stored inside the save as a chain (session["backup"]["backup"]...), so every level up added a
+# full copy of the save to it and the whole chain was rewritten on every request. They now live in a separate
+# database and only the newest MAX_BACKUPS per save are kept.
+MAX_BACKUPS = 20
+BACKUP_KEYS = ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on', 'save_version',
+               'original_save_version']
+
+
+def backup_db_path():
+    return os.path.join(my_games_path(), "backups.db")
+
+
+def _backup_db():
+    con = sqlite3.connect(backup_db_path())
+    con.execute("CREATE TABLE IF NOT EXISTS backups (id INTEGER PRIMARY KEY AUTOINCREMENT, save_id TEXT NOT NULL, "
+                "saved_on REAL, replaced_on REAL, save_version TEXT, message TEXT, data BLOB NOT NULL)")
+    con.execute("CREATE INDEX IF NOT EXISTS backups_save_id ON backups (save_id, id)")
+    return con
+
+
+def _save_id(save):
+    """The server side session id, also for saves read from the database (where it is "session:<sid>")."""
+    sid = str(getattr(save, "sid", None) or save.get("session_id") or "local")
+    return sid[len("session:"):] if sid.startswith("session:") else sid
+
+
+def store_backup(save_id, backup):
+    with closing(_backup_db()) as con, con:
+        con.execute("INSERT INTO backups (save_id, saved_on, replaced_on, save_version, message, data) "
+                    "VALUES (?, ?, ?, ?, ?, ?)",
+                    (save_id, backup.get('saved_on'), backup.get('replaced_on'), str(backup.get('save_version')),
+                     str(backup.get('message', '')), zlib.compress(pickle.dumps(backup, pickle.HIGHEST_PROTOCOL))))
+        con.execute("DELETE FROM backups WHERE save_id = ? AND id NOT IN "
+                    "(SELECT id FROM backups WHERE save_id = ? ORDER BY id DESC LIMIT ?)",
+                    (save_id, save_id, MAX_BACKUPS))
+
+
+def list_backups(save):
+    """Newest first: [(id, {'saved_on', 'replaced_on', 'save_version', 'message'})]."""
+    if not os.path.exists(backup_db_path()):
+        return []
+    with closing(_backup_db()) as con:
+        rows = con.execute("SELECT id, saved_on, replaced_on, save_version, message FROM backups "
+                           "WHERE save_id = ? ORDER BY id DESC", (_save_id(save),)).fetchall()
+    return [(r[0], {'saved_on': r[1], 'replaced_on': r[2], 'save_version': r[3], 'message': r[4]}) for r in rows]
+
+
+def load_backup(save, backup_id):
+    with closing(_backup_db()) as con:
+        row = con.execute("SELECT data FROM backups WHERE save_id = ? AND id = ?",
+                          (_save_id(save), backup_id)).fetchone()
+    return pickle.loads(zlib.decompress(row[0])) if row else None
+
+
+def move_nested_backups(save):
+    """Moves an old in-save backup chain to the backup database. Returns True if the save was changed."""
+    chain = []
+    node = save
+    while isinstance(node.get("backup"), dict):
+        node = node["backup"]
+        chain.append({k: v for k, v in node.items() if k != "backup"})
+    if "backup" not in save:
+        return False
+    for backup in reversed(chain[:MAX_BACKUPS]):  # oldest first, so ids keep the original order
+        store_backup(_save_id(save), backup)
+    del save["backup"]
+    return True
+
+
 def create_backup(message):
     timestamp = datetime.now().timestamp()
-    session["backup"] = copy.deepcopy({k: v for k, v in session.items() if
-                         k in ['user_object', 'quests', 'battle', 'fleets', 'population', 'saved', 'saved_on',
-                               'save_version', 'original_save_version', 'backup']})  # nested backups
+    backup = copy.deepcopy({k: v for k, v in session.items() if k in BACKUP_KEYS})
+    backup['replaced_on'] = timestamp
+    backup['message'] = message
+    store_backup(_save_id(session), backup)
     session['saved_on'] = timestamp
-    session["backup"]['replaced_on'] = timestamp
-    session["backup"]['message'] = message
 
 def save_database_uri(root_path, instance_path):
     save_db_path = os.path.join(my_games_path(), "save.db")

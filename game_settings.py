@@ -89,6 +89,14 @@ def lookup_items_by_unit_class(unit_class):
     return items
 
 
+def lookup_energy_cap(level):
+    """Energy cap for a level. energycaps only go up to level 66 while there are 85 levels, so higher levels
+    use the cap of the highest level that has one."""
+    caps = {int(e['-level']): int(e['-cap']) for e in game_settings['settings']['energycaps']['energycap']}
+    known = [lvl for lvl in caps if lvl <= int(level)]
+    return caps[max(known)] if known else min(caps.values())
+
+
 def lookup_yield():  #TODO buildstate
     yields = {e['-name']: int(e['yield']['-workers']) for e in lookup_items_with_workers_yield()}
     return sum([yields[e['itemName']] for e in session['user_object']["userInfo"]["world"]["objects"] if e['itemName'] in yields.keys()])

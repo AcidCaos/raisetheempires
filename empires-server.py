@@ -1,6 +1,9 @@
 import os
 import webbrowser
+import functools
+import pickle
 from pathlib import Path
+from urllib.parse import urlparse
 
 import msgspec
 from flask_session.base import MsgSpecSerializer
@@ -26,7 +29,8 @@ if os.name == 'nt':
     os.system('color')
 
 from save_engine import db, save_database_uri, log_path, lookup_objects_save_by_position, get_all_sessions, \
-    store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path, base_path
+    store_session, validate_save, InvalidSaveException, set_crash_log, my_games_path, install_path, base_path, \
+    move_nested_backups, list_backups, load_backup
 from save_migration import migrate, is_0_08a_preview
 from builtins import print
 from time import sleep
@@ -118,9 +122,28 @@ app.config['SQLALCHEMY_DATABASE_URI'] = save_database_uri(app.root_path, app.ins
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Flask-SQLAlchemy has its own event notification system that gets layered on top of SQLAlchemy. To do this, it tracks modifications to the SQLAlchemy session. This option disables the modification tracking system.
 app.config['SESSION_SQLALCHEMY'] = db
 app.config['SESSION_COOKIE_HTTPONLY'] = False
+# The save game is only ever used by this server's own pages and the game, so never send it along with requests
+# started by other sites (e.g. <img src="http://127.0.0.1:5005/wipe_session"> on any page opened in the browser).
+app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
 #app.config['SESSION_SERIALIZATION_FORMAT '] = 'json' # flask-session uses msgspec by default now which makes it undepickleable
 app.config['MAX_FORM_MEMORY_SIZE'] = 5 * 1024 * 1024  # 5 MB
 app.permanent_session_lifetime = timedelta(weeks=520)
+
+# Routes that change or replace the save game. They are plain links on this server's own pages, so a request
+# coming from another site is never legitimate.
+SAVE_CHANGING_PATH_PREFIXES = ("/wipe_session", "/list_session", "/gazillionaire", "/deprogress", "/seed/", "/patch/",
+                               "/unlock_quest/", "/complete_quest/", "/remove_quest/", "/save-editor",
+                               "/chooseavatar/", "/login.html", "/new.html")
+
+
+@app.before_request
+def reject_cross_site_save_changes():
+    if request.path.startswith(SAVE_CHANGING_PATH_PREFIXES):
+        source = request.headers.get("Origin") or request.headers.get("Referer")
+        if source and urlparse(source).netloc != request.host:
+            print("Blocked cross-site request to", request.path, "from", source)
+            return "Cross-site request blocked", 403
+
 
 MIN_ADMIN_ID = -1
 STEELE_ID = -1
@@ -224,7 +247,7 @@ def wipe_session():
 
 @app.route("/list_session", methods=['GET', 'POST'])
 def list_session():
-    response = get_sessions_dropdown_info(get_all_sessions())
+    response = get_sessions_dropdown_info(get_saves())
 
     dump = json.dumps(response,
                       default=lambda o: '<not serializable>', sort_keys=False, indent=2)
@@ -428,14 +451,10 @@ def remove_quest(value):
 
 @app.route("/save-editor", methods=['GET'])
 def save_editor():
-    backups = []
-    s = session
-    backup_count = 0
-    while "backup" in s:
-        backups.append(format_backup_message(s["backup"]))
-        s = s["backup"]
-        backup_count += 1
-    print("Backups present", backup_count)
+    if move_nested_backups(session):
+        session.modified = True
+    backups = [format_backup_message(info) for _, info in list_backups(session)]
+    print("Backups present", len(backups))
 
     incomplete_quests = [e["name"] for e in session['quests'] if e["complete"] == False]
     complete_quests = [e["name"] for e in session['quests'] if e["complete"]]
@@ -466,10 +485,12 @@ def save_savegame():
     restores = [int(key[7:]) for key in request.form.keys() if "restore" in key]
 
     if restores:
-        save_game = session["backup"]
-        for i in range(restores[0]):
-            save_game = save_game["backup"]
-        save_game = copy.deepcopy(save_game)
+        if move_nested_backups(session):
+            session.modified = True
+        backup_ids = [backup_id for backup_id, _ in list_backups(session)]
+        if restores[0] >= len(backup_ids):
+            return ("Backup not found", 404)
+        save_game = load_backup(session, backup_ids[restores[0]])
         print("restoring backup")
         message = "Revert to backup \"" + format_backup_message(save_game) + "\""
     else:
@@ -766,7 +787,30 @@ def send_from_directory_mod(directory, filename, **options):
     return mod_engine.mod.get(mod_path)() if mod_path in mod_engine.mod else send_from_directory(absolute_directory, filename, **options)
 
 
+def transactional_session(view):
+    """The client sends several calls per request. If one of them fails, the error page is returned but the session
+    was still saved with the changes of the calls before it, so client and server got out of sync. Restore the
+    session to how it was before the request instead."""
+    @functools.wraps(view)
+    def wrapper(*args, **kwargs):
+        try:
+            snapshot = pickle.dumps(dict(session), pickle.HIGHEST_PROTOCOL)
+        except Exception as error:
+            print("WARNING: could not snapshot the session:", error)
+            snapshot = None
+        try:
+            return view(*args, **kwargs)
+        except Exception:
+            if snapshot is not None:
+                session.clear()
+                session.update(pickle.loads(snapshot))
+                print("Request failed, the save game was restored to its state before the request")
+            raise
+    return wrapper
+
+
 @app.route('/files/empire-s.assets.zgncdn.com/assets/109338/127.0.0.1flashservices/gateway.php', methods=['POST'])
+@transactional_session
 def post_gateway():
     print("Gateway:")
     print(repr(request))
@@ -1515,6 +1559,9 @@ def user_response():
         if not validate_save(session):
             print("invalid save file")
             raise InvalidSaveException
+        if move_nested_backups(session):
+            session.modified = True
+            print("Moved save game backups to the backup database")
         user = session['user_object']
         user["userInfo"]["player"]["uid"] = get_zid()
         if session.get('save_version') != version:
@@ -1873,11 +1920,13 @@ def perform_world_response(params):
     # print("next_click_state:", repr(next_click_state))
     meta = {"newPVE": 0}
     print(step)
-    if step in ["setState", "clear", "move", "speedUp", "add", "list", "remove", "staffPosition"] and \
+    if step in ["setState", "clear", "move", "speedUp", "add", "list", "remove", "staffPosition",
+                "decoCrewBuyOnce"] and \
             not any(e['id'] == id for e in session['user_object']["userInfo"]["world"]["objects"]):
         # client can refer to an object that is already gone (e.g. double click); don't crash the request
         print("WARNING: Object", id, "not found for", step + ". Ignoring.")
-        return {"errorType": 0, "userId": 1, "metadata": meta, "data": {"id": id}}
+        data = [] if step in ["list", "remove"] else {"id": id}  # same shape as the normal response for the step
+        return {"errorType": 0, "userId": 1, "metadata": meta, "data": data}
     if step in ["place", "setState"]:
         click_next_state(True, id, meta, step, reference_item, cancel=cancel)  # place & setstate only
 
@@ -1887,7 +1936,7 @@ def perform_world_response(params):
             if item_name == "Mastery Factory 01" and int(ref_item.get("masteryTokenCost","0"))> 0:
                 session['user_object']["userInfo"]["player"]["inventory"]["items"]["VTK"] -= int(ref_item["masteryTokenCost"])
             else:
-                costs = ref_item.get("cost")
+                costs = ref_item.get("cost") or {}
                 do_costs({k: v for k, v in costs.items() if k != "-cash"})
         lookup_object(id)["referenceItem"] = reference_item
 
@@ -1901,7 +1950,7 @@ def perform_world_response(params):
 
     if step == "place":
         if not from_inventory:
-            costs = lookup_item_by_name(item_name).get("cost")
+            costs = lookup_item_by_name(item_name).get("cost") or {}
             if "-unitClass" in lookup_item_by_name(item_name):
                 do_costs({k: v for k, v in costs.items() if k == "-cash"})
             else:

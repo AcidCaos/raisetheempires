@@ -13,3 +13,5 @@
 .coverage
 coverage.xml
 test-results.xml
+/backups.db
+
