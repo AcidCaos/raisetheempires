@@ -4,7 +4,7 @@ from functools import reduce
 from flask import session
 
 from game_settings import game_settings, lookup_item_by_code, lookup_state_machine, replenish_energy, lookup_yield, \
-    allies, get_sessions_friends, lookup_items_by_unit_class
+    allies, get_sessions_friends, lookup_items_by_unit_class, lookup_energy_cap
 from quest_settings import quest_settings, prequels
 from save_engine import lookup_objects_by_item_name, create_backup, get_saves
 
@@ -494,7 +494,7 @@ def do_rewards(label, raw_rewards, meta, inc_modifier=lambda a: a, item_modifier
     levels_count = 0
     levels = [level for level in game_settings['settings']['levels']['level'] if int(level["-num"]) > player['level'] and int(level["-requiredXP"]) <= player['xp']    ]
     for level in levels:
-        [energy_cap] = [e['-cap'] for e in game_settings['settings']['energycaps']['energycap'] if e['-level'] == level["-num"]]
+        energy_cap = lookup_energy_cap(level["-num"])
         print("Level increased to", level["-num"], "New energy:", energy_cap)
         player['level'] = int(level["-num"])
         player['energy'] = int(energy_cap)
