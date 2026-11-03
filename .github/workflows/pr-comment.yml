@@ -34,17 +34,57 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const run = context.payload.workflow_run;
-            const prs = run.pull_requests || [];
-  
-            if (prs.length === 0) {
-              core.notice("No associated PR found.");
-              return;
+
+            // Retrieve the original workflow run
+            const { data: workflowRun } = await github.rest.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: run.id,
+            });
+            
+            const branch = workflowRun.head_branch;
+            const owner = workflowRun.head_repository?.owner?.login;
+            
+            if (!owner || !branch) {
+              throw new Error(
+                `Cannot determine PR source: owner=${owner}, branch=${branch}`
+              );
             }
-  
+            
+            core.info(`Searching PR for ${owner}:${branch}`);
+            
+            // Search open PRs first, then closed/merged ones
+            let prs = [];
+            
+            for (const state of ["open", "closed"]) {
+              const { data } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state,
+                head: `${owner}:${branch}`,
+                sort: "updated",
+                direction: "desc",
+                per_page: 100,
+              });
+            
+              if (data.length > 0) {
+                prs = data;
+                break;
+              }
+            }
+            
+            if (prs.length === 0) {
+              throw new Error(`No PR found for branch ${owner}:${branch}`);
+            }
+            
             const pr = prs[0];
-            const runUrl = run.html_url;
+            
+            core.info(`Found PR #${pr.number}`);
+            
+            const runUrl = workflowRun.html_url;
+
             const body = `
-            :rocket: 🦇 **Feature preview build for this pull request** :fire_engine:
+            :rocket: 🦇 **Feature preview build for this pull request** 🚒☢️
   
             Test your installer, in some cases errors can happen that only happen installed. 
 
