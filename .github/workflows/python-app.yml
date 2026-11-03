@@ -103,7 +103,7 @@ jobs:
 
       - name: Coverage comment
         id: coverage_comment
-        uses: py-cov-action/python-coverage-comment-action@v3
+        uses: py-cov-action/python-coverage-comment-action@5d8df5979747514c914e1c5a12335a7cf9a2745f # v4.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         #  COVERAGE_PATH: coverage
@@ -396,7 +396,7 @@ jobs:
             { 
               sub(/{{CHANGES}}/, changes)
               IGNORECASE = 1
-              $0 = gensub(/(\154\157\163\163.*)\(/, "\\1~~:.|:;~~ :window: \(", "1")
+              $0 = gensub(/(\154\157\163\163.[^\n]*)\(/, "\\1~~:.|:;~~ :window: \\(", "g")
               print
             }
             ' build-tools/.release-notes-tmp.md > build-tools/.release-notes-tmp2.md 
@@ -440,7 +440,7 @@ jobs:
             { 
               sub(/{{CHANGES}}/, changes)
               IGNORECASE = 1
-              $0 = gensub(/(\154\157\163\163.*)\(/, "\\1~~:.|:;~~ :window: \(", "1")
+              $0 = gensub(/(\154\157\163\163.[^\n]*)\(/, "\\1~~:.|:;~~ :window: \\(", "g")
               print
             }
             ' build-tools/.nightly-release-notes-tmp.md > nightly-release-notes.md
@@ -474,7 +474,7 @@ jobs:
             { 
               sub(/{{CHANGES}}/, changes)
               IGNORECASE = 1
-              $0 = gensub(/(\154\157\163\163.*)\(/, "\\1~~:.|:;~~ :window: \(", "1")
+              $0 = gensub(/(\154\157\163\163.[^\n]*)\(/, "\\1~~:.|:;~~ :window: \\(", "g")
               print
             }
             ' build-tools/.preview-release-notes-tmp.md > preview-release-notes.md
